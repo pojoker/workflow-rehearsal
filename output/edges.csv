@@ -36,7 +36,7 @@ E034,Lumentum,Nokia,10.5%,FY2023,实边,Lumentum 10-K FY2023,同E026,本轮P1-SE
 E035,Lumentum,Google,18.9%,FY2024,实边,Lumentum 10-K FY2024,同E032,本轮P1-SEC原文命中,云巨头实名直销边——罕见样本;datacom激光/组件
 E036,Lumentum,Ciena(解匿),16.0%,FY2025,推断边(A级),Lumentum 10-K FY2025+FY2024+FY2023考古,https://www.sec.gov/Archives/edgar/data/1633978/000162828025040830/lite-20250628.htm,P3判例#003-A级,原Customer A;四组指纹自洽双射;判例见deanonymization-cases.md
 E037,Lumentum,Google(解匿),15.4%,FY2025,推断边(A级),Lumentum 10-K FY2025+FY2024考古,同E036,P3判例#003-A级,原Customer B;FY2024列18.9%=Google实名值
-E038,Fabrinet(解匿),Lumentum,采购占比FY2023:42.5%/FY2024:30.3%/FY2025:25.1%,FY2023-FY2025,推断边(A级),Lumentum 10-K FY2024/FY2025+Fabrinet 10-K FY2023反照,同E032;同E036,P3判例#004-A级,原Contract Manufacturer A;对手方实名+排他性论证;FY2023年报口径43%后重列42.5%
+E038,Fabrinet(解匿),Lumentum,采购占比FY2023:42.5%/FY2024:30.3%/FY2025:25.1%,FY2023-FY2025,推断边(B级),Lumentum 10-K FY2024/FY2025+Fabrinet 10-K FY2023反照,同E032;同E036,P3判例#004-B级(RT-006由A降级),原Contract Manufacturer A;对手方实名+量级排除(排他性分母口径未闭合);FY2023年报口径43%后重列42.5%
 E039,Coherent,匿名客户(FY2023),10%,FY2023(至2023-06),半边槽位,Coherent 10-K FY2023,https://www.sec.gov/Archives/edgar/data/820318/000082031823000016/iivi-20230630.htm,本轮P1登记,Networking段;Coherent制度性不点名
 E040,Coherent,匿名客户(FY2024),10%,FY2024,半边槽位,Coherent 10-K FY2024,https://www.sec.gov/Archives/edgar/data/820318/000082031824000016/iivi-20240630.htm,本轮P1登记,年报明示与FY2023客户不同人("another major customer")
 E041,Coherent,匿名客户1(FY2025),12%,FY2025,半边槽位,Coherent 10-K FY2025,https://www.sec.gov/Archives/edgar/data/820318/000082031825000014/iivi-20250630.htm,本轮P1登记,Networking段;年报明示FY2024客户是"a different major customer"
