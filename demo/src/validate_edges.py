@@ -79,6 +79,7 @@ RESULT: PASS structural=0 truth=0/0
 import argparse
 import csv
 import json
+import os
 import re
 import sys
 
@@ -141,12 +142,282 @@ def where_match(edge, where):
     return True
 
 
+# ======================================================================
+# W5 校验扩展：三个互斥的子命令模式（schema 校验，不触碰既有结构校验）
+# ======================================================================
+
+FLOW_FIELDS = ["flow_id", "产品", "构成项", "构成类型", "系数或占比",
+               "计价单位", "期间", "证据文件", "锚点", "验证状态", "备注"]
+FLOW_REQUIRED_TOP = ["meta", "flows", "warnings"]
+
+CAT_EXPECT_COLS = ["cat_id", "公司", "产品型号", "速率", "封装", "技术路线",
+                   "来源URL", "抓取日期", "备注"]
+CAT_URL_IDX = 6       # 来源URL
+CAT_DATE_IDX = 7      # 抓取日期
+DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+LINK_EXPECT_COLS = ["link_id", "公司", "公司代码", "产品线", "速率档", "HS编码",
+                    "出口相关性(直接/间接/无)", "去向证据(友商链)", "证据锚点", "备注"]
+LINK_REL_IDX = 6      # 出口相关性
+LINK_REL_VALUES = {"直接", "间接", "无"}
+LINK_ANCHOR_IDX = 8   # 证据锚点
+
+
+def _check_file_exists(path):
+    """文件不存在 -> 向 stderr 打印清晰错误并返回 2（供三个新模式的统一入口）。"""
+    if not os.path.exists(path):
+        sys.stderr.write("错误：文件不存在: %s\n" % path)
+        return False
+    return True
+
+
+def check_flows(path):
+    """--check-flows <json>：字段齐全 + 占比为字符串 + warnings 为数组。"""
+    out, n_err = [], 0
+
+    def log(l): out.append(l)
+    def ok(m): log("[OK]   " + m)
+    def fail(m): log("[FAIL] " + m)
+    def warn(m): log("[WARN] " + m)
+
+    if not _check_file_exists(path):
+        return 2
+
+    log("=== flows schema 校验 (%s) ===" % path)
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception as e:
+        fail("JSON 解析失败: %s" % e)
+        log("")
+        log("=== 汇总 ===")
+        log("RESULT: FAIL structural=1")
+        sys.stdout.write("\n".join(out) + "\n")
+        return 1
+
+    # 顶层字段齐全
+    missing_top = [k for k in FLOW_REQUIRED_TOP if k not in data]
+    if missing_top:
+        n_err += len(missing_top)
+        fail("顶层字段缺失: %s" % ", ".join(missing_top))
+    else:
+        ok("顶层字段齐全 (meta/flows/warnings)")
+
+    # warnings 为数组
+    if "warnings" in data:
+        if isinstance(data["warnings"], list):
+            ok("warnings 为数组 (共 %d 条)" % len(data["warnings"]))
+        else:
+            n_err += 1
+            fail("warnings 非数组，类型=%s" % type(data["warnings"]).__name__)
+
+    flows = data.get("flows", [])
+    if not isinstance(flows, list):
+        n_err += 1
+        fail("flows 非数组")
+        flows = []
+
+    # 每条 flow：字段齐全 + 占比为字符串
+    field_missing, ratio_bad = [], []
+    for i, fl in enumerate(flows, start=1):
+        if not isinstance(fl, dict):
+            n_err += 1
+            fail("flows[%d] 非对象" % i)
+            continue
+        for fld in FLOW_FIELDS:
+            if fld not in fl:
+                field_missing.append((i, fld))
+        ratio = fl.get("系数或占比")
+        if "系数或占比" in fl and not isinstance(ratio, str):
+            ratio_bad.append((i, type(ratio).__name__))
+
+    if field_missing:
+        n_err += len(field_missing)
+        seen = set()
+        for i, fld in field_missing:
+            if (i, fld) not in seen:
+                seen.add((i, fld))
+                fail("flow[%d] 缺字段 %s" % (i, fld))
+    else:
+        ok("每条 flow 字段齐全 (共 %d 条)" % len(flows))
+
+    if ratio_bad:
+        n_err += len(ratio_bad)
+        for i, t in ratio_bad:
+            fail("flow[%d] 系数或占比 非字符串，类型=%s" % (i, t))
+    else:
+        ok("每条 flow 系数或占比 均为字符串")
+
+    passed = n_err == 0
+    log("")
+    log("=== 汇总 ===")
+    log("RESULT: %s structural=%d" % ("PASS" if passed else "FAIL", n_err))
+    sys.stdout.write("\n".join(out) + "\n")
+    return 0 if passed else 1
+
+
+def check_catalog(path):
+    """--check-catalog <csv>：9 列 + URL 列 http 开头 + 抓取日期 YYYY-MM-DD。"""
+    out, n_err = [], 0
+
+    def log(l): out.append(l)
+    def ok(m): log("[OK]   " + m)
+    def fail(m): log("[FAIL] " + m)
+    def warn(m): log("[WARN] " + m)
+
+    if not _check_file_exists(path):
+        return 2
+
+    log("=== catalog schema 校验 (%s) ===" % path)
+    with open(path, newline="", encoding="utf-8-sig") as f:  # 注意 BOM
+        rows = list(csv.reader(f))
+
+    if not rows:
+        fail("catalog.csv 为空")
+        log("")
+        log("=== 汇总 ===")
+        log("RESULT: FAIL structural=1")
+        sys.stdout.write("\n".join(out) + "\n")
+        return 1
+
+    header = rows[0]
+    data_rows = rows[1:]
+
+    # 9 列
+    if len(header) != 9:
+        n_err += 1
+        fail("表头列数=%d (期望 9): %s" % (len(header), header))
+    else:
+        ok("表头 9 列: %s" % ",".join(header))
+
+    # 仅当列数正确时，按固定下标做逐行 URL / 日期校验
+    if len(header) == 9:
+        url_bad, date_bad = [], []
+        for i, row in enumerate(data_rows, start=2):
+            if len(row) <= CAT_URL_IDX or not (row[CAT_URL_IDX] or "").startswith("http"):
+                url_bad.append(i)
+            if len(row) <= CAT_DATE_IDX or not DATE_RE.match(row[CAT_DATE_IDX] or ""):
+                date_bad.append(i)
+        if url_bad:
+            n_err += len(url_bad)
+            for i in url_bad:
+                fail("行 %d: 来源URL 列未以 http 开头" % i)
+        else:
+            ok("来源URL 列均以 http 开头 (共 %d 行)" % len(data_rows))
+        if date_bad:
+            n_err += len(date_bad)
+            for i in date_bad:
+                fail("行 %d: 抓取日期 不符合 YYYY-MM-DD" % i)
+        else:
+            ok("抓取日期 均符合 YYYY-MM-DD (共 %d 行)" % len(data_rows))
+    else:
+        warn("因表头列数异常，跳过逐行 URL/日期 校验")
+
+    passed = n_err == 0
+    log("")
+    log("=== 汇总 ===")
+    log("RESULT: %s structural=%d" % ("PASS" if passed else "FAIL", n_err))
+    sys.stdout.write("\n".join(out) + "\n")
+    return 0 if passed else 1
+
+
+def check_linkage(path):
+    """--check-linkage <csv>：10 列 + 出口相关性∈{直接,间接,无} + 锚点非空。"""
+    out, n_err = [], 0
+
+    def log(l): out.append(l)
+    def ok(m): log("[OK]   " + m)
+    def fail(m): log("[FAIL] " + m)
+    def warn(m): log("[WARN] " + m)
+
+    if not _check_file_exists(path):
+        return 2
+
+    log("=== linkage schema 校验 (%s) ===" % path)
+    with open(path, newline="", encoding="utf-8-sig") as f:
+        rows = list(csv.reader(f))
+
+    if not rows:
+        fail("linkage.csv 为空")
+        log("")
+        log("=== 汇总 ===")
+        log("RESULT: FAIL structural=1")
+        sys.stdout.write("\n".join(out) + "\n")
+        return 1
+
+    header = rows[0]
+    data_rows = rows[1:]
+
+    # 10 列
+    if len(header) != 10:
+        n_err += 1
+        fail("表头列数=%d (期望 10): %s" % (len(header), header))
+    else:
+        ok("表头 10 列: %s" % ",".join(header))
+
+    if len(header) == 10:
+        rel_bad, anchor_bad = [], []
+        for i, row in enumerate(data_rows, start=2):
+            rel = (row[LINK_REL_IDX] if len(row) > LINK_REL_IDX else "").strip() \
+                if len(row) > LINK_REL_IDX else ""
+            if rel not in LINK_REL_VALUES:
+                rel_bad.append((i, row[LINK_REL_IDX] if len(row) > LINK_REL_IDX else ""))
+            anchor = (row[LINK_ANCHOR_IDX] if len(row) > LINK_ANCHOR_IDX else "")
+            if (anchor or "").strip() == "":
+                anchor_bad.append(i)
+        if rel_bad:
+            n_err += len(rel_bad)
+            for i, v in rel_bad:
+                fail("行 %d: 出口相关性=%r 不在 {直接,间接,无}" % (i, v))
+        else:
+            ok("出口相关性 均∈{直接,间接,无} (共 %d 行)" % len(data_rows))
+        if anchor_bad:
+            n_err += len(anchor_bad)
+            for i in anchor_bad:
+                fail("行 %d: 证据锚点(锚点)为空" % i)
+        else:
+            ok("证据锚点(锚点) 均非空 (共 %d 行)" % len(data_rows))
+    else:
+        warn("因表头列数异常，跳过逐行 出口相关性/锚点 校验")
+
+    passed = n_err == 0
+    log("")
+    log("=== 汇总 ===")
+    log("RESULT: %s structural=%d" % ("PASS" if passed else "FAIL", n_err))
+    sys.stdout.write("\n".join(out) + "\n")
+    return 0 if passed else 1
+
+
 def main():
     ap = argparse.ArgumentParser(description="供应链图谱 demo 边生成器校验器")
-    ap.add_argument("--edges", required=True, help="edges.csv 路径")
-    ap.add_argument("--nodes", required=True, help="nodes.csv 路径")
+    # 既有结构校验模式（零回归红线：行为与输出完全不变）
+    ap.add_argument("--edges", default=None, help="edges.csv 路径（结构校验模式）")
+    ap.add_argument("--nodes", default=None, help="nodes.csv 路径（结构校验模式）")
     ap.add_argument("--truth", default=None, help="truth.json 路径（可选）")
+    # W5 校验扩展：三个互斥的 schema 校验子命令
+    ap.add_argument("--check-flows", default=None, help="校验 flows JSON schema")
+    ap.add_argument("--check-catalog", default=None, help="校验 catalog.csv schema")
+    ap.add_argument("--check-linkage", default=None, help="校验 linkage.csv schema")
     args = ap.parse_args()
+
+    # ---- W5 校验扩展：互斥子命令优先，均优先于既有结构校验 ----
+    n_new = sum(x is not None for x in
+                (args.check_flows, args.check_catalog, args.check_linkage))
+    if n_new > 1:
+        sys.stderr.write(
+            "错误：--check-flows / --check-catalog / --check-linkage 互斥，只能指定其一\n")
+        sys.exit(2)
+    if args.check_flows is not None:
+        sys.exit(check_flows(args.check_flows))
+    if args.check_catalog is not None:
+        sys.exit(check_catalog(args.check_catalog))
+    if args.check_linkage is not None:
+        sys.exit(check_linkage(args.check_linkage))
+
+    # ---- 既有结构校验模式 ----
+    if not args.edges or not args.nodes:
+        sys.stderr.write("错误：结构校验模式需要同时提供 --edges 与 --nodes 参数\n")
+        sys.exit(2)
 
     out = []
     def log(line): out.append(line)
