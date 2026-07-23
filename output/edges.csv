@@ -36,7 +36,7 @@ E034,Lumentum,Nokia,10.5%,FY2023,实边,Lumentum 10-K FY2023,同E026,本轮P1-SE
 E035,Lumentum,Google,18.9%,FY2024,实边,Lumentum 10-K FY2024,同E032,本轮P1-SEC原文命中,云巨头实名直销边——罕见样本;datacom激光/组件
 E036,Lumentum,Ciena(解匿),16.0%,FY2025,推断边(A级),Lumentum 10-K FY2025+FY2024+FY2023考古,https://www.sec.gov/Archives/edgar/data/1633978/000162828025040830/lite-20250628.htm,P3判例#003-A级,原Customer A;四组指纹自洽双射;判例见deanonymization-cases.md
 E037,Lumentum,Google(解匿),15.4%,FY2025,推断边(A级),Lumentum 10-K FY2025+FY2024考古,同E036,P3判例#003-A级,原Customer B;FY2024列18.9%=Google实名值
-E038,Fabrinet(解匿),Lumentum,采购占比FY2023:42.5%/FY2024:30.3%/FY2025:25.1%,FY2023-FY2025,推断边(B级),Lumentum 10-K FY2024/FY2025+Fabrinet 10-K FY2023反照,同E032;同E036,P3判例#004-B级(RT-006由A降级),原Contract Manufacturer A;对手方实名+量级排除(排他性分母口径未闭合);FY2023年报口径43%后重列42.5%
+E038,Fabrinet(解匿),Lumentum,采购占比FY2023:42.5%/FY2024:30.3%/FY2025:25.1%,FY2023-FY2025,推断边(B级),Lumentum 10-K FY2024/FY2025+Fabrinet 10-K FY2023反照,同E032;同E036,P3判例#004-B级终态(R2审查:U门闭合$1272M上界/L门客户级归类不可得),原Contract Manufacturer A;对手方实名+量级排除强化(全额进入分母则占32%);FY2023年报口径43%后重列42.5%
 E039,Coherent,匿名客户(FY2023),10%,FY2023(至2023-06),半边槽位,Coherent 10-K FY2023,https://www.sec.gov/Archives/edgar/data/820318/000082031823000016/iivi-20230630.htm,本轮P1登记,Networking段;Coherent制度性不点名
 E040,Coherent,匿名客户(FY2024),10%,FY2024,半边槽位,Coherent 10-K FY2024,https://www.sec.gov/Archives/edgar/data/820318/000082031824000016/iivi-20240630.htm,本轮P1登记,年报明示与FY2023客户不同人("another major customer")
 E041,Coherent,匿名客户1(FY2025),12%,FY2025,半边槽位,Coherent 10-K FY2025,https://www.sec.gov/Archives/edgar/data/820318/000082031825000014/iivi-20250630.htm,本轮P1登记,Networking段;年报明示FY2024客户是"a different major customer"
@@ -72,7 +72,7 @@ E070,Fabrinet,Cisco,15.6%,FY2023,实边,Fabrinet 10-K FY2023,同E068,本轮P3-SE
 E071,Fabrinet,Infinera,12.4%,FY2023,实边,Fabrinet 10-K FY2023,同E068,本轮P3-SEC原文命中,FY2022:12.5%/FY2021:11.6%;Infinera 2025并入Nokia
 E072,天孚通信,Fabrinet,53.61%(1039308855.95元),2023,实边,天孚通信2023年报前五大客户表(实名),https://static.cninfo.com.cn/finalpage/2024-04-22/1219698777.PDF,正式版管线产出-人工原文复核通过,原文名"Fabrinet Co.，Ltd.(半角逗号转全角避CSV列分裂)";三年序列53.61→61.69→63.31起点
 E073,天孚通信,Fabrinet,61.69%(2005917035.59元),2024,实边,天孚通信2024年报前五大客户表(实名),https://static.cninfo.com.cn/finalpage/2025-04-21/1223152632.PDF,正式版管线产出-人工原文复核通过,
-E074,光迅科技,烽火通信,5.59%(369224117.92元),2023,实边,光迅科技2023年报前五大客户表(实名),https://static.cninfo.com.cn/finalpage/2024-04-26/1219826062.PDF,正式版管线产出-人工原文复核通过,原文全称"烽火通信科技股份有限公司";关联方锁定:前五大关联方销售占比5.59%逐位相等;同属中国信科体系;2024/2025年跌出前五
+E074,光迅科技,烽火通信,5.59%(369224117.92元),2023,实边,光迅科技2023年报前五大客户表(实名),https://static.cninfo.com.cn/finalpage/2024-04-26/1219826062.PDF,正式版管线产出-人工原文复核通过,原文全称"烽火通信科技股份有限公司";关联方锁定:前五大关联方销售占比5.59%逐位相等;同属中国信科体系;2024/2025年跌出前五;R4双侧核对:金额为含税口径(÷1.13=附注不含税3.267亿);技术服务1746.25万烽火侧逐位镜像确认;商品口径集团粒度差4.9%待解(counterparty-audit-run1)
 E075,光迅科技,客户1(匿名),15.16%(1807934600.51元),2025,半边槽位,光迅科技2025年报,https://static.cninfo.com.cn/finalpage/2026-04-23/1225148212.PDF,正式版管线产出-人工原文复核通过,2024:12.42%/2023:15.24%(2023年第一名)
 E076,罗博特科,客户一(匿名),19.35%(183805309.74元),2025,半边槽位,罗博特科2025年报,https://static.cninfo.com.cn/finalpage/2026-03-31/1225059372.PDF,正式版管线产出-人工原文复核通过,前五集中度63.14%
 E077,凯格精机,第一名(匿名),8.51%(94811977.48元),2025,半边槽位,凯格精机2025年报,https://static.cninfo.com.cn/finalpage/2026-04-28/1225202249.PDF,正式版管线产出-人工原文复核通过,前五集中度仅27.65%——设备商客户分散样本
