@@ -1,6 +1,6 @@
 # flows/ROADMAP-v1.7a.md — v1.7 定稿候选（三方讨论综合版，2026-07-24）
 
-**状态：待 codex 确认审（按其七项冻结条件逐项核对）后冻结。** 承接
+**状态：确认审(roadmap-v17a-confirm-codex.md)四项最小条款已逐字并入，冻结。** 承接
 ROADMAP-v1.7.md（草案，保留不改）；综合依据：roadmap-v17-review-codex.md（对抗
 评审）+ roadmap-v17-opinion-kimi.md（独立评议）+ discussion-v1.7.md 终审裁决。
 
@@ -12,7 +12,7 @@ ROADMAP-v1.7.md（草案，保留不改）；综合依据：roadmap-v17-review-c
   销售代理/仅提及/无法判断；闸 owner=终验；裁决逐条入闸台账）。候选容器
   实现：flows/src/discovery_queue.py（kimi 原型-未准入，还债段硬化评审）。
 - **事件/缺口/治理触发的算子**：S0a 词表扫描（词表变更或年度快照触发）、
-  S0b 递归跳（新入账公开主体触发）、S0c 必然边清单（报告缺口触发）、
+  S0b 递归跳（新入账公开主体触发）、S0c 必要接口/结构缺口清单（非边——BOM必需部件不能直接推出公司间交易边；缺口触发）、
   媒体线索、海关量结构突变。**无触发不扫描，不为流程完整制造任务。**
 
 ### 四段执行序（codex 案全盘采纳）
@@ -38,6 +38,14 @@ ROADMAP-v1.7.md（草案，保留不改）；综合依据：roadmap-v17-review-c
 | 专利 | **推迟至 v1.8**（kimi 案） | —— |
 | 环评 | 事件触发 0h | 单案处理 |
 
+**证据类型边界（确认审最小条款1，逐字采纳）**：债券募集说明书与评级报告分别
+登记 `source_type/discloser/provenance`、分别统计产出——评级报告无逐项原始
+出处时不得按发行人一手披露准入；裁判文书默认产出 `historical_contract` 或
+`dispute_event`，不得外推为当前/主要/持续供货关系；环评/能评默认产出
+`capacity_event/equipment_type/site`，仅原文具名供应商且交易语义明确时才生成
+设备供货边；专利重启（v1.8）前须先定义 `co_application` 与 `assignment` 两个
+subtype，两者均不得转换为供货边。
+
 **第3段 只吸收实测有效机制**：试点后决定入流程；未跑/不可达/单位经济学为负
 →"候选信源"存档；SOP v1.2 最后做，只吸收有事前日志+验收漏斗的机制。
 
@@ -47,13 +55,21 @@ ROADMAP-v1.7.md（草案，保留不改）；综合依据：roadmap-v17-review-c
 
 ## 其余各项（依冻结条件修订）
 
-- **D**：改名**候选集覆盖率**；分母=冻结时点"S0a全库命中且过闸"集合，冻结三
-  硬条件（词表版本锁定/闸裁决完成/集合快照落盘）后方可计算；禁称总体查全。
+- **D**：改名**候选集覆盖率**（禁称总体查全）。可复算定义（确认审最小条款2）：
+  `C_layer`=冻结语料与词表下 S0a 命中并完成判定闸裁决的生产候选集合；
+  `G_layer`=已取得合格证据并进入对应图层的主体集合；
+  候选集覆盖率=`|G_layer ∩ C_layer| / |C_layer|`；另报候选处理率=
+  `已裁决/(已裁决+待裁决)`——待裁决不得从分母消失，须报数量与老化时间。
+  分母冻结三硬条件：词表版本锁定/闸裁决完成/集合快照落盘。
 - **E**：两层契约——身份层（entity-registry：法人/集团/别名/更名证据锚）+
   观察 scope 层（counterparty_scope=group|legal_entity|branch + members +
   scope_effective_period）。
-- **F**：三问改三份可审计产物（算子清单 diff/信源清单 diff/裁剪类别复审表）+
-  第四问（闸裁决有无 owner 与 schema）；触发频率=变更触发，非每轮固定。
+- **F**：三份可审计产物按最小 schema（确认审最小条款3）：①问题—算子矩阵
+  `claim_or_gap/observable/operator/corpus/known_blindspot/last_run/trigger`；
+  ②信源登记册版本差异 `access_status/expected_output/pilot_yield/decision`；
+  ③裁剪台账审计（按规则计数；新类别全审、既有类别固定种子抽样；报
+  `误杀/回收/仍拒绝` 数量）+ 第四问（闸裁决有无 owner 与 schema）；
+  触发频率=变更触发，非每轮固定。
 - **C**：股权边/担保边 subtype schema 入台账独立层，不参与供货集中度统计。
 
 ## 版本纪律
