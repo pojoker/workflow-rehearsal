@@ -24,7 +24,7 @@
                 "title": "A1a 激光器芯片（EEL/DFB/EML/VCSEL）"
               }
             ],
-            "source_line": 132,
+            "source_line": 141,
             "company_indices": [
               0,
               1
@@ -49,7 +49,7 @@
                 "title": "A1b 陶瓷插芯"
               }
             ],
-            "source_line": 143,
+            "source_line": 152,
             "company_indices": [
               2
             ],
@@ -73,7 +73,7 @@
                 "title": "A1c 陶瓷管壳（T1并入候选，未入关系台账）"
               }
             ],
-            "source_line": 157,
+            "source_line": 166,
             "company_indices": [
               3,
               4
@@ -98,7 +98,7 @@
                 "title": "A1d 透镜（仍为部分/弱覆盖，无专产主体）"
               }
             ],
-            "source_line": 176,
+            "source_line": 185,
             "company_indices": [
               5,
               6,
@@ -125,7 +125,7 @@
                 "title": "A2a 探测器芯片（PIN/APD）"
               }
             ],
-            "source_line": 197,
+            "source_line": 206,
             "company_indices": [
               9,
               10
@@ -150,7 +150,7 @@
                 "title": "波分复用器 / AWG（本轮升级：仕佳光子已由\"宽类型\"升格为具体产品锚）"
               }
             ],
-            "source_line": 210,
+            "source_line": 219,
             "company_indices": [
               11,
               12
@@ -175,7 +175,7 @@
                 "title": "波分复用器 / AWG — S0a本地扫描并入（判定闸=生产中，2026-07-24）"
               }
             ],
-            "source_line": 231,
+            "source_line": 240,
             "company_indices": [
               13,
               14
@@ -200,7 +200,7 @@
                 "title": "光纤阵列 / FAU — S0a本地扫描并入（判定闸=生产中，2026-07-24）"
               }
             ],
-            "source_line": 242,
+            "source_line": 251,
             "company_indices": [
               15,
               16,
@@ -226,7 +226,7 @@
                 "title": "隔离器（T1并入候选，未入关系台账）"
               }
             ],
-            "source_line": 252,
+            "source_line": 261,
             "company_indices": [
               18,
               19
@@ -251,7 +251,7 @@
                 "title": "隔离器 — S0a本地扫描并入（判定闸=生产中，2026-07-24）"
               }
             ],
-            "source_line": 279,
+            "source_line": 288,
             "company_indices": [
               20,
               21
@@ -272,7 +272,7 @@
                 "title": "A-其余光器件（未细分至 A1/A2/A3 具体叶，仅类型归层）"
               }
             ],
-            "source_line": 291,
+            "source_line": 300,
             "company_indices": [
               22,
               23,
@@ -322,7 +322,7 @@
                 "title": "B1 电芯片（DSP / 激光驱动 Driver / 限幅放大 TIA / 时钟恢复 CDR）"
               }
             ],
-            "source_line": 341,
+            "source_line": 350,
             "company_indices": [
               47,
               48,
@@ -333,6 +333,30 @@
           },
           {
             "id": "leaf-013",
+            "title": "B1 电芯片 — S0a本地扫描并入（判定闸=生产中，2026-07-24）",
+            "heading_level": 4,
+            "section_path": [
+              {
+                "level": 2,
+                "title": "B. 功能电路分支"
+              },
+              {
+                "level": 3,
+                "title": "B1 电芯片（DSP / 激光驱动 Driver / 限幅放大 TIA / 时钟恢复 CDR）"
+              },
+              {
+                "level": 4,
+                "title": "B1 电芯片 — S0a本地扫描并入（判定闸=生产中，2026-07-24）"
+              }
+            ],
+            "source_line": 376,
+            "company_indices": [
+              51
+            ],
+            "company_count": 1
+          },
+          {
+            "id": "leaf-014",
             "title": "B2 PCB板（T1并入候选，未入关系台账）",
             "heading_level": 3,
             "section_path": [
@@ -345,16 +369,16 @@
                 "title": "B2 PCB板（T1并入候选，未入关系台账）"
               }
             ],
-            "source_line": 363,
+            "source_line": 390,
             "company_indices": [
-              51,
               52,
-              53
+              53,
+              54
             ],
             "company_count": 3
           },
           {
-            "id": "leaf-014",
+            "id": "leaf-015",
             "title": "B2 PCB板 — S0a本地扫描并入（判定闸=生产中，2026-07-24）",
             "heading_level": 4,
             "section_path": [
@@ -371,12 +395,12 @@
                 "title": "B2 PCB板 — S0a本地扫描并入（判定闸=生产中，2026-07-24）"
               }
             ],
-            "source_line": 374,
+            "source_line": 401,
             "company_indices": [
-              54,
               55,
               56,
-              57
+              57,
+              58
             ],
             "company_count": 4
           }
@@ -387,7 +411,7 @@
         "title": "C. 结构件分支（底座/壳体/金手指）（T1并入候选，未入关系台账）",
         "leaves": [
           {
-            "id": "leaf-015",
+            "id": "leaf-016",
             "title": "C. 结构件分支（底座/壳体/金手指）（T1并入候选，未入关系台账）",
             "heading_level": 2,
             "section_path": [
@@ -396,9 +420,9 @@
                 "title": "C. 结构件分支（底座/壳体/金手指）（T1并入候选，未入关系台账）"
               }
             ],
-            "source_line": 391,
+            "source_line": 418,
             "company_indices": [
-              58
+              59
             ],
             "company_count": 1
           }
@@ -409,7 +433,7 @@
         "title": "光模块（总成）— 三分支汇聚节点（L6，27 家）",
         "leaves": [
           {
-            "id": "leaf-016",
+            "id": "leaf-017",
             "title": "光模块（总成）— 三分支汇聚节点（L6，27 家）",
             "heading_level": 2,
             "section_path": [
@@ -418,9 +442,8 @@
                 "title": "光模块（总成）— 三分支汇聚节点（L6，27 家）"
               }
             ],
-            "source_line": 401,
+            "source_line": 428,
             "company_indices": [
-              59,
               60,
               61,
               62,
@@ -446,12 +469,13 @@
               82,
               83,
               84,
-              85
+              85,
+              86
             ],
             "company_count": 27
           },
           {
-            "id": "leaf-017",
+            "id": "leaf-018",
             "title": "光模块（总成）— S0a本地扫描并入（判定闸=生产中，2026-07-24）",
             "heading_level": 4,
             "section_path": [
@@ -464,9 +488,9 @@
                 "title": "光模块（总成）— S0a本地扫描并入（判定闸=生产中，2026-07-24）"
               }
             ],
-            "source_line": 436,
+            "source_line": 463,
             "company_indices": [
-              86
+              87
             ],
             "company_count": 1
           }
@@ -477,7 +501,7 @@
         "title": "上游材料（分喂 A 分支各叶）",
         "leaves": [
           {
-            "id": "leaf-018",
+            "id": "leaf-019",
             "title": "材料 → A1a·A2a（芯片衬底/靶材/MO源/特气/光刻掩模类，13 家）",
             "heading_level": 3,
             "section_path": [
@@ -490,9 +514,8 @@
                 "title": "材料 → A1a·A2a（芯片衬底/靶材/MO源/特气/光刻掩模类，13 家）"
               }
             ],
-            "source_line": 465,
+            "source_line": 492,
             "company_indices": [
-              87,
               88,
               89,
               90,
@@ -504,12 +527,13 @@
               96,
               97,
               98,
-              99
+              99,
+              100
             ],
             "company_count": 13
           },
           {
-            "id": "leaf-019",
+            "id": "leaf-020",
             "title": "InP 衬底线索级候选（未入 nodes.csv/edges.csv，来自 `flows/out/pilot-s0a.md` S0a 试点，仅供后续判定闸参考）",
             "heading_level": 4,
             "section_path": [
@@ -526,18 +550,18 @@
                 "title": "InP 衬底线索级候选（未入 nodes.csv/edges.csv，来自 `flows/out/pilot-s0a.md` S0a 试点，仅供后续判定闸参考）"
               }
             ],
-            "source_line": 485,
+            "source_line": 512,
             "company_indices": [
-              100,
               101,
               102,
               103,
-              104
+              104,
+              105
             ],
             "company_count": 5
           },
           {
-            "id": "leaf-020",
+            "id": "leaf-021",
             "title": "InP 衬底 — S0a本地扫描并入（判定闸=生产中，2026-07-24，区别于上方线索级候选）",
             "heading_level": 4,
             "section_path": [
@@ -554,14 +578,14 @@
                 "title": "InP 衬底 — S0a本地扫描并入（判定闸=生产中，2026-07-24，区别于上方线索级候选）"
               }
             ],
-            "source_line": 499,
+            "source_line": 526,
             "company_indices": [
-              105
+              106
             ],
             "company_count": 1
           },
           {
-            "id": "leaf-021",
+            "id": "leaf-022",
             "title": "材料 → A3（石英/树脂/光纤等无源器件材料，6 家）",
             "heading_level": 3,
             "section_path": [
@@ -574,19 +598,19 @@
                 "title": "材料 → A3（石英/树脂/光纤等无源器件材料，6 家）"
               }
             ],
-            "source_line": 509,
+            "source_line": 536,
             "company_indices": [
-              106,
               107,
               108,
               109,
               110,
-              111
+              111,
+              112
             ],
             "company_count": 6
           },
           {
-            "id": "leaf-022",
+            "id": "leaf-023",
             "title": "材料对象未细分（仅类型归层，待锚，无法判定具体喂入叶子，6 家）",
             "heading_level": 3,
             "section_path": [
@@ -599,14 +623,14 @@
                 "title": "材料对象未细分（仅类型归层，待锚，无法判定具体喂入叶子，6 家）"
               }
             ],
-            "source_line": 523,
+            "source_line": 550,
             "company_indices": [
-              112,
               113,
               114,
               115,
               116,
-              117
+              117,
+              118
             ],
             "company_count": 6
           }
@@ -617,7 +641,7 @@
         "title": "横切工序轴（单独一节，非链环）",
         "leaves": [
           {
-            "id": "leaf-023",
+            "id": "leaf-024",
             "title": "芯片封装（委托加工，跨光/电芯片工序，9 家）",
             "heading_level": 3,
             "section_path": [
@@ -630,9 +654,8 @@
                 "title": "芯片封装（委托加工，跨光/电芯片工序，9 家）"
               }
             ],
-            "source_line": 551,
+            "source_line": 578,
             "company_indices": [
-              118,
               119,
               120,
               121,
@@ -640,12 +663,13 @@
               123,
               124,
               125,
-              126
+              126,
+              127
             ],
             "company_count": 9
           },
           {
-            "id": "leaf-024",
+            "id": "leaf-025",
             "title": "组件封装（TOSA/ROSA，S0a本地扫描并入后改判有主：联特科技、武汉钧恒/汇绿生态；天孚通信构成工序覆盖线索）",
             "heading_level": 3,
             "section_path": [
@@ -658,11 +682,11 @@
                 "title": "组件封装（TOSA/ROSA，S0a本地扫描并入后改判有主：联特科技、武汉钧恒/汇绿生态；天孚通信构成工序覆盖线索）"
               }
             ],
-            "source_line": 570,
+            "source_line": 597,
             "company_indices": [
-              127,
               128,
-              129
+              129,
+              130
             ],
             "company_count": 3
           }
@@ -673,7 +697,7 @@
         "title": "设备 / 仪器纵轴（贯穿封装-器件-模块-测试，不插入主链序，V，29 家）",
         "leaves": [
           {
-            "id": "leaf-025",
+            "id": "leaf-026",
             "title": "设备 / 仪器纵轴（贯穿封装-器件-模块-测试，不插入主链序，V，29 家）",
             "heading_level": 2,
             "section_path": [
@@ -682,9 +706,8 @@
                 "title": "设备 / 仪器纵轴（贯穿封装-器件-模块-测试，不插入主链序，V，29 家）"
               }
             ],
-            "source_line": 608,
+            "source_line": 635,
             "company_indices": [
-              130,
               131,
               132,
               133,
@@ -712,7 +735,8 @@
               155,
               156,
               157,
-              158
+              158,
+              159
             ],
             "company_count": 29
           }
@@ -723,7 +747,7 @@
         "title": "下游",
         "leaves": [
           {
-            "id": "leaf-026",
+            "id": "leaf-027",
             "title": "代工 EMS（L7，1 家）",
             "heading_level": 3,
             "section_path": [
@@ -736,14 +760,14 @@
                 "title": "代工 EMS（L7，1 家）"
               }
             ],
-            "source_line": 650,
+            "source_line": 677,
             "company_indices": [
-              159
+              160
             ],
             "company_count": 1
           },
           {
-            "id": "leaf-027",
+            "id": "leaf-028",
             "title": "系统设备商 / 云巨头终端 / 线缆（L8，20 家）",
             "heading_level": 3,
             "section_path": [
@@ -756,9 +780,8 @@
                 "title": "系统设备商 / 云巨头终端 / 线缆（L8，20 家）"
               }
             ],
-            "source_line": 656,
+            "source_line": 683,
             "company_indices": [
-              160,
               161,
               162,
               163,
@@ -777,7 +800,8 @@
               176,
               177,
               178,
-              179
+              179,
+              180
             ],
             "company_count": 20
           }
@@ -788,7 +812,7 @@
         "title": "附录：非主链节点（X 类，共 21 家，不属 BOM 骨架，随台账收录）",
         "leaves": [
           {
-            "id": "leaf-028",
+            "id": "leaf-029",
             "title": "贸易 / 代理 / 物流（7 家）",
             "heading_level": 3,
             "section_path": [
@@ -801,20 +825,20 @@
                 "title": "贸易 / 代理 / 物流（7 家）"
               }
             ],
-            "source_line": 687,
+            "source_line": 714,
             "company_indices": [
-              180,
               181,
               182,
               183,
               184,
               185,
-              186
+              186,
+              187
             ],
             "company_count": 7
           },
           {
-            "id": "leaf-029",
+            "id": "leaf-030",
             "title": "边界外 / 跨行业 / 科研 / 非BOM（6 家）",
             "heading_level": 3,
             "section_path": [
@@ -827,19 +851,19 @@
                 "title": "边界外 / 跨行业 / 科研 / 非BOM（6 家）"
               }
             ],
-            "source_line": 699,
+            "source_line": 726,
             "company_indices": [
-              187,
               188,
               189,
               190,
               191,
-              192
+              192,
+              193
             ],
             "company_count": 6
           },
           {
-            "id": "leaf-030",
+            "id": "leaf-031",
             "title": "匿名槽位 / 待核 / 类型过宽主体（8 家）",
             "heading_level": 3,
             "section_path": [
@@ -852,16 +876,16 @@
                 "title": "匿名槽位 / 待核 / 类型过宽主体（8 家）"
               }
             ],
-            "source_line": 710,
+            "source_line": 737,
             "company_indices": [
-              193,
               194,
               195,
               196,
               197,
               198,
               199,
-              200
+              200,
+              201
             ],
             "company_count": 8
           }
@@ -882,7 +906,7 @@
       "name_cell_raw": "N33 源杰科技 [科创:688498]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 134
+      "source_line": 143
     },
     {
       "name": "长光华芯",
@@ -896,7 +920,7 @@
       "name_cell_raw": "N160 长光华芯 [科创:688048]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 135
+      "source_line": 144
     },
     {
       "name": "太辰光",
@@ -910,7 +934,7 @@
       "name_cell_raw": "N104 太辰光 [创业:300570]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 145
+      "source_line": 154
     },
     {
       "name": "三环集团",
@@ -926,7 +950,7 @@
       "anchor_urls": [
         "https://static.cninfo.com.cn/finalpage/2026-03-28/1225041594.PDF"
       ],
-      "source_line": 159
+      "source_line": 168
     },
     {
       "name": "中瓷电子",
@@ -942,7 +966,7 @@
       "anchor_urls": [
         "https://static.cninfo.com.cn/finalpage/2024-04-26/1219832754.PDF"
       ],
-      "source_line": 160
+      "source_line": 169
     },
     {
       "name": "炬光",
@@ -956,7 +980,7 @@
       "name_cell_raw": "N143 炬光（东莞）微光学有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 178
+      "source_line": 187
     },
     {
       "name": "长光华芯",
@@ -970,7 +994,7 @@
       "name_cell_raw": "N160 长光华芯 [科创:688048]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 179
+      "source_line": 188
     },
     {
       "name": "腾景科技股份有限公司",
@@ -984,7 +1008,7 @@
       "name_cell_raw": "N145 腾景科技股份有限公司 [科创:688195]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 180
+      "source_line": 189
     },
     {
       "name": "福晶科技",
@@ -1000,7 +1024,7 @@
       "anchor_urls": [
         "https://static.cninfo.com.cn/finalpage/2026-04-29/1225227139.pdf"
       ],
-      "source_line": 181
+      "source_line": 190
     },
     {
       "name": "武汉云岭光电有限公司",
@@ -1014,7 +1038,7 @@
       "name_cell_raw": "N119 武汉云岭光电有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 199
+      "source_line": 208
     },
     {
       "name": "武汉云岭光电股份有限公司",
@@ -1028,7 +1052,7 @@
       "name_cell_raw": "N120 武汉云岭光电股份有限公司 [未上市/未识别(北证代码874775.BJ待闭环)]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 200
+      "source_line": 209
     },
     {
       "name": "仕佳光子",
@@ -1042,7 +1066,7 @@
       "name_cell_raw": "N85 仕佳光子 [科创:688313]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 212
+      "source_line": 221
     },
     {
       "name": "太辰光",
@@ -1056,7 +1080,7 @@
       "name_cell_raw": "N104 太辰光 [创业:300570]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 213
+      "source_line": 222
     },
     {
       "name": "长盈通",
@@ -1070,7 +1094,7 @@
       "name_cell_raw": "长盈通 [科创:688143]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 233
+      "source_line": 242
     },
     {
       "name": "永鼎股份",
@@ -1084,7 +1108,7 @@
       "name_cell_raw": "永鼎股份 [沪主板:600105]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 234
+      "source_line": 243
     },
     {
       "name": "弘景光电",
@@ -1098,7 +1122,7 @@
       "name_cell_raw": "弘景光电 [创业:301479]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 244
+      "source_line": 253
     },
     {
       "name": "长盈通",
@@ -1112,7 +1136,7 @@
       "name_cell_raw": "长盈通 [科创:688143]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 245
+      "source_line": 254
     },
     {
       "name": "永鼎股份",
@@ -1126,7 +1150,7 @@
       "name_cell_raw": "永鼎股份 [沪主板:600105]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 246
+      "source_line": 255
     },
     {
       "name": "光库科技",
@@ -1142,7 +1166,7 @@
       "anchor_urls": [
         "https://static.cninfo.com.cn/finalpage/2024-04-03/1219506244.PDF"
       ],
-      "source_line": 254
+      "source_line": 263
     },
     {
       "name": "天孚通信",
@@ -1158,7 +1182,7 @@
       "anchor_urls": [
         "https://static.cninfo.com.cn/finalpage/2020-08-03/1208119960.PDF"
       ],
-      "source_line": 255
+      "source_line": 264
     },
     {
       "name": "东田微",
@@ -1172,7 +1196,7 @@
       "name_cell_raw": "东田微 [创业:301183]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 281
+      "source_line": 290
     },
     {
       "name": "永鼎股份",
@@ -1186,7 +1210,7 @@
       "name_cell_raw": "永鼎股份 [沪主板:600105]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 282
+      "source_line": 291
     },
     {
       "name": "Lumentum",
@@ -1200,7 +1224,7 @@
       "name_cell_raw": "N04 Lumentum [NASDAQ:LITE]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 293
+      "source_line": 302
     },
     {
       "name": "NeoPhotonics",
@@ -1214,7 +1238,7 @@
       "name_cell_raw": "N07 NeoPhotonics [已退市;历史代码NYSE:NPTN]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 294
+      "source_line": 303
     },
     {
       "name": "天孚通信",
@@ -1228,7 +1252,7 @@
       "name_cell_raw": "N12 天孚通信 [创业:300394]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 295
+      "source_line": 304
     },
     {
       "name": "Coherent",
@@ -1242,7 +1266,7 @@
       "name_cell_raw": "N18 Coherent [NYSE:COHR]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 296
+      "source_line": 305
     },
     {
       "name": "士兰微",
@@ -1256,7 +1280,7 @@
       "name_cell_raw": "N46 士兰微 [沪主板:600460]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 297
+      "source_line": 306
     },
     {
       "name": "三安光电",
@@ -1270,7 +1294,7 @@
       "name_cell_raw": "N48 三安光电 [沪主板:600703]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 298
+      "source_line": 307
     },
     {
       "name": "Intel(含其代工厂)",
@@ -1284,7 +1308,7 @@
       "name_cell_raw": "N58 Intel(含其代工厂) [NASDAQ:INTC]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 299
+      "source_line": 308
     },
     {
       "name": "上海宽捷光电科技有限公司",
@@ -1298,7 +1322,7 @@
       "name_cell_raw": "N70 上海宽捷光电科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 300
+      "source_line": 309
     },
     {
       "name": "东莞福可喜玛通讯科技有限公司",
@@ -1312,7 +1336,7 @@
       "name_cell_raw": "N76 东莞福可喜玛通讯科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 301
+      "source_line": 310
     },
     {
       "name": "博创科技",
@@ -1326,7 +1350,7 @@
       "name_cell_raw": "N95 博创科技 [创业:300548]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 302
+      "source_line": 311
     },
     {
       "name": "博创科技股份有限公司",
@@ -1340,7 +1364,7 @@
       "name_cell_raw": "N96 博创科技股份有限公司 [创业:300548]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 303
+      "source_line": 312
     },
     {
       "name": "四川乐飞光电科技有限公司",
@@ -1354,7 +1378,7 @@
       "name_cell_raw": "N98 四川乐飞光电科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 304
+      "source_line": 313
     },
     {
       "name": "四川光恒通信技术有限公司",
@@ -1368,7 +1392,7 @@
       "name_cell_raw": "N100 四川光恒通信技术有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 305
+      "source_line": 314
     },
     {
       "name": "四川飞普科技有限公司",
@@ -1382,7 +1406,7 @@
       "name_cell_raw": "N101 四川飞普科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 306
+      "source_line": 315
     },
     {
       "name": "常州太平通讯科技有限公司",
@@ -1396,7 +1420,7 @@
       "name_cell_raw": "N105 常州太平通讯科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 307
+      "source_line": 316
     },
     {
       "name": "成都储翰科技",
@@ -1410,7 +1434,7 @@
       "name_cell_raw": "N109 成都储翰科技 [新三板(已摘牌):831964]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 308
+      "source_line": 317
     },
     {
       "name": "成都智禾光通(原成都旭创科技)",
@@ -1424,7 +1448,7 @@
       "name_cell_raw": "N111 成都智禾光通(原成都旭创科技) [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 309
+      "source_line": 318
     },
     {
       "name": "普利技术潜江有限公司",
@@ -1438,7 +1462,7 @@
       "name_cell_raw": "N114 普利技术潜江有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 310
+      "source_line": 319
     },
     {
       "name": "武汉正源高理光学有限公司",
@@ -1452,7 +1476,7 @@
       "name_cell_raw": "N123 武汉正源高理光学有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 311
+      "source_line": 320
     },
     {
       "name": "武汉灿光光电有限公司",
@@ -1466,7 +1490,7 @@
       "name_cell_raw": "N124 武汉灿光光电有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 312
+      "source_line": 321
     },
     {
       "name": "波若威光纤通讯有限公司",
@@ -1480,7 +1504,7 @@
       "name_cell_raw": "N130 波若威光纤通讯有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 313
+      "source_line": 322
     },
     {
       "name": "湖北瑞创信达光电有限公司",
@@ -1494,7 +1518,7 @@
       "name_cell_raw": "N142 湖北瑞创信达光电有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 314
+      "source_line": 323
     },
     {
       "name": "苏州环明电子科技有限公司",
@@ -1508,7 +1532,7 @@
       "name_cell_raw": "N151 苏州环明电子科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 315
+      "source_line": 324
     },
     {
       "name": "苏州镓锐芯光科技有限公司",
@@ -1522,7 +1546,7 @@
       "name_cell_raw": "N154 苏州镓锐芯光科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 316
+      "source_line": 325
     },
     {
       "name": "郑州仕佳通信科技有限公司",
@@ -1536,7 +1560,7 @@
       "name_cell_raw": "N157 郑州仕佳通信科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 317
+      "source_line": 326
     },
     {
       "name": "Acacia",
@@ -1550,7 +1574,7 @@
       "name_cell_raw": "N05 Acacia [已退市;历史代码NASDAQ:ACIA]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 343
+      "source_line": 352
     },
     {
       "name": "博通(Broadcom)",
@@ -1564,7 +1588,7 @@
       "name_cell_raw": "N15 博通(Broadcom) [NASDAQ:AVGO]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 344
+      "source_line": 353
     },
     {
       "name": "Marvell",
@@ -1578,7 +1602,7 @@
       "name_cell_raw": "N62 Marvell [NASDAQ:MRVL]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 345
+      "source_line": 354
     },
     {
       "name": "上海橙科微电子科技有限公司",
@@ -1592,12 +1616,26 @@
       "name_cell_raw": "N73 上海橙科微电子科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 346
+      "source_line": 355
+    },
+    {
+      "name": "优迅股份",
+      "market_code": "科创:688807",
+      "leaf": "leaf-013",
+      "identity_quote": "\"优迅股份作为国内光通信电芯片领域的领军企业……专注于光通信前端收发电芯片的研发、设计与销售\"；核心技术集群表自述\"高带宽、低噪声、宽动态跨阻放大器设计技术\"技术来源=自研/技术所处阶段=成熟应用/对应产品类型=\"高速率跨阻放大器芯片\"；50G PON段\"产品覆盖TIA、DRIVER及配套辅助芯片全品类\"；1.6T段\"研发跨阻放大器、VCSEL激光器驱动器……等核心产品\"",
+      "anchor": "S0a本地扫描2025年报（688807__em_优迅股份_em__2025_优迅股份：2025年年度报告.pdf），全文扩看核实",
+      "status": "节点层宽闸,S0a并入,判定闸=生产中（TIA/跨阻放大器子槽；同年报另有Driver/CDR两项自研成熟应用自述，超出本轮命中词\"TIA/跨阻放大\"范围，未单独立判定单元，见t9-gate-increment.md §2附带发现，供后续定向补判）",
+      "admission_tier": "node_wide_gate",
+      "node_id": "",
+      "name_cell_raw": "优迅股份 [科创:688807]",
+      "raw_name_annotation": "",
+      "anchor_urls": [],
+      "source_line": 378
     },
     {
       "name": "景旺电子",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-013",
+      "leaf": "leaf-014",
       "identity_quote": "\"800G光模块等高速PCB产品已实现量产\"",
       "anchor": "[2024年年度报告](https://static.cninfo.com.cn/finalpage/2025-04-29/1223377812.PDF)",
       "status": "节点层宽闸,T1并入,未入关系台账",
@@ -1608,12 +1646,12 @@
       "anchor_urls": [
         "https://static.cninfo.com.cn/finalpage/2025-04-29/1223377812.PDF"
       ],
-      "source_line": 365
+      "source_line": 392
     },
     {
       "name": "四会富仕",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-013",
+      "leaf": "leaf-014",
       "identity_quote": "\"应用于光通信的800G光模块PCB等新型产品\"",
       "anchor": "[2024年年度报告](https://static.cninfo.com.cn/finalpage/2025-03-29/1222948563.PDF)",
       "status": "节点层宽闸,T1并入,未入关系台账",
@@ -1624,12 +1662,12 @@
       "anchor_urls": [
         "https://static.cninfo.com.cn/finalpage/2025-03-29/1222948563.PDF"
       ],
-      "source_line": 366
+      "source_line": 393
     },
     {
       "name": "本川智能",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-013",
+      "leaf": "leaf-014",
       "identity_quote": "\"高频高速产品已在光模块客户中实现小批量出货\"",
       "anchor": "[2025年年度报告](https://static.cninfo.com.cn/finalpage/2026-04-29/1225228204.PDF)",
       "status": "节点层宽闸,T1并入,未入关系台账,小批量,成熟度低",
@@ -1640,12 +1678,12 @@
       "anchor_urls": [
         "https://static.cninfo.com.cn/finalpage/2026-04-29/1225228204.PDF"
       ],
-      "source_line": 367
+      "source_line": 394
     },
     {
       "name": "生益电子",
       "market_code": "科创:688183",
-      "leaf": "leaf-014",
+      "leaf": "leaf-015",
       "identity_quote": "\"研究开发高速光模块PCB产品，并实现产业化\"（同段落，版面顺序有错位）",
       "anchor": "S0a本地扫描2025年报（688183__em_生益电子_em__2025_生益电子2025年年度报告.pdf）",
       "status": "节点层宽闸,S0a并入,判定闸=生产中",
@@ -1654,12 +1692,12 @@
       "name_cell_raw": "生益电子 [科创:688183]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 376
+      "source_line": 403
     },
     {
       "name": "迅捷兴",
       "market_code": "科创:688655",
-      "leaf": "leaf-014",
+      "leaf": "leaf-015",
       "identity_quote": "\"公司完成任意互联HDI结构的800G光模块PCB、1.6T光模块PCB技术研发\"；\"400G光模块PCB生产工艺技术自主研发\"",
       "anchor": "S0a本地扫描2025年报（688655__em_迅捷兴_em__2025_2025年年度报告.pdf）",
       "status": "节点层宽闸,S0a并入,判定闸=生产中",
@@ -1668,12 +1706,12 @@
       "name_cell_raw": "迅捷兴 [科创:688655]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 377
+      "source_line": 404
     },
     {
       "name": "博敏电子",
       "market_code": "沪主板:603936",
-      "leaf": "leaf-014",
+      "leaf": "leaf-015",
       "identity_quote": "\"已实现400G、800G光模块PCB批量供货，同时积极推动1.6T光模块PCB量产工作\"",
       "anchor": "S0a本地扫描2025年报（603936__em_博敏电子_em__2025_博敏电子2025年年度报告.pdf）",
       "status": "节点层宽闸,S0a并入,判定闸=生产中",
@@ -1682,12 +1720,12 @@
       "name_cell_raw": "博敏电子 [沪主板:603936]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 378
+      "source_line": 405
     },
     {
       "name": "生益科技",
       "market_code": "沪主板:600183",
-      "leaf": "leaf-014",
+      "leaf": "leaf-015",
       "identity_quote": "\"研究开发高速光模块PCB产品制作工艺技术，攻克技术难点，并实现产业化\"",
       "anchor": "S0a本地扫描2025年报（600183__em_生益科技_em__2025_生益科技2025年年度报告.pdf）",
       "status": "节点层宽闸,S0a并入,判定闸=生产中",
@@ -1696,12 +1734,12 @@
       "name_cell_raw": "生益科技 [沪主板:600183]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 379
+      "source_line": 406
     },
     {
       "name": "斯瑞新材",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-015",
+      "leaf": "leaf-016",
       "identity_quote": "\"光模块芯片基座/壳体\"为主要产品；\"目前已实现壳体批量供应\"",
       "anchor": "[2025年年度报告](https://static.cninfo.com.cn/finalpage/2026-04-28/1225214766.PDF)",
       "status": "节点层宽闸,T1并入,未入关系台账",
@@ -1712,12 +1750,12 @@
       "anchor_urls": [
         "https://static.cninfo.com.cn/finalpage/2026-04-28/1225214766.PDF"
       ],
-      "source_line": 393
+      "source_line": 420
     },
     {
       "name": "中际旭创",
       "market_code": "创业:300308",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）光模块厂",
       "anchor": "仅类型归层，待锚",
       "status": "有（E044起多条，供方/需方均有）",
@@ -1726,12 +1764,12 @@
       "name_cell_raw": "N10 中际旭创 [创业:300308]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 403
+      "source_line": 430
     },
     {
       "name": "新易盛",
       "market_code": "创业:300502",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）光模块厂",
       "anchor": "仅类型归层，待锚",
       "status": "有（E015起多条）",
@@ -1740,12 +1778,12 @@
       "name_cell_raw": "N11 新易盛 [创业:300502]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 404
+      "source_line": 431
     },
     {
       "name": "Applied Optoelectronics(AAOI)",
       "market_code": "NASDAQ:AAOI",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）光模块厂",
       "anchor": "仅类型归层，待锚",
       "status": "有（E017起多条；边中作\"AAOI\"）",
@@ -1754,12 +1792,12 @@
       "name_cell_raw": "N19 Applied Optoelectronics(AAOI) [NASDAQ:AAOI]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 405
+      "source_line": 432
     },
     {
       "name": "索尔思(Source Photonics)",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）光模块厂",
       "anchor": "仅类型归层，待锚",
       "status": "有（E047→猎奇智能需方）",
@@ -1768,12 +1806,12 @@
       "name_cell_raw": "N31 索尔思(Source Photonics) [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 406
+      "source_line": 433
     },
     {
       "name": "光迅科技",
       "market_code": "深主板:002281",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "光收发模块、有源光缆、光放大器、波长管理器件、光通信器件、子系统等",
       "anchor": "有锚；发行人自述（2023年报）",
       "status": "有（E048/E074/E075起）",
@@ -1782,12 +1820,12 @@
       "name_cell_raw": "N32 光迅科技 [深主板:002281]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 407
+      "source_line": 434
     },
     {
       "name": "海信集团",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）光模块/宽带(海信宽带)",
       "anchor": "仅类型归层，待锚；entity-evidence-q3：海信宽带确认为海信集团全资子公司（2003年海信集团控股+TransLight共设），置信中",
       "status": "有（E087/E089/E092→联讯仪器需方）",
@@ -1796,12 +1834,12 @@
       "name_cell_raw": "N47 海信集团 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 408
+      "source_line": 435
     },
     {
       "name": "ALFAFONET ENDUSTRIYEL TELEKOM URUNLERI A.S.",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E106→仕佳光子）",
@@ -1810,12 +1848,12 @@
       "name_cell_raw": "N49 ALFAFONET ENDUSTRIYEL TELEKOM URUNLERI A.S. [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 409
+      "source_line": 436
     },
     {
       "name": "Cloud Light Technology Limited",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E148→博创科技）",
@@ -1824,12 +1862,12 @@
       "name_cell_raw": "N51 Cloud Light Technology Limited [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 410
+      "source_line": 437
     },
     {
       "name": "FOSTEC",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E107→仕佳光子）",
@@ -1838,12 +1876,12 @@
       "name_cell_raw": "N54 FOSTEC [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 411
+      "source_line": 438
     },
     {
       "name": "Fibracem Teleinformática Ltda.",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E108→仕佳光子）",
@@ -1852,12 +1890,12 @@
       "name_cell_raw": "N55 Fibracem Teleinformática Ltda. [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 412
+      "source_line": 439
     },
     {
       "name": "KUMPULAN ABEX SDN BHD",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E111→仕佳光子）",
@@ -1866,12 +1904,12 @@
       "name_cell_raw": "N59 KUMPULAN ABEX SDN BHD [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 413
+      "source_line": 440
     },
     {
       "name": "Kaiam Corporation",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E146→博创科技，坏账核销/关系已死亡）",
@@ -1880,12 +1918,12 @@
       "name_cell_raw": "N60 Kaiam Corporation [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 414
+      "source_line": 441
     },
     {
       "name": "Out Line S.r.l.",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E112→仕佳光子）",
@@ -1894,12 +1932,12 @@
       "name_cell_raw": "N65 Out Line S.r.l. [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 415
+      "source_line": 442
     },
     {
       "name": "PRIME WORLD INTERNATIONAL HOLDINGS LTD.",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E113→仕佳光子）",
@@ -1908,12 +1946,12 @@
       "name_cell_raw": "N66 PRIME WORLD INTERNATIONAL HOLDINGS LTD. [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 416
+      "source_line": 443
     },
     {
       "name": "SHARPNFLAT INC",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E114→仕佳光子）",
@@ -1922,12 +1960,12 @@
       "name_cell_raw": "N67 SHARPNFLAT INC [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 417
+      "source_line": 444
     },
     {
       "name": "上海八界光电科技有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E181→源杰科技需方）",
@@ -1936,12 +1974,12 @@
       "name_cell_raw": "N68 上海八界光电科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 418
+      "source_line": 445
     },
     {
       "name": "东莞铭普光磁股份有限公司",
       "market_code": "深主板:002902",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E183→源杰科技需方）",
@@ -1950,12 +1988,12 @@
       "name_cell_raw": "N77 东莞铭普光磁股份有限公司 [深主板:002902]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 419
+      "source_line": 446
     },
     {
       "name": "全科科技有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E185→源杰科技需方）",
@@ -1964,12 +2002,12 @@
       "name_cell_raw": "N87 全科科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 420
+      "source_line": 447
     },
     {
       "name": "四川九州光电子技术有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E187→源杰科技需方）",
@@ -1978,12 +2016,12 @@
       "name_cell_raw": "N99 四川九州光电子技术有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 421
+      "source_line": 448
     },
     {
       "name": "德国罗森博格通讯有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E121→仕佳光子）",
@@ -1992,12 +2030,12 @@
       "name_cell_raw": "N107 德国罗森博格通讯有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 422
+      "source_line": 449
     },
     {
       "name": "成都蓉博通信技术有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E190→源杰科技需方）",
@@ -2006,12 +2044,12 @@
       "name_cell_raw": "N112 成都蓉博通信技术有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 423
+      "source_line": 450
     },
     {
       "name": "成都迪谱光电科技有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E191→源杰科技需方）",
@@ -2020,12 +2058,12 @@
       "name_cell_raw": "N113 成都迪谱光电科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 424
+      "source_line": 451
     },
     {
       "name": "汇聚科技",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E124→仕佳光子）",
@@ -2034,12 +2072,12 @@
       "name_cell_raw": "N127 汇聚科技（惠州）有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 425
+      "source_line": 452
     },
     {
       "name": "深圳市亚美斯通电子有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E192→源杰科技需方）",
@@ -2048,12 +2086,12 @@
       "name_cell_raw": "N136 深圳市亚美斯通电子有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 426
+      "source_line": 453
     },
     {
       "name": "苏州旭创科技有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E193→源杰科技需方）",
@@ -2062,12 +2100,12 @@
       "name_cell_raw": "N148 苏州旭创科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 427
+      "source_line": 454
     },
     {
       "name": "青岛海信宽带多媒体技术有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E194→源杰科技需方）",
@@ -2076,12 +2114,12 @@
       "name_cell_raw": "N165 青岛海信宽带多媒体技术有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 428
+      "source_line": 455
     },
     {
       "name": "香港新南利",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-016",
+      "leaf": "leaf-017",
       "identity_quote": "（类型）模块/光电子商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E129→仕佳光子）",
@@ -2090,12 +2128,12 @@
       "name_cell_raw": "N169 香港新南利 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 429
+      "source_line": 456
     },
     {
       "name": "武汉钧恒科技有限公司",
       "market_code": "深主板:001267",
-      "leaf": "leaf-017",
+      "leaf": "leaf-018",
       "identity_quote": "\"武汉钧恒为公司的控股子公司，武汉钧恒2012年成立，总部位于武汉光谷，专业从事以光模块为主的光通信产品的研发、制造和销售\"；\"光模块业务的营业收入比重大于50%\"",
       "anchor": "S0a本地扫描2025年报（001267__em_汇绿生态_em__2025_2025年年度报告.pdf）；管理层讨论与分析·一、报告期内公司从事的主要业务",
       "status": "节点层宽闸,S0a并入,判定闸=生产中（口径限定：光模块总成，非TOSA/ROSA/跨阻放大器独立部件生产判定，另见横切工序轴组件封装TOSA/ROSA节交叉引用）",
@@ -2104,12 +2142,12 @@
       "name_cell_raw": "武汉钧恒科技有限公司（汇绿生态[深主板:001267]控股51%子公司，2025-01-31并表）",
       "raw_name_annotation": "控股51%子公司，2025-01-31并表）",
       "anchor_urls": [],
-      "source_line": 438
+      "source_line": 465
     },
     {
       "name": "Maruwa Co.,Ltd",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-018",
+      "leaf": "leaf-019",
       "identity_quote": "热沉",
       "anchor": "有锚；披露方产品列（长光华芯招股书供应商表）",
       "status": "有（E201→长光华芯）",
@@ -2118,12 +2156,12 @@
       "name_cell_raw": "N61 Maruwa Co.,Ltd [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 467
+      "source_line": 494
     },
     {
       "name": "上海函泰电子科技有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-018",
+      "leaf": "leaf-019",
       "identity_quote": "显影液、增粘剂、光刻胶等",
       "anchor": "有锚；披露方产品列（源杰招股书供应商表）",
       "status": "有（E166→源杰科技）",
@@ -2132,12 +2170,12 @@
       "name_cell_raw": "N69 上海函泰电子科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 468
+      "source_line": 495
     },
     {
       "name": "京瓷",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-018",
+      "leaf": "leaf-019",
       "identity_quote": "热沉",
       "anchor": "有锚；披露方产品列（长光华芯招股书供应商表）",
       "status": "有（E204→长光华芯）",
@@ -2146,12 +2184,12 @@
       "name_cell_raw": "N84 京瓷（中国）商贸有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 469
+      "source_line": 496
     },
     {
       "name": "北京通美晶体",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-018",
+      "leaf": "leaf-019",
       "identity_quote": "衬底（InP等晶圆衬底）",
       "anchor": "有锚；披露方产品列（源杰/长光华芯招股书供应商表）；另 pilot-s0a 确认其现行 InP substrate 供货（AXT 2026-06-17 Form 8-K）",
       "status": "有（E168→源杰科技；E205→长光华芯）",
@@ -2160,12 +2198,12 @@
       "name_cell_raw": "N93 北京通美晶体 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 470
+      "source_line": 497
     },
     {
       "name": "大阳日酸特殊气体",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-018",
+      "leaf": "leaf-019",
       "identity_quote": "磷化氢、砷化氢",
       "anchor": "有锚；披露方产品列（源杰招股书供应商表）",
       "status": "有（E170→源杰科技）",
@@ -2174,12 +2212,12 @@
       "name_cell_raw": "N103 大阳日酸特殊气体（上海）有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 471
+      "source_line": 498
     },
     {
       "name": "有研亿金新材料有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-018",
+      "leaf": "leaf-019",
       "identity_quote": "金靶、铂靶、金锗靶等/贵金属蒸发材料",
       "anchor": "有锚；披露方产品列（源杰/长光华芯招股书供应商表）",
       "status": "有（E172→源杰科技；E206→长光华芯）",
@@ -2188,12 +2226,12 @@
       "name_cell_raw": "N115 有研亿金新材料有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 472
+      "source_line": 499
     },
     {
       "name": "江苏南大光电材料股份有限公司",
       "market_code": "创业:300346",
-      "leaf": "leaf-018",
+      "leaf": "leaf-019",
       "identity_quote": "磷烷、三甲基铟、三甲基镓等",
       "anchor": "有锚；披露方产品列（源杰招股书供应商表）；pilot-s0a 三甲基铟检索确认其为核心生产主体",
       "status": "有（E175→源杰科技）",
@@ -2202,12 +2240,12 @@
       "name_cell_raw": "N128 江苏南大光电材料股份有限公司 [创业:300346]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 473
+      "source_line": 500
     },
     {
       "name": "泛孟新材料",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-018",
+      "leaf": "leaf-019",
       "identity_quote": "异丙醇、光刻胶去除液",
       "anchor": "有锚；披露方产品列（源杰招股书供应商表）",
       "status": "有（E176→源杰科技）",
@@ -2216,12 +2254,12 @@
       "name_cell_raw": "N129 泛孟新材料（上海）有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 474
+      "source_line": 501
     },
     {
       "name": "泰库尼思科电子",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-018",
+      "leaf": "leaf-019",
       "identity_quote": "热沉",
       "anchor": "有锚；披露方产品列（长光华芯招股书供应商表）",
       "status": "有（E207→长光华芯）",
@@ -2230,12 +2268,12 @@
       "name_cell_raw": "N131 泰库尼思科电子（苏州）有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 475
+      "source_line": 502
     },
     {
       "name": "深圳市路维光电股份有限公司",
       "market_code": "科创:688401",
-      "leaf": "leaf-018",
+      "leaf": "leaf-019",
       "identity_quote": "光刻掩模板",
       "anchor": "有锚；披露方产品列（源杰招股书供应商表）",
       "status": "有（E179→源杰科技）",
@@ -2244,12 +2282,12 @@
       "name_cell_raw": "N140 深圳市路维光电股份有限公司 [科创:688401]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 476
+      "source_line": 503
     },
     {
       "name": "西安卫光气体有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-018",
+      "leaf": "leaf-019",
       "identity_quote": "氮气、氢气、氧气、氩气等",
       "anchor": "有锚；披露方产品列（源杰招股书供应商表）",
       "status": "有（E196→源杰科技）",
@@ -2258,12 +2296,12 @@
       "name_cell_raw": "N155 西安卫光气体有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 477
+      "source_line": 504
     },
     {
       "name": "诺力昂化学品",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-018",
+      "leaf": "leaf-019",
       "identity_quote": "金属有机物（MO源类）",
       "anchor": "有锚；披露方产品列（源杰招股书供应商表）",
       "status": "有（E197→源杰科技）",
@@ -2272,12 +2310,12 @@
       "name_cell_raw": "N156 诺力昂化学品（宁波）有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 478
+      "source_line": 505
     },
     {
       "name": "陕西兴化集团有限责任公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-018",
+      "leaf": "leaf-019",
       "identity_quote": "氢气、氮气",
       "anchor": "有锚；披露方产品列（源杰招股书供应商表）",
       "status": "有（E198→源杰科技）",
@@ -2286,12 +2324,12 @@
       "name_cell_raw": "N163 陕西兴化集团有限责任公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 479
+      "source_line": 506
     },
     {
       "name": "珠海鼎泰芯源晶体有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-019",
+      "leaf": "leaf-020",
       "identity_quote": "InP衬底单晶材料的研发、生产及销售",
       "anchor": "线索级待锚；历史交叉锚（cninfo 2021-06-26），当期 Wind 未返回，需 owner 核对量产连续性",
       "status": "否，候选未入台账",
@@ -2300,12 +2338,12 @@
       "name_cell_raw": "珠海鼎泰芯源晶体有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 487
+      "source_line": 514
     },
     {
       "name": "青岛立昂晶电半导体科技有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-019",
+      "leaf": "leaf-020",
       "identity_quote": "掌握2/3英寸磷化铟衬底生产技术，已实现小批量交付",
       "anchor": "线索级待锚；框架协议锚（cninfo 2026-06-22），小批量交付发生在资产转让前，连续性待终裁",
       "status": "否，候选未入台账",
@@ -2314,12 +2352,12 @@
       "name_cell_raw": "青岛立昂晶电半导体科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 488
+      "source_line": 515
     },
     {
       "name": "江苏兴光半导体有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-019",
+      "leaf": "leaf-020",
       "identity_quote": "收购磷化铟衬底制造与销售业务（拟生产）",
       "anchor": "线索级待锚；同上框架锚，收购后需备案/环评/安评方可生产",
       "status": "否，候选未入台账",
@@ -2328,12 +2366,12 @@
       "name_cell_raw": "江苏兴光半导体有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 489
+      "source_line": 516
     },
     {
       "name": "云南鑫耀半导体材料有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-019",
+      "leaf": "leaf-020",
       "identity_quote": "2025年生产磷化铟晶片10.01万片",
       "anchor": "线索级待锚；云南锗业2026-05-11投资者关系记录，上市披露主体与实际生产主体需分层建实体",
       "status": "否，候选未入台账",
@@ -2342,12 +2380,12 @@
       "name_cell_raw": "云南鑫耀半导体材料有限公司（云南锗业体系） [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 490
+      "source_line": 517
     },
     {
       "name": "江苏光铟半导体有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-019",
+      "leaf": "leaf-020",
       "identity_quote": "从事磷化铟衬底的研发生产销售（拟设项目）",
       "anchor": "线索级待锚；上交所监管交叉锚，合作方被监管指出无实际业务，高风险待闸",
       "status": "否，候选未入台账",
@@ -2356,12 +2394,12 @@
       "name_cell_raw": "江苏光铟半导体有限公司（拟设） [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 491
+      "source_line": 518
     },
     {
       "name": "东山精密",
       "market_code": "深主板:002384",
-      "leaf": "leaf-020",
+      "leaf": "leaf-021",
       "identity_quote": "\"索尔思光电拥有覆盖磷化铟衬底、外延材料至光芯片的全流程研发与工艺体系，技术壁垒持续夯实\"",
       "anchor": "S0a本地扫描2025年报（002384__em_东山精密_em__2025_2025年年度报告.pdf）",
       "status": "节点层宽闸,S0a并入,判定闸=生产中（索尔思光电已作为N31出现于\"光模块（总成）\"节，本条为东山精密2025年报披露其磷化铟衬底全流程能力，补充N31身份线索，不改变N31原归属，东山精密本身不重复建节点）",
@@ -2370,12 +2408,12 @@
       "name_cell_raw": "东山精密 [深主板:002384]（控股子公司索尔思光电，即已有节点N31）",
       "raw_name_annotation": "（控股子公司索尔思光电，即已有节点N31）",
       "anchor_urls": [],
-      "source_line": 501
+      "source_line": 528
     },
     {
       "name": "OharaQuartzCo.,Ltd.",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-021",
+      "leaf": "leaf-022",
       "identity_quote": "石英片",
       "anchor": "有锚；披露方产品列（仕佳光子招股书供应商表）",
       "status": "有（E100→仕佳光子）",
@@ -2384,12 +2422,12 @@
       "name_cell_raw": "N64 OharaQuartzCo.,Ltd. [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 511
+      "source_line": 538
     },
     {
       "name": "上海普恩化工有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-021",
+      "leaf": "leaf-022",
       "identity_quote": "EVA树脂",
       "anchor": "有锚；披露方产品列（仕佳光子招股书供应商表）",
       "status": "有（E101→仕佳光子）",
@@ -2398,12 +2436,12 @@
       "name_cell_raw": "N71 上海普恩化工有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 512
+      "source_line": 539
     },
     {
       "name": "上海景仓通信技术有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-021",
+      "leaf": "leaf-022",
       "identity_quote": "光纤",
       "anchor": "有锚；披露方产品列（仕佳光子招股书供应商表）",
       "status": "有（E102→仕佳光子）",
@@ -2412,12 +2450,12 @@
       "name_cell_raw": "N72 上海景仓通信技术有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 513
+      "source_line": 540
     },
     {
       "name": "成都中住光纤有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-021",
+      "leaf": "leaf-022",
       "identity_quote": "光纤",
       "anchor": "有锚；披露方产品列（仕佳光子招股书供应商表）",
       "status": "有（E130→仕佳光子）",
@@ -2426,12 +2464,12 @@
       "name_cell_raw": "N108 成都中住光纤有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 514
+      "source_line": 541
     },
     {
       "name": "杜邦(含关联方)",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-021",
+      "leaf": "leaf-022",
       "identity_quote": "芳纶纱",
       "anchor": "有锚；披露方产品列（仕佳光子招股书供应商表）",
       "status": "有（E131→仕佳光子）",
@@ -2440,12 +2478,12 @@
       "name_cell_raw": "N116 杜邦(含关联方) [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 515
+      "source_line": 542
     },
     {
       "name": "洛阳中超新材料股份有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-021",
+      "leaf": "leaf-022",
       "identity_quote": "氢氧化铝",
       "anchor": "有锚；披露方产品列（仕佳光子招股书供应商表）",
       "status": "有（E134→仕佳光子）",
@@ -2454,12 +2492,12 @@
       "name_cell_raw": "N133 洛阳中超新材料股份有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 516
+      "source_line": 543
     },
     {
       "name": "奥普瑞",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-022",
+      "leaf": "leaf-023",
       "identity_quote": "（类型）加工件供应商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E052→猎奇智能）",
@@ -2468,12 +2506,12 @@
       "name_cell_raw": "N35 奥普瑞 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 525
+      "source_line": 552
     },
     {
       "name": "泰科电子(含关联方)",
       "market_code": "NYSE:TEL",
-      "leaf": "leaf-022",
+      "leaf": "leaf-023",
       "identity_quote": "（类型）材料/设备供应商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E126→仕佳光子）",
@@ -2482,12 +2520,12 @@
       "name_cell_raw": "N132 泰科电子(含关联方) [NYSE:TEL]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 526
+      "source_line": 553
     },
     {
       "name": "深圳市中迅实业有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-022",
+      "leaf": "leaf-023",
       "identity_quote": "（类型）材料/设备供应商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E208→长光华芯）",
@@ -2496,12 +2534,12 @@
       "name_cell_raw": "N135 深圳市中迅实业有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 527
+      "source_line": 554
     },
     {
       "name": "深圳市宏钢机械设备有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-022",
+      "leaf": "leaf-023",
       "identity_quote": "盖板、壳体组等",
       "anchor": "有锚；披露方产品列（长光华芯招股书供应商表）；邻域可能涉及激光器件壳体，未证光模块陶瓷管壳身份",
       "status": "有（E209→长光华芯）",
@@ -2510,12 +2548,12 @@
       "name_cell_raw": "N138 深圳市宏钢机械设备有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 528
+      "source_line": 555
     },
     {
       "name": "深圳市星欣磊实业有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-022",
+      "leaf": "leaf-023",
       "identity_quote": "（类型）材料/设备供应商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E210→长光华芯）",
@@ -2524,12 +2562,12 @@
       "name_cell_raw": "N139 深圳市星欣磊实业有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 529
+      "source_line": 556
     },
     {
       "name": "苏州邦皓电子新材料有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-022",
+      "leaf": "leaf-023",
       "identity_quote": "（类型）上游材料",
       "anchor": "仅类型归层，待锚",
       "status": "有（E214→长光华芯）",
@@ -2538,12 +2576,12 @@
       "name_cell_raw": "N153 苏州邦皓电子新材料有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 530
+      "source_line": 557
     },
     {
       "name": "北京康特睿科光电科技有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-023",
+      "leaf": "leaf-024",
       "identity_quote": "芯片封装（委托加工）",
       "anchor": "有锚；披露方产品列（源杰招股书委托加工表）",
       "status": "有（E167→源杰科技）",
@@ -2552,12 +2590,12 @@
       "name_cell_raw": "N92 北京康特睿科光电科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 553
+      "source_line": 580
     },
     {
       "name": "广东瑞谷光网通信股份有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-023",
+      "leaf": "leaf-024",
       "identity_quote": "芯片封装（委托加工）",
       "anchor": "有锚；披露方产品列（源杰招股书委托加工表）",
       "status": "有（E171→源杰科技）",
@@ -2566,12 +2604,12 @@
       "name_cell_raw": "N106 广东瑞谷光网通信股份有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 554
+      "source_line": 581
     },
     {
       "name": "桂林芯飞光电子科技有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-023",
+      "leaf": "leaf-024",
       "identity_quote": "芯片封装（委托加工）",
       "anchor": "有锚；披露方产品列（源杰招股书委托加工表）",
       "status": "有（E173→源杰科技）",
@@ -2580,12 +2618,12 @@
       "name_cell_raw": "N118 桂林芯飞光电子科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 555
+      "source_line": 582
     },
     {
       "name": "武汉昱升光电(原昱升光器件)",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-023",
+      "leaf": "leaf-024",
       "identity_quote": "芯片封装（委托加工）",
       "anchor": "有锚；披露方产品列（源杰招股书委托加工表）；entity-evidence-q3：工商统一社会信用代码一致，确认同一法人更名（置信中高）",
       "status": "有（E174→源杰科技；E122/E132→仕佳光子；E161→博创科技）",
@@ -2594,12 +2632,12 @@
       "name_cell_raw": "N122 武汉昱升光电(原昱升光器件) [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 556
+      "source_line": 583
     },
     {
       "name": "深圳市东飞凌科技有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-023",
+      "leaf": "leaf-024",
       "identity_quote": "芯片封装（委托加工）",
       "anchor": "有锚；披露方产品列（源杰招股书委托加工表）",
       "status": "有（E177→源杰科技）",
@@ -2608,12 +2646,12 @@
       "name_cell_raw": "N134 深圳市东飞凌科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 557
+      "source_line": 584
     },
     {
       "name": "深圳市力子光电科技有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-023",
+      "leaf": "leaf-024",
       "identity_quote": "芯片封装（委托加工）",
       "anchor": "有锚；披露方产品列（源杰招股书委托加工表）",
       "status": "有（E178→源杰科技）",
@@ -2622,12 +2660,12 @@
       "name_cell_raw": "N137 深圳市力子光电科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 558
+      "source_line": 585
     },
     {
       "name": "湖北安一辰光电科技有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-023",
+      "leaf": "leaf-024",
       "identity_quote": "芯片封装（委托加工）",
       "anchor": "有锚；披露方产品列（源杰招股书委托加工表）",
       "status": "有（E180→源杰科技）",
@@ -2636,12 +2674,12 @@
       "name_cell_raw": "N141 湖北安一辰光电科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 559
+      "source_line": 586
     },
     {
       "name": "芯思杰技术",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-023",
+      "leaf": "leaf-024",
       "identity_quote": "芯片封装（委托加工）",
       "anchor": "有锚；披露方产品列（源杰招股书委托加工表）",
       "status": "有（E195→源杰科技）",
@@ -2650,12 +2688,12 @@
       "name_cell_raw": "N146 芯思杰技术（深圳）股份有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 560
+      "source_line": 587
     },
     {
       "name": "Power Master",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-023",
+      "leaf": "leaf-024",
       "identity_quote": "（类型）功率器件封测(半导体)",
       "anchor": "仅类型归层，待锚",
       "status": "有（E082→联讯仪器需方）",
@@ -2664,12 +2702,12 @@
       "name_cell_raw": "N44 Power Master [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 561
+      "source_line": 588
     },
     {
       "name": "天孚通信",
       "market_code": "创业:300394",
-      "leaf": "leaf-024",
+      "leaf": "leaf-025",
       "identity_quote": "\"OSA光器件（TOSA/ROSA/BOSA）\"",
       "anchor": "[2020年向特定对象发行股票募集说明书](https://static.cninfo.com.cn/finalpage/2020-08-03/1208119960.PDF)",
       "status": "组件封装工序覆盖,非专产判定",
@@ -2680,12 +2718,12 @@
       "anchor_urls": [
         "https://static.cninfo.com.cn/finalpage/2020-08-03/1208119960.PDF"
       ],
-      "source_line": 572
+      "source_line": 599
     },
     {
       "name": "联特科技",
       "market_code": "创业:301205",
-      "leaf": "leaf-024",
+      "leaf": "leaf-025",
       "identity_quote": "\"公司生产工序包括光芯片集成（COC）、光器件及光模块的生产，其中……光器件的生产工序包括软板焊接、元件贴装、COC贴装、金丝键合、耦合、高低温循环、测试、检验等\"（生产模式章节自述，组件级封装工序具体到金丝键合/耦合）",
       "anchor": "S0a本地扫描2025年报（301205__em_联特科技_em__2025_2025年年度报告.pdf）",
       "status": "节点层宽闸,S0a并入,判定闸=生产中",
@@ -2694,12 +2732,12 @@
       "name_cell_raw": "联特科技 [创业:301205]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 573
+      "source_line": 600
     },
     {
       "name": "武汉钧恒科技有限公司",
       "market_code": "深主板:001267",
-      "leaf": "leaf-024",
+      "leaf": "leaf-025",
       "identity_quote": "\"光模块由光器件、功能电路和光接口等构成，其中光器件是光模块的关键元件，包括激光器（TOSA）和探测器（ROSA）……通过跨阻放大器后将此电流信号转换成电压信号\"（限定照录：此句为光模块内部结构的定义性描述句，非独立TOSA/ROSA/跨阻放大器部件生产声明；判定闸=生产中的口径限定为武汉钧恒经营光模块总成，光模块业务收入占比>50%，非独立部件产能）",
       "anchor": "S0a本地扫描2025年报（001267__em_汇绿生态_em__2025_2025年年度报告.pdf）",
       "status": "节点层宽闸,S0a并入,判定闸=生产中（口径限定，见左栏引语说明）",
@@ -2708,12 +2746,12 @@
       "name_cell_raw": "武汉钧恒科技有限公司（汇绿生态[深主板:001267]控股51%子公司）",
       "raw_name_annotation": "控股51%子公司）",
       "anchor_urls": [],
-      "source_line": 574
+      "source_line": 601
     },
     {
       "name": "Cisco",
       "market_code": "NASDAQ:CSCO",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）网络设备OEM",
       "anchor": "仅类型归层，待锚",
       "status": "有（E003/E004→Fabrinet需方）",
@@ -2722,12 +2760,12 @@
       "name_cell_raw": "N03 Cisco [NASDAQ:CSCO]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 610
+      "source_line": 637
     },
     {
       "name": "Infinera",
       "market_code": "已退市;历史代码NASDAQ:INFN",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）系统设备商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E007→Fabrinet需方）",
@@ -2736,12 +2774,12 @@
       "name_cell_raw": "N06 Infinera [已退市;历史代码NASDAQ:INFN]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 611
+      "source_line": 638
     },
     {
       "name": "华为(含海思)",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）系统设备商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E008\"华为+海思\"→NeoPhotonics；E033\"华为\"→Lumentum）",
@@ -2750,12 +2788,12 @@
       "name_cell_raw": "N08 华为(含海思) [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 612
+      "source_line": 639
     },
     {
       "name": "Ciena",
       "market_code": "NYSE:CIEN",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）系统设备商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E009/E029起→Lumentum需方）",
@@ -2764,12 +2802,12 @@
       "name_cell_raw": "N09 Ciena [NYSE:CIEN]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 613
+      "source_line": 640
     },
     {
       "name": "猎奇智能",
       "market_code": "IPO在途:创业板",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "光通信/半导体/汽车自动化等领域智能生产装备；产品应用于贴片、光学耦合、老化测试三核心环节",
       "anchor": "有锚；发行人自述（招股书第五节）",
       "status": "有（E010/E045起多条）",
@@ -2778,12 +2816,12 @@
       "name_cell_raw": "N13 猎奇智能 [IPO在途:创业板]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 614
+      "source_line": 641
     },
     {
       "name": "罗博特科/ficonTEC",
       "market_code": "创业:300757",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "高精度光学组件和光电元件生产设备；半导体自动化微组装及精密测试设备设计研发生产销售",
       "anchor": "有锚；竞品描述（发行人披露）；BOM词表 E011/E012 标注CPO耦合设备；C35内容台账补充：正基于硅光/CPO光模块技术需求研发激光辅助键合、倒装热压等先进封装工艺（发行人自述，设备-工序能力条目）",
       "status": "有（E011/E012→博通/NVIDIA；E076→客户匿名）",
@@ -2792,12 +2830,12 @@
       "name_cell_raw": "N14 罗博特科/ficonTEC [创业:300757]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 615
+      "source_line": 642
     },
     {
       "name": "凯格精机",
       "market_code": "创业:301338",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）组装设备商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E014→Fabrinet疑似客户；E077→客户匿名）",
@@ -2806,12 +2844,12 @@
       "name_cell_raw": "N16 凯格精机 [创业:301338]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 616
+      "source_line": 643
     },
     {
       "name": "ATX Networks",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）CATV设备商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E021/E022→AAOI需方）",
@@ -2820,12 +2858,12 @@
       "name_cell_raw": "N22 ATX Networks [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 617
+      "source_line": 644
     },
     {
       "name": "Nokia",
       "market_code": "NYSE:NOK",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）系统设备商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E034→Lumentum需方）",
@@ -2834,12 +2872,12 @@
       "name_cell_raw": "N25 Nokia [NYSE:NOK]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 618
+      "source_line": 645
     },
     {
       "name": "星微科技",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）驱动控制供应商",
       "anchor": "仅类型归层，待锚；**注意**：为猎奇智能\"驱动控制\"类设备供应商，非光模块电芯片Driver IC，s0c-gap-grid已显式排除为假友元",
       "status": "有（E051→猎奇智能需方）",
@@ -2848,12 +2886,12 @@
       "name_cell_raw": "N34 星微科技 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 619
+      "source_line": 646
     },
     {
       "name": "烽火通信",
       "market_code": "沪主板:600498",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "信息通信网络产品与解决方案提供商，主营业务立足于光通信",
       "anchor": "有锚；发行人自述（2023年报）",
       "status": "有（E074→光迅科技需方）",
@@ -2862,12 +2900,12 @@
       "name_cell_raw": "N38 烽火通信 [沪主板:600498]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 620
+      "source_line": 647
     },
     {
       "name": "奥特维",
       "market_code": "科创:688516",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）组件封装设备商",
       "anchor": "仅类型归层，待锚；主业光伏，光模块设备为扩张线",
       "status": "有（E080→客户匿名）",
@@ -2876,12 +2914,12 @@
       "name_cell_raw": "N39 奥特维 [科创:688516]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 621
+      "source_line": 648
     },
     {
       "name": "博众精工",
       "market_code": "科创:688097",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）自动化设备商",
       "anchor": "仅类型归层，待锚；3C自动化主业",
       "status": "有（E081→客户匿名）",
@@ -2890,12 +2928,12 @@
       "name_cell_raw": "N40 博众精工 [科创:688097]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 622
+      "source_line": 649
     },
     {
       "name": "快克智能",
       "market_code": "沪主板:603203",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）焊接设备商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E078→客户匿名）",
@@ -2904,12 +2942,12 @@
       "name_cell_raw": "N41 快克智能 [沪主板:603203]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 623
+      "source_line": 650
     },
     {
       "name": "普源精电",
       "market_code": "科创:688337",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）测试测量仪器",
       "anchor": "仅类型归层，待锚",
       "status": "有（E079→客户匿名）",
@@ -2918,12 +2956,12 @@
       "name_cell_raw": "N42 普源精电 [科创:688337]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 624
+      "source_line": 651
     },
     {
       "name": "联讯仪器",
       "market_code": "IPO在途:科创板",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "电子测量仪器和半导体测试设备的研发、制造、销售及服务",
       "anchor": "有锚；发行人自述（招股书）",
       "status": "有（E082起多条）",
@@ -2932,12 +2970,12 @@
       "name_cell_raw": "N43 联讯仪器 [IPO在途:科创板]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 625
+      "source_line": 652
     },
     {
       "name": "上海飞博激光科技股份有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）激光设备/科研",
       "anchor": "仅类型归层，待锚",
       "status": "有（E217→长光华芯需方）",
@@ -2946,12 +2984,12 @@
       "name_cell_raw": "N75 上海飞博激光科技股份有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 626
+      "source_line": 653
     },
     {
       "name": "光惠激光科技有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）激光设备/科研",
       "anchor": "仅类型归层，待锚",
       "status": "有（E219→长光华芯需方）",
@@ -2960,12 +2998,12 @@
       "name_cell_raw": "N86 光惠激光科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 627
+      "source_line": 654
     },
     {
       "name": "创鑫激光",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）激光设备/科研",
       "anchor": "仅类型归层，待锚",
       "status": "有（E220→长光华芯需方）",
@@ -2974,12 +3012,12 @@
       "name_cell_raw": "N89 创鑫激光 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 628
+      "source_line": 655
     },
     {
       "name": "大科激光",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）激光设备/科研",
       "anchor": "仅类型归层，待锚",
       "status": "有（E221→长光华芯需方）",
@@ -2988,12 +3026,12 @@
       "name_cell_raw": "N102 大科激光 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 629
+      "source_line": 656
     },
     {
       "name": "武汉华日精密激光",
       "market_code": "新三板:874868",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）激光设备/科研",
       "anchor": "仅类型归层，待锚",
       "status": "有（E222→长光华芯需方）",
@@ -3002,12 +3040,12 @@
       "name_cell_raw": "N121 武汉华日精密激光 [新三板:874868]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 630
+      "source_line": 657
     },
     {
       "name": "武汉高跃科技有限责任公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）激光设备/科研",
       "anchor": "仅类型归层，待锚",
       "status": "有（E223→长光华芯需方）",
@@ -3016,12 +3054,12 @@
       "name_cell_raw": "N126 武汉高跃科技有限责任公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 631
+      "source_line": 658
     },
     {
       "name": "苏州单峰光子科技有限责任公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）激光设备/科研",
       "anchor": "仅类型归层，待锚",
       "status": "有（E224→长光华芯需方）",
@@ -3030,12 +3068,12 @@
       "name_cell_raw": "N147 苏州单峰光子科技有限责任公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 632
+      "source_line": 659
     },
     {
       "name": "苏州星钥光子科技有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）激光设备/科研",
       "anchor": "仅类型归层，待锚",
       "status": "有（E225→长光华芯需方）",
@@ -3044,12 +3082,12 @@
       "name_cell_raw": "N149 苏州星钥光子科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 633
+      "source_line": 660
     },
     {
       "name": "苏州焜原光电有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）激光设备/科研",
       "anchor": "仅类型归层，待锚",
       "status": "有（E226→长光华芯需方）",
@@ -3058,12 +3096,12 @@
       "name_cell_raw": "N150 苏州焜原光电有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 634
+      "source_line": 661
     },
     {
       "name": "苏州睿科晶创光电科技有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）激光设备/科研",
       "anchor": "仅类型归层，待锚",
       "status": "有（E227→长光华芯需方）",
@@ -3072,12 +3110,12 @@
       "name_cell_raw": "N152 苏州睿科晶创光电科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 635
+      "source_line": 662
     },
     {
       "name": "锐科激光",
       "market_code": "创业:300747",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）激光设备/科研",
       "anchor": "仅类型归层，待锚",
       "status": "有（E216/E229→长光华芯）",
@@ -3086,12 +3124,12 @@
       "name_cell_raw": "N159 锐科激光 [创业:300747]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 636
+      "source_line": 663
     },
     {
       "name": "飞博激光",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）激光设备/科研",
       "anchor": "仅类型归层，待锚",
       "status": "有（E230→长光华芯需方）",
@@ -3100,12 +3138,12 @@
       "name_cell_raw": "N167 飞博激光 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 637
+      "source_line": 664
     },
     {
       "name": "飞顿国际有限公司、飞顿国际科技有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-025",
+      "leaf": "leaf-026",
       "identity_quote": "（类型）激光设备/科研",
       "anchor": "仅类型归层，待锚",
       "status": "有（E231→长光华芯需方）",
@@ -3114,12 +3152,12 @@
       "name_cell_raw": "N168 飞顿国际有限公司、飞顿国际科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 638
+      "source_line": 665
     },
     {
       "name": "Fabrinet",
       "market_code": "NYSE:FN",
-      "leaf": "leaf-026",
+      "leaf": "leaf-027",
       "identity_quote": "向OEM提供光通信组件/模块/子系统等复杂产品的光学封装与精密光机电电子制造服务",
       "anchor": "有锚；发行人自述（Fabrinet 10-K）",
       "status": "有（E001起多条，链条天孚→Fabrinet→NVIDIA两跳全实名）",
@@ -3128,12 +3166,12 @@
       "name_cell_raw": "N01 Fabrinet [NYSE:FN]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 652
+      "source_line": 679
     },
     {
       "name": "NVIDIA",
       "market_code": "NASDAQ:NVDA",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "（类型）算力终端/系统商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E001/E012→需方）",
@@ -3142,12 +3180,12 @@
       "name_cell_raw": "N02 NVIDIA [NASDAQ:NVDA]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 658
+      "source_line": 685
     },
     {
       "name": "Microsoft",
       "market_code": "NASDAQ:MSFT",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "（类型）云巨头(终端)",
       "anchor": "仅类型归层，待锚",
       "status": "有（E017/E018/E019→AAOI需方）",
@@ -3156,12 +3194,12 @@
       "name_cell_raw": "N20 Microsoft [NASDAQ:MSFT]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 659
+      "source_line": 686
     },
     {
       "name": "Oracle",
       "market_code": "NYSE:ORCL",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "（类型）云巨头(终端)",
       "anchor": "仅类型归层，待锚",
       "status": "有（E020→AAOI需方）",
@@ -3170,12 +3208,12 @@
       "name_cell_raw": "N21 Oracle [NYSE:ORCL]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 660
+      "source_line": 687
     },
     {
       "name": "Apple",
       "market_code": "NASDAQ:AAPL",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "（类型）消费电子终端",
       "anchor": "仅类型归层，待锚；3D传感需求非光通信",
       "status": "有（E026/E027/E028→Lumentum需方）",
@@ -3184,12 +3222,12 @@
       "name_cell_raw": "N24 Apple [NASDAQ:AAPL]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 661
+      "source_line": 688
     },
     {
       "name": "Google",
       "market_code": "NASDAQ:GOOGL",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "（类型）云巨头(终端)",
       "anchor": "仅类型归层，待锚",
       "status": "有（E035/E037→Lumentum需方）",
@@ -3198,12 +3236,12 @@
       "name_cell_raw": "N26 Google [NASDAQ:GOOGL]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 662
+      "source_line": 689
     },
     {
       "name": "Corning Incorporated",
       "market_code": "NYSE:GLW",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "（类型）线缆/系统/终端",
       "anchor": "仅类型归层，待锚",
       "status": "有（E165→太辰光需方）",
@@ -3212,12 +3250,12 @@
       "name_cell_raw": "N52 Corning Incorporated [NYSE:GLW]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 663
+      "source_line": 690
     },
     {
       "name": "Corning(解匿)",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "（类型）线缆/系统/终端",
       "anchor": "仅类型归层，待锚",
       "status": "有（E232→太辰光需方，推断边B级）",
@@ -3226,12 +3264,12 @@
       "name_cell_raw": "N53 Corning(解匿) [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 664
+      "source_line": 691
     },
     {
       "name": "Furukawa Electric",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "（类型）供应链主体",
       "anchor": "仅类型归层，待锚",
       "status": "有（E109→仕佳光子需方）",
@@ -3240,12 +3278,12 @@
       "name_cell_raw": "N56 Furukawa Electric [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 665
+      "source_line": 692
     },
     {
       "name": "HTI",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "（类型）线缆/系统/终端",
       "anchor": "仅类型归层，待锚",
       "status": "有（E136→剑桥科技需方）",
@@ -3254,12 +3292,12 @@
       "name_cell_raw": "N57 HTI [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 666
+      "source_line": 693
     },
     {
       "name": "上海诺基亚贝尔股份有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "（类型）线缆/系统/终端",
       "anchor": "仅类型归层，待锚",
       "status": "有（E149→博创科技需方）",
@@ -3268,12 +3306,12 @@
       "name_cell_raw": "N74 上海诺基亚贝尔股份有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 667
+      "source_line": 694
     },
     {
       "name": "中天科技(含关联方)",
       "market_code": "沪主板:600522",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "（类型）线缆/系统/终端",
       "anchor": "仅类型归层，待锚",
       "status": "有（E117→仕佳光子需方）",
@@ -3282,12 +3320,12 @@
       "name_cell_raw": "N80 中天科技(含关联方) [沪主板:600522]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 668
+      "source_line": 695
     },
     {
       "name": "中盈优创资讯科技有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "（类型）线缆/系统/终端",
       "anchor": "仅类型归层，待锚",
       "status": "有（E150→博创科技需方）",
@@ -3296,12 +3334,12 @@
       "name_cell_raw": "N81 中盈优创资讯科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 669
+      "source_line": 696
     },
     {
       "name": "中航光电(含关联方)",
       "market_code": "深主板:002179",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "（类型）线缆/系统/终端",
       "anchor": "仅类型归层，待锚",
       "status": "有（E118→仕佳光子需方）",
@@ -3310,12 +3348,12 @@
       "name_cell_raw": "N82 中航光电(含关联方) [深主板:002179]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 670
+      "source_line": 697
     },
     {
       "name": "亨通光电(含关联方)",
       "market_code": "沪主板:600487",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "（类型）线缆/系统/终端",
       "anchor": "仅类型归层，待锚",
       "status": "有（E119→仕佳光子需方）",
@@ -3324,12 +3362,12 @@
       "name_cell_raw": "N83 亨通光电(含关联方) [沪主板:600487]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 671
+      "source_line": 698
     },
     {
       "name": "剑桥科技",
       "market_code": "沪主板:603083",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "（类型）供应链主体",
       "anchor": "仅类型归层，待锚",
       "status": "有（E136→HTI需方，\"仅披露缩写，不做身份推断\"）",
@@ -3338,12 +3376,12 @@
       "name_cell_raw": "N91 剑桥科技 [沪主板:603083]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 672
+      "source_line": 699
     },
     {
       "name": "华工科技",
       "market_code": "深主板:000988",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "（类型）供应链主体",
       "anchor": "仅类型归层，待锚",
       "status": "有（E137起多条）",
@@ -3352,12 +3390,12 @@
       "name_cell_raw": "N94 华工科技 [深主板:000988]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 673
+      "source_line": 700
     },
     {
       "name": "武汉长飞智慧网络技术有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "（类型）线缆/系统/终端",
       "anchor": "仅类型归层，待锚",
       "status": "有（E153/E162→博创科技）",
@@ -3366,12 +3404,12 @@
       "name_cell_raw": "N125 武汉长飞智慧网络技术有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 674
+      "source_line": 701
     },
     {
       "name": "金信诺及其关联方",
       "market_code": "创业:300252",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "（类型）线缆/系统/终端",
       "anchor": "仅类型归层，待锚",
       "status": "有（E128→仕佳光子需方）",
@@ -3380,12 +3418,12 @@
       "name_cell_raw": "N158 金信诺及其关联方 [创业:300252]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 675
+      "source_line": 702
     },
     {
       "name": "长飞光纤(合并)",
       "market_code": "沪主板+HK:601869/6869",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "光纤",
       "anchor": "有锚；披露方产品列（仕佳光子招股书供应商表）；entity-evidence-q3：完整成员清单未获一手PDF核实，置信低-中",
       "status": "有（E135→仕佳光子；E154/E163→博创科技）",
@@ -3394,12 +3432,12 @@
       "name_cell_raw": "N161 长飞光纤(合并) [沪主板+HK:601869/6869]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 676
+      "source_line": 703
     },
     {
       "name": "长飞光纤光缆股份有限公司(单体)",
       "market_code": "沪主板+HK:601869/6869",
-      "leaf": "leaf-027",
+      "leaf": "leaf-028",
       "identity_quote": "光纤",
       "anchor": "有锚；披露方产品列",
       "status": "有（E155/E164→博创科技）",
@@ -3408,12 +3446,12 @@
       "name_cell_raw": "N162 长飞光纤光缆股份有限公司(单体) [沪主板+HK:601869/6869]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 677
+      "source_line": 704
     },
     {
       "name": "浙江粮油",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-028",
+      "leaf": "leaf-029",
       "identity_quote": "（类型）出口代理(贸易商)",
       "anchor": "仅类型归层，待锚",
       "status": "有（E016\"浙江粮油(出口代理)\"→新易盛需方）",
@@ -3422,12 +3460,12 @@
       "name_cell_raw": "N17 浙江粮油 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 689
+      "source_line": 716
     },
     {
       "name": "Digicomm",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-028",
+      "leaf": "leaf-029",
       "identity_quote": "（类型）CATV分销商",
       "anchor": "仅类型归层，待锚",
       "status": "有（E023/E024/E025→AAOI需方）",
@@ -3436,12 +3474,12 @@
       "name_cell_raw": "N23 Digicomm [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 690
+      "source_line": 717
     },
     {
       "name": "南央国际",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-028",
+      "leaf": "leaf-029",
       "identity_quote": "（类型）滑台类日本代理",
       "anchor": "仅类型归层，待锚",
       "status": "有（E053→猎奇智能需方）",
@@ -3450,12 +3488,12 @@
       "name_cell_raw": "N36 南央国际 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 691
+      "source_line": 718
     },
     {
       "name": "津微光电",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-028",
+      "leaf": "leaf-029",
       "identity_quote": "（类型）神津精机代理",
       "anchor": "仅类型归层，待锚",
       "status": "有（E054→猎奇智能需方）",
@@ -3464,12 +3502,12 @@
       "name_cell_raw": "N37 津微光电 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 692
+      "source_line": 719
     },
     {
       "name": "讯速信远",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-028",
+      "leaf": "leaf-029",
       "identity_quote": "（类型）测试设备经销",
       "anchor": "仅类型归层，待锚",
       "status": "有（E084→联讯仪器需方）",
@@ -3478,12 +3516,12 @@
       "name_cell_raw": "N45 讯速信远 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 693
+      "source_line": 720
     },
     {
       "name": "陕西电子信息国际商务有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-028",
+      "leaf": "leaf-029",
       "identity_quote": "贸易/委托加工通道：披露产品列含衬底等、钛靶材；委托加工列含光栅工艺",
       "anchor": "有锚；披露方产品列（源杰招股书）",
       "status": "有（E199/E200→源杰科技）",
@@ -3492,12 +3530,12 @@
       "name_cell_raw": "N164 陕西电子信息国际商务有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 694
+      "source_line": 721
     },
     {
       "name": "顺丰速运(西安顺丰及其咸阳分公司)",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-028",
+      "leaf": "leaf-029",
       "identity_quote": "运费/物流",
       "anchor": "有锚；披露方产品列；entity-evidence-q3：确认为顺丰集团全资子公司，仅二手转述佐证",
       "status": "有（E200→源杰科技需方）",
@@ -3506,12 +3544,12 @@
       "name_cell_raw": "N166 顺丰速运(西安顺丰及其咸阳分公司) [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 695
+      "source_line": 722
     },
     {
       "name": "派克新材",
       "market_code": "沪主板:605123",
-      "leaf": "leaf-029",
+      "leaf": "leaf-030",
       "identity_quote": "（类型）锻件厂(跨行业)",
       "anchor": "仅类型归层，待锚",
       "status": "有（E013→等离子体所需方，**仅E013 schema参考，边界外**）",
@@ -3520,12 +3558,12 @@
       "name_cell_raw": "N27 派克新材 [沪主板:605123]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 701
+      "source_line": 728
     },
     {
       "name": "等离子体所",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-029",
+      "leaf": "leaf-030",
       "identity_quote": "（类型）科研院所(跨行业)",
       "anchor": "仅类型归层，待锚",
       "status": "有（E013\"等离子体所(客户)\"→需方，边界外）",
@@ -3534,12 +3572,12 @@
       "name_cell_raw": "N28 等离子体所 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 702
+      "source_line": 729
     },
     {
       "name": "索恩格(SEG Automotive)",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-029",
+      "leaf": "leaf-030",
       "identity_quote": "（类型）汽车电机厂",
       "anchor": "仅类型归层，待锚；猎奇非光通信客户",
       "status": "有（E046\"索恩格\"→猎奇智能需方）",
@@ -3548,12 +3586,12 @@
       "name_cell_raw": "N30 索恩格(SEG Automotive) [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 703
+      "source_line": 730
     },
     {
       "name": "中国科学院半导体研究所",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-029",
+      "leaf": "leaf-030",
       "identity_quote": "（类型）科研院所",
       "anchor": "仅类型归层，待锚",
       "status": "有（E104/E116→仕佳光子需方）",
@@ -3562,12 +3600,12 @@
       "name_cell_raw": "N78 中国科学院半导体研究所 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 704
+      "source_line": 731
     },
     {
       "name": "中国科学院长春光学精密机械与物理研究所",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-029",
+      "leaf": "leaf-030",
       "identity_quote": "（类型）激光设备/科研",
       "anchor": "仅类型归层，待锚",
       "status": "有（E218→长光华芯需方）",
@@ -3576,12 +3614,12 @@
       "name_cell_raw": "N79 中国科学院长春光学精密机械与物理研究所 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 705
+      "source_line": 732
     },
     {
       "name": "咸阳华汉光电密封制品有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-029",
+      "leaf": "leaf-030",
       "identity_quote": "房屋建筑物租赁（关联交易披露，非BOM产品）",
       "anchor": "有锚；披露方产品列（源杰招股书）",
       "status": "有（E169→源杰科技需方）",
@@ -3590,12 +3628,12 @@
       "name_cell_raw": "N97 咸阳华汉光电密封制品有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 706
+      "source_line": 733
     },
     {
       "name": "PINEWAVE",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-030",
+      "leaf": "leaf-031",
       "identity_quote": "（类型）旭创关联方(海外销售主体待核)",
       "anchor": "仅类型归层，待锚；2025年旭创对其销售4.34亿美元",
       "status": "有（E044\"PINEWAVE(关联方)\"→中际旭创需方）",
@@ -3604,12 +3642,12 @@
       "name_cell_raw": "N29 PINEWAVE [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 712
+      "source_line": 739
     },
     {
       "name": "Broadex Technologies UK Limited",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-030",
+      "leaf": "leaf-031",
       "identity_quote": "（类型）供应链主体",
       "anchor": "仅类型归层，待锚",
       "status": "有（E145/E147→博创科技）",
@@ -3618,12 +3656,12 @@
       "name_cell_raw": "N50 Broadex Technologies UK Limited [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 713
+      "source_line": 740
     },
     {
       "name": "Mighty Lift.,Inc.",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-030",
+      "leaf": "leaf-031",
       "identity_quote": "（类型）供应链主体",
       "anchor": "仅类型归层，待锚",
       "status": "有（E202→长光华芯需方）",
@@ -3632,12 +3670,12 @@
       "name_cell_raw": "N63 Mighty Lift.,Inc. [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 714
+      "source_line": 741
     },
     {
       "name": "分销商A(匿名)",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-030",
+      "leaf": "leaf-031",
       "identity_quote": "（类型）供应链主体",
       "anchor": "仅类型归层，待锚",
       "status": "有（E059→中际旭创需方，半边槽位）",
@@ -3646,12 +3684,12 @@
       "name_cell_raw": "N88 分销商A(匿名) [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 715
+      "source_line": 742
     },
     {
       "name": "前五大终端客户(匿名合计)",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-030",
+      "leaf": "leaf-031",
       "identity_quote": "（类型）供应链主体",
       "anchor": "仅类型归层，待锚",
       "status": "有（E235→博通需方，非DSP专属口径）",
@@ -3660,12 +3698,12 @@
       "name_cell_raw": "N90 前五大终端客户(匿名合计) [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 716
+      "source_line": 743
     },
     {
       "name": "成都八九九科技有限公司",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-030",
+      "leaf": "leaf-031",
       "identity_quote": "（类型）供应链主体",
       "anchor": "仅类型归层，待锚",
       "status": "有（E159→博创科技需方）",
@@ -3674,12 +3712,12 @@
       "name_cell_raw": "N110 成都八九九科技有限公司 [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 717
+      "source_line": 744
     },
     {
       "name": "某分销商(匿名)",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-030",
+      "leaf": "leaf-031",
       "identity_quote": "（类型）供应链主体",
       "anchor": "仅类型归层，待锚",
       "status": "有（E066→天孚通信需方）",
@@ -3688,12 +3726,12 @@
       "name_cell_raw": "N117 某分销商(匿名) [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 718
+      "source_line": 745
     },
     {
       "name": "直接客户A(匿名)",
       "market_code": "未上市/未识别",
-      "leaf": "leaf-030",
+      "leaf": "leaf-031",
       "identity_quote": "（类型）供应链主体",
       "anchor": "仅类型归层，待锚",
       "status": "有（E233→Marvell需方，非DSP专属口径）",
@@ -3702,7 +3740,7 @@
       "name_cell_raw": "N144 直接客户A(匿名) [未上市/未识别]",
       "raw_name_annotation": "",
       "anchor_urls": [],
-      "source_line": 719
+      "source_line": 746
     }
   ],
   "network": {
@@ -9420,12 +9458,12 @@
   },
   "parse_warnings": [],
   "meta": {
-    "generated_at": "2026-07-24T00:00:00+08:00",
+    "generated_at": "2026-07-24T21:30+08:00",
     "counts": {
       "branches": 9,
-      "leaves": 30,
-      "company_rows": 201,
-      "unique_company_names": 193,
+      "leaves": 31,
+      "company_rows": 202,
+      "unique_company_names": 194,
       "nodes": 169,
       "edges": 236,
       "relationship_index_companies": 202,
@@ -9435,13 +9473,13 @@
         "cross_reference": 2,
         "edge_backed": 171,
         "lead_only": 5,
-        "node_wide_gate": 22
+        "node_wide_gate": 23
       }
     },
     "sources": {
       "panorama": {
         "path": "output/光模块供应链全景-v1.1.md",
-        "sha256": "0a857e0aa8bb29f01782fe379d097764ae434157d13ecadb7b5603b364368f82"
+        "sha256": "d26a26b35f592a78b99d48158823e63c453c4da4f410c75643de336c26a454b0"
       },
       "nodes": {
         "path": "output/nodes.csv",
