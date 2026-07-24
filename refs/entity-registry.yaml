@@ -405,3 +405,12 @@ observation_scope_layer:
       anchor: ""
       source_ruling: 5
       notes: "物流服务商，集团口径合理；西安顺丰为子/分支，可走 branch scope 独立观察"
+
+# 2026-07-25 天眼查对外投资数据修正(聚合库,pending_primary)
+- entity_id: LEGAL_ZHIHE
+  legal_name: 成都智禾光通科技有限公司
+  identifiers: {信用代码: 91510100MA69GLFW85}
+  related: {member_of: 旭创系(中际旭创100%全资,天眼查对外投资,2021-01设立)}
+  identity_decision: distinct_legal_entities
+  修正: 此前"承继原成都旭创且脱离旭创系"推断后半句错误,智禾在系内
+- 曾用名补充: {天孚通信: 苏州天孚精密陶瓷有限公司, 中际旭创: 龙口中际电工机械/山东中际电工装备}
