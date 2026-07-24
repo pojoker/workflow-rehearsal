@@ -2,3 +2,4 @@
 __pycache__/
 demo/data/**/*.pdf
 .gstack/
+flows/input/corpus-v1/
