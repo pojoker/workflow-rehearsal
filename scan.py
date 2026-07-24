@@ -1,0 +1,135 @@
+#!/usr/bin/env python3
+"""scan.py — 扫描+七不变量。用法: python3 scan.py [--check]
+--check: 只跑不变量(<10s)。扫描分母=corpus/annual(_frozen登记);legacy-input=证据库不参与扫描。"""
+import sys,os,csv,re,glob,time,subprocess
+
+ROOT=os.path.dirname(os.path.abspath(__file__))
+ERR=[]
+def fail(k,msg): ERR.append(f"[{k}] {msg}")
+
+def rows(f):
+    p=os.path.join(ROOT,f)
+    return list(csv.DictReader(open(p,encoding='utf-8-sig'))) if os.path.exists(p) else []
+
+E_状态={'生产中','在建','传闻','宇宙外观察'}
+E_标签={'A股','美股','港股','台股','未上市私企','未解析'}
+E_数值类型={'占比','金额'}
+E_单位={'元','万元','亿元','美元','万美元','百万美元','亿美元','欧元','万欧元'}
+E_边等级={'实边','半边','推断A','推断B','推断C'}
+E_来源={'扫描','线索','人工'}
+E_处置={'已入点','已入边候选','驳回-碰撞','驳回-非本格','驳回-证据不足','待判'}
+U2Y={'元':1,'万元':1e4,'亿元':1e8,'美元':7,'万美元':7e4,'百万美元':7e6,'亿美元':7e8,'欧元':8,'万欧元':8e4}
+
+def staleness():
+    fs=glob.glob(os.path.join(ROOT,'corpus/annual/**/*.pdf'),recursive=True)
+    if not fs: print('[饥饿] corpus/annual 无语料'); return
+    n=(time.time()-max(os.path.getmtime(f) for f in fs))/86400
+    frozen={r['代码'] for r in rows('corpus/_frozen.csv')}
+    have={os.path.basename(d) for d in glob.glob(os.path.join(ROOT,'corpus/annual/*')) if os.path.isdir(d)}
+    miss=sorted(frozen-have)
+    print(f"[语料] 最新文件距今{n:.0f}天; 宇宙内缺席年报 {len(miss)} 家"+(f"(样例:{','.join(miss[:5])})" if miss else ''))
+    if n>120: print("[黄灯] 语料距今>120天,该投喂了(README年报季提示)")
+
+def invariants():
+    pts,egs,trg=rows('points.csv'),rows('edges.csv'),rows('triage.csv')
+    # ①分母: annual/<code> 必在_frozen
+    frozen={r['代码'] for r in rows('corpus/_frozen.csv')}
+    if not frozen: fail('①','corpus/_frozen.csv 缺失或为空')
+    for d in glob.glob(os.path.join(ROOT,'corpus/annual/*')):
+        c=os.path.basename(d)
+        if os.path.isdir(d) and c not in frozen: fail('①',f'语料目录无分母行: {c}')
+    # ②端点闭合
+    pid={p['point_id'] for p in pts}|{'ANON','EXT'}
+    for e in egs:
+        for col in ('供方point_id','需方point_id'):
+            if e.get(col,'') and e[col] not in pid: fail('②',f"{e.get('edge_id')} {col}={e[col]} 悬空")
+    # ③自指(零豁免): 上市且非宇宙外观察 ⇒ 公司须∈_frozen名称或代码; 宇宙外观察须在tree观察名单
+    import yaml
+    tr=yaml.safe_load(open(os.path.join(ROOT,'tree.yaml'),encoding='utf-8'))
+    obs={o['名称'] for o in tr.get('observation_list',[])}
+    fro_names={r['名称'] for r in rows('corpus/_frozen.csv')}
+    for p in pts:
+        if p['状态']=='宇宙外观察':
+            if p['公司'] not in obs: fail('③',f"{p['公司']} 宇宙外观察但不在tree观察名单")
+        elif p['上市标签'] in ('A股',):
+            if p['公司'] not in fro_names and not any(p['公司'] in n or n in p['公司'] for n in fro_names):
+                fail('③',f"{p['公司']} A股生产点不在_frozen分母(零豁免,须先入corpus)")
+    # ④单位量级
+    for e in egs:
+        t=e.get('数值类型','')
+        if t=='金额':
+            if e.get('单位','') not in E_单位: fail('④',f"{e.get('edge_id')} 金额行单位非法:[{e.get('单位')}]")
+            else:
+                try:
+                    v=float(str(e['数值']).replace(',',''))*U2Y[e['单位']]
+                    if not (1e3<=v<=5e11): fail('④',f"{e.get('edge_id')} 金额换算{v:.0f}元越界(疑单位错)")
+                except: fail('④',f"{e.get('edge_id')} 数值不可解析")
+        elif t=='占比':
+            try:
+                v=float(str(e['数值']))
+                if not (0<v<=100): fail('④',f"{e.get('edge_id')} 占比{v}越界")
+            except: fail('④',f"{e.get('edge_id')} 占比不可解析")
+    # ⑤枚举
+    for p in pts:
+        if p['状态'] not in E_状态: fail('⑤',f"points {p.get('point_id')} 状态非法:{p['状态']}")
+        if p['上市标签'] not in E_标签: fail('⑤',f"points {p.get('point_id')} 上市标签非法:{p['上市标签']}")
+    for e in egs:
+        if e.get('数值类型') and e['数值类型'] not in E_数值类型: fail('⑤',f"{e.get('edge_id')} 数值类型非法")
+        if e.get('边等级') and e['边等级'] not in E_边等级: fail('⑤',f"{e.get('edge_id')} 边等级非法:{e['边等级']}")
+    for t in trg:
+        if t['来源'] not in E_来源: fail('⑤',f"triage {t.get('hit_id')} 来源非法")
+        if t['处置'] not in E_处置: fail('⑤',f"triage {t.get('hit_id')} 处置非法")
+    for i,l in enumerate(open(os.path.join(ROOT,'words.txt'),encoding='utf-8')) if os.path.exists(os.path.join(ROOT,'words.txt')) else []:
+        if l.strip() and not l.startswith('#') and l.count('|')!=3: fail('⑤',f"words.txt 第{i+1}行竖线数≠3")
+    # ⑥白名单
+    WL={'README.md','CLAUDE.md','tree.yaml','points.csv','edges.csv','triage.csv','words.txt','scan.py','render.py','RESTART-v2.md','.gitignore','.DS_Store'}
+    for f in os.listdir(ROOT):
+        if os.path.isfile(os.path.join(ROOT,f)) and f not in WL: fail('⑥',f'根目录白名单外文件: {f}')
+    refs=os.listdir(os.path.join(ROOT,'refs')) if os.path.isdir(os.path.join(ROOT,'refs')) else []
+    if len(refs)>6: fail('⑥',f'refs/文件数{len(refs)}>6(补丁P3)')
+    for m in glob.glob(os.path.join(ROOT,'**/*.md'),recursive=True):
+        rel=os.path.relpath(m,ROOT)
+        if not rel.startswith(('archive/','refs/','out/','corpus/')) and rel not in ('README.md','CLAUDE.md','RESTART-v2.md'):
+            fail('⑥',f'越位md: {rel}')
+    # ⑦triage一致性
+    pnames={p['公司'] for p in pts}
+    for t in trg:
+        if t['处置']=='已入点' and t['公司'] not in pnames: fail('⑦',f"triage {t['hit_id']} 已入点但points无此公司")
+
+def scan():
+    """全量扫描: words×corpus/annual → 净队列(剔除triage已处置), 空叶格优先(P6), hit_id=公司+cell+文件(P7)"""
+    words=[]
+    for l in open(os.path.join(ROOT,'words.txt'),encoding='utf-8'):
+        if l.strip() and not l.startswith('#'):
+            w,cell,ex,ctx=[x.strip() for x in l.split('|')]
+            words.append((w,cell,ex,ctx))
+    done={t['hit_id'] for t in rows('triage.csv')}
+    pts=rows('points.csv'); filled={p['cell_id'] for p in pts}
+    q=[]
+    for d in sorted(glob.glob(os.path.join(ROOT,'corpus/annual/*/'))):
+        for pdf in glob.glob(d+'**/*.pdf',recursive=True):
+            txt=pdf+'.txt'
+            if not os.path.exists(txt): subprocess.run(['pdftotext','-layout',pdf,txt],capture_output=True)
+            try: t=re.sub(r'\s+','',open(txt,encoding='utf-8',errors='ignore').read())
+            except: continue
+            m=re.search(r'_([^_]+)_em_',os.path.basename(pdf)); co=m.group(1) if m else os.path.basename(d.rstrip('/'))
+            for w,cell,ex,ctx in words:
+                for mm in list(re.finditer(re.escape(w),t))[:2]:
+                    seg=t[max(0,mm.start()-40):mm.end()+40]
+                    if ex and re.search(ex,seg): continue
+                    hid=f'{co}+{cell}+{os.path.basename(pdf)[:40]}'
+                    if hid in done: continue
+                    q.append((0 if cell not in filled else 1,hid,co,cell,w,seg))
+                    break
+    q.sort()
+    print(f'净队列 {len(q)} 条(空叶格优先排序)')
+    for pr,hid,co,cell,w,seg in q[:40]: print(f'  [{"空格" if pr==0 else "  "}] {co} | {cell} | {w} | {seg[:50]}')
+    return q
+
+if __name__=='__main__':
+    staleness()
+    invariants()
+    if ERR:
+        print('\n'.join('\033[31m'+e+'\033[0m' for e in ERR)); sys.exit(1)
+    print('七不变量: 全绿')
+    if '--check' not in sys.argv: scan()
