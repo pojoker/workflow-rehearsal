@@ -96,3 +96,42 @@ tree:
     - {cell_id: EQ8, 名称: 气密封装设备(缝焊/激光焊), 路线: 电信气密}
 
 EXT: [云巨头, 系统设备商, 线缆集团]   # 宇宙外终端,只作边端点,不占格
+
+# BOM流向骨架(常识层,免锚;渲染时叠加edges.csv已证边计数)
+flows:
+  - {from: M1, to: [M2a, M2b]}
+  - {from: M2a, to: [C1, C3, C6]}
+  - {from: M2b, to: [C2]}
+  - {from: M2c, to: [C4]}
+  - {from: M3, to: [M2a, M2b, C1, C2, C4]}
+  - {from: M4, to: [D4, D7, D10, B2]}
+  - {from: M5, to: [B1]}
+  - {from: C1, to: [P1, D12, C6]}
+  - {from: C2, to: [P1, D12]}
+  - {from: C3, to: [P1, D2, D12]}
+  - {from: C4, to: [D12]}
+  - {from: C5, to: [D12, MOD1, MOD2, MOD3]}
+  - {from: P1, to: [D1, D2, D3]}
+  - {from: D4, to: [D1, D2, D3]}
+  - {from: D6, to: [D1, C6, MOD3]}
+  - {from: D7, to: [D1, D2, D12]}
+  - {from: D8, to: [MOD1, MOD3]}
+  - {from: D10, to: [D9, MOD3]}
+  - {from: D9, to: [MOD1]}
+  - {from: D11, to: [D8, D2]}
+  - {from: D1, to: [MOD3]}
+  - {from: D2, to: [MOD3]}
+  - {from: D3, to: [MOD3]}
+  - {from: D12, to: [MOD1]}
+  - {from: C6, to: [MOD2]}
+  - {from: B1, to: [MOD1, MOD2, MOD3]}
+  - {from: B2, to: [MOD1, MOD2, MOD3]}
+  - {from: EMS1, to: [MOD1, MOD3]}
+  - {from: EQ1, to: [M2a, M2b]}
+  - {from: EQ2, to: [C1, C4]}
+  - {from: EQ3, to: [P1, D12]}
+  - {from: EQ4, to: [P1, D12]}
+  - {from: EQ5, to: [P1, D12]}
+  - {from: EQ6, to: [D12, MOD1]}
+  - {from: EQ7, to: [MOD1, MOD2, MOD3]}
+  - {from: EQ8, to: [D1, D2, D3, MOD3]}
