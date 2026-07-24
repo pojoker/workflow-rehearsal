@@ -1,0 +1,11 @@
+#!/bin/bash
+cd "$(git rev-parse --show-toplevel)"
+WL="README.md CLAUDE.md tree.yaml points.csv edges.csv triage.csv words.txt scan.py render.py RESTART-v2.md .gitignore"
+for f in $(ls -p | grep -v /); do
+  echo "$WL" | tr ' ' '\n' | grep -qx "$f" || { echo "pre-commit拒绝: 根目录白名单外文件 [$f]"; exit 1; }
+done
+REFN=$(ls refs 2>/dev/null | wc -l | tr -d ' ')
+[ "$REFN" -gt 6 ] && { echo "pre-commit拒绝: refs/文件数$REFN>6"; exit 1; }
+[ -f scan.py ] && { python3 scan.py --check || exit 1; }
+[ -f render.py ] && { python3 render.py --verify || exit 1; }
+exit 0
