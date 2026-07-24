@@ -117,6 +117,7 @@ def scan():
                 for mm in list(re.finditer(re.escape(w),t))[:2]:
                     seg=t[max(0,mm.start()-40):mm.end()+40]
                     if ex and re.search(ex,seg): continue
+                    if ctx and ctx not in seg: continue
                     hid=f'{co}+{cell}+{os.path.basename(pdf)[:40]}'
                     if hid in done: continue
                     q.append((0 if cell not in filled else 1,hid,co,cell,w,seg))
