@@ -431,3 +431,8 @@
 "920179","凯德石英","北交所","半导体","巨潮资讯WebAPI p_stock2110（申银万国行业分类标准F001V=008003；当前记录F008C=1；查询日2026-07-24；https://webapi.cninfo.com.cn/api/stock/p_stock2110?scode=920179&sdate=1990-01-01&edate=2026-07-24）"
 "920186","中科仪","北交所","半导体","巨潮资讯WebAPI p_stock2110（申银万国行业分类标准F001V=008003；当前记录F008C=1；查询日2026-07-24；https://webapi.cninfo.com.cn/api/stock/p_stock2110?scode=920186&sdate=1990-01-01&edate=2026-07-24）"
 "920189","康美特","北交所","半导体","巨潮资讯WebAPI p_stock2110（申银万国行业分类标准F001V=008003；当前记录F008C=1；查询日2026-07-24；https://webapi.cninfo.com.cn/api/stock/p_stock2110?scode=920189&sdate=1990-01-01&edate=2026-07-24）"
+Fabrinet,Fabrinet,美股,宇宙外补录v2,"v2补录:点层迁移,出处=有锚；发行人自述（Fabrinet 10-K）"
+Marvell,Marvell,美股,宇宙外补录v2,"v2补录:点层迁移,出处=FY2026 10-K产品段(sec.gov mrvl-20260131.htm,补锚2026-07-24)"
+博通(Broadcom),博通(Broadcom),美股,宇宙外补录v2,"v2补录:点层迁移,出处=FY2025 10-K产品段(sec.gov avgo-20251102.htm,共识结构层补锚2026-07-24)"
+300757,罗博特科,深交所创业板,宇宙外补录v2,"v2补录:点层需要(耦合设备/ficonTEC母公司),申万机械设备行业不在四行业分母;出处=巨潮 http://www.cninfo.com.cn/new/disclosure/stock?stockCode=300757"
+300346,江苏南大光电材料股份有限公司,深交所创业板,宇宙外补录v2,"v2补录:点层需要(MO源/磷烷,源杰供应商),申万电子化学品不在四行业分母;出处=巨潮 http://www.cninfo.com.cn/new/disclosure/stock?stockCode=300346"
