@@ -1,0 +1,98 @@
+# tree.yaml — 光模块 BOM 骨架 v2（共识结构层：教科书级+archive/industry-chain-v2底稿，schema 无锚字段=物理免锚）
+meta:
+  version: v2
+  date: "2026-07-24"
+  底稿: archive/industry-chain-v2（codex 112节点五层结构，读取一次）
+  修复: [L8电信视角, 外延层缺失, 路线未分叉]
+
+universe:                     # 分母定义（L4：边界印在结构上）
+  frozen_file: corpus/_frozen.csv
+  frozen_date: "2026-07-24"
+  count: 432
+  行业口径: [光学光电子, 通信设备, 元件, 半导体]   # 申万二级，巨潮WebAPI逐家带出处
+  扩容规则: 升版本号且新增行带出处；美股/港股点须先入corpus+_frozen（补丁P1，零豁免）
+
+observation_list:             # 宇宙外观察点合法名录（点准入路径②：须官网/上市文件锚+引语）
+  - {名称: 联亚光电, 市场: 台股, 理由: InP外延代工}
+  - {名称: 全新光电, 市场: 台股, 理由: III-V外延片}
+  - {名称: IQE, 市场: 伦敦, 理由: 化合物半导体外延}
+  - {名称: 海思, 市场: 未上市(华为子公司), 理由: 光模块DSP自研}
+
+tree:
+- id: M
+  名称: 材料层
+  children:
+    - {cell_id: M1, 名称: 衬底(InP/GaAs), 路线: 共用}
+    - id: M2
+      名称: 外延层            # L8修复：独立产业环节，≥3叶
+      children:
+        - {cell_id: M2a, 名称: InP量子阱外延/掩埋再生长, 路线: 共用, 工艺备注: MOCVD/MBE}
+        - {cell_id: M2b, 名称: GaAs/VCSEL外延, 路线: 数通COB/硅光}
+        - {cell_id: M2c, 名称: 锗/硅基选区外延, 路线: 数通COB/硅光, 工艺备注: 锗探测器}
+    - {cell_id: M3, 名称: 靶材/MO源/特气/光刻耗材, 路线: 共用}
+    - {cell_id: M4, 名称: 结构陶瓷/粉体, 路线: 共用}
+    - {cell_id: M5, 名称: 高速板材, 路线: 共用}
+- id: C
+  名称: 芯片层
+  children:
+    - {cell_id: C1, 名称: 激光器芯片(EML/DFB/CW光源), 路线: 共用}
+    - {cell_id: C2, 名称: VCSEL, 路线: 数通COB/硅光, 工艺备注: 多模短距}
+    - {cell_id: C3, 名称: 探测器芯片(PIN/APD), 路线: 共用}
+    - {cell_id: C4, 名称: 硅光PIC, 路线: 数通COB/硅光, 工艺备注: SOI平台,CMOS代工}
+    - {cell_id: C5, 名称: 电芯片(DSP/Driver/TIA/CDR), 路线: 共用}
+    - {cell_id: C6, 名称: 可调谐激光器/相干光组件, 路线: 相干, 工艺备注: 气密金盒}
+- id: P
+  名称: 芯片封装/委外
+  children:
+    - {cell_id: P1, 名称: 芯片封装(COC/TO/筛选), 路线: 共用, 工艺备注: 委外常态(东飞凌型)}
+- id: D
+  名称: 器件层
+  children:
+    - id: D-tel
+      名称: 电信/接入气密线      # TOSA/ROSA只在此分支合法
+      children:
+        - {cell_id: D1, 名称: TOSA, 路线: 电信气密}
+        - {cell_id: D2, 名称: ROSA, 路线: 电信气密}
+        - {cell_id: D3, 名称: BOSA, 路线: 电信气密}
+        - {cell_id: D4, 名称: 陶瓷管壳/TO管座, 路线: 电信气密}
+    - id: D-dc
+      名称: 数通组件线           # 断言:本分支禁止出现TOSA/ROSA叶
+      children:
+        - {cell_id: D12, 名称: 光引擎/COB组件, 路线: 数通COB/硅光, 工艺备注: 固晶+键合,非气密}
+    - id: D-pas
+      名称: 无源器件(跨线共用)
+      children:
+        - {cell_id: D6, 名称: 隔离器, 路线: 共用, 工艺备注: 光隔离,勿混数字隔离器}
+        - {cell_id: D7, 名称: 透镜/微光学, 路线: 共用}
+        - {cell_id: D8, 名称: AWG/波分复用, 路线: 共用}
+        - {cell_id: D9, 名称: 光纤阵列FAU/MPO连接, 路线: 共用}
+        - {cell_id: D10, 名称: 陶瓷插芯/套管, 路线: 共用}
+        - {cell_id: D11, 名称: 滤波片/薄膜, 路线: 共用}
+- id: B
+  名称: 电路与结构
+  children:
+    - {cell_id: B1, 名称: 光模块PCB, 路线: 共用}
+    - {cell_id: B2, 名称: 结构件(底座/壳体/散热), 路线: 共用}
+- id: MOD
+  名称: 模块层
+  children:
+    - {cell_id: MOD1, 名称: 数通直检模块(800G/1.6T), 路线: 数通COB/硅光}
+    - {cell_id: MOD2, 名称: 相干模块(400ZR+), 路线: 相干}
+    - {cell_id: MOD3, 名称: 电信/接入模块, 路线: 电信气密}
+- id: EMS
+  名称: 制造/代工
+  children:
+    - {cell_id: EMS1, 名称: 模块代工EMS, 路线: 共用}
+- id: EQ
+  名称: 设备/仪器纵轴          # 服务各工序,不在BOM物流里
+  children:
+    - {cell_id: EQ1, 名称: 外延设备(MOCVD/MBE/CVD), 路线: 共用}
+    - {cell_id: EQ2, 名称: 光刻/刻蚀(III-V与硅光), 路线: 共用}
+    - {cell_id: EQ3, 名称: 贴片/固晶(共晶/固晶), 路线: 共用}
+    - {cell_id: EQ4, 名称: 耦合设备(含CPO耦合), 路线: 共用}
+    - {cell_id: EQ5, 名称: 键合设备, 路线: 共用}
+    - {cell_id: EQ6, 名称: AOI/在线检测, 路线: 共用}
+    - {cell_id: EQ7, 名称: 测试仪器/ATE(示波器/时钟恢复/老化), 路线: 共用}
+    - {cell_id: EQ8, 名称: 气密封装设备(缝焊/激光焊), 路线: 电信气密}
+
+EXT: [云巨头, 系统设备商, 线缆集团]   # 宇宙外终端,只作边端点,不占格
