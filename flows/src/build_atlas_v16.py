@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
-"""build_atlas_v16.py — 光模块产业图谱 v1.6 · 三合一前端
+"""build_atlas_v16.py — 光模块产业图谱 v1.6 · 供应链树主视图 三视图前端
 
-在 v1.5 关系图（四硬约束不变）上合并两个新视图，一次产出：
-- 视图① 关系图：236 边 / 169 节点，原四硬约束不变
-  （自包含零外链 / 边等级视觉可区分+图例 / 节点点击溯源锚点 / 页脚徽章
+按 flows/atlas-v1.6-handoff.md（T4 裁定）重做 v1.6：
+- 主视图① 供应链树 × 每节点公司名单：照 output/光模块供应链全景-v1.1.md 的
+  并行三分支 mermaid 骨架（材料分喂 → A光器件/B功能电路/C结构件 → 总成 →
+  代工EMS/下游直销），双闸声明：树不表达供货关系，空叶如实标空，T1 候选
+  不升格、单独标色。
+- 次视图② 关系图：236 边 / 169 节点，原四硬约束不变（自包含零外链 /
+  六类边等级视觉可区分+图例 / 节点点击溯源锚点 / 页脚徽章
   "236边/169节点/判例2A+2B"）。
-- 视图② 节点层上下游分层：flows/out/supply-chain-nodes-v0.md（169 节点，
-  48 有锚 / 121 待锚），全视图标注「宽准入 · 不承重」。
-- 视图③ 工序/内容：flows/out/content-layer-sample-lieqi.md（猎奇 34 条）
-  + flows/out/content-pilot-yuanjie.md（源杰 39 条），全视图标注
-  「未准入 · 不作关系边证据 · issuer_self 永不承重」。
+- 次视图③ 工序视图：横切工序轴（芯片制造→芯片封装(委外)→组件封装→模块组装
+  →测试）+ 设备/仪器纵轴；与 BOM 树是两个坐标轴，不是链环。
 
-输入均为既有彩排产出文件；本脚本只做事前端的装配与断言，不改任何台账。
+输入均为既有彩排产出文件；本脚本只做装配与断言，不改任何台账。
+注意：全景 v1.1.md 可能被 T1/T2 车道并发追加空叶候选——解析器容忍无 NID
+的候选行与"部分证实"等锚档，覆盖性断言降级为警告；重跑本脚本即可重建。
 输出自包含、无外部资源依赖的 output/光模块产业图谱-v1.6.html。
 """
 
@@ -19,15 +22,14 @@ import csv
 import json
 import os
 import re
+import time
 from collections import Counter
 
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 NODES_PATH = os.path.join(ROOT, "output", "nodes.csv")
 EDGES_PATH = os.path.join(ROOT, "output", "edges.csv")
-LAYER_MD = os.path.join(ROOT, "flows", "out", "supply-chain-nodes-v0.md")
-LIEQI_MD = os.path.join(ROOT, "flows", "out", "content-layer-sample-lieqi.md")
-YUANJIE_MD = os.path.join(ROOT, "flows", "out", "content-pilot-yuanjie.md")
+PANORAMA_MD = os.path.join(ROOT, "output", "光模块供应链全景-v1.1.md")
 OUT_PATH = os.path.join(ROOT, "output", "光模块产业图谱-v1.6.html")
 
 LAYER_ORDER = ("L1", "L2", "L3", "L4", "L5", "L6", "L7")
@@ -43,40 +45,7 @@ LAYER_LABEL = {
 DSP_BLINDSPOT = {"Marvell", "博通(Broadcom)"}
 
 
-# ---------------------------------------------------------------- 视图① 数据
-
-def layer_for_type(node_type):
-    """按「类型」字段归层；顺序用于消解复合类型，不使用节点名称映射。"""
-    t = (node_type or "").strip()
-
-    if any(k in t for k in ("算力终端", "云巨头")):
-        return "L7"
-    if any(k in t for k in (
-        "芯片", "DSP", "半导体", "半导体IDM", "驱动控制", "功率器件封测"
-    )):
-        return "L2"
-    if any(k in t for k in (
-        "代工(EMS)", "线缆/系统/终端", "系统设备商", "网络设备OEM",
-        "CATV设备商", "CATV分销商", "消费电子终端", "汽车电机厂"
-    )):
-        return "L6"
-    if "光器件" in t or "模块/器件" in t:
-        return "L4"
-    if any(k in t for k in (
-        "模块/光电子商", "光模块厂", "光模块/宽带", "供应链主体", "旭创关联方"
-    )):
-        return "L5"
-    if any(k in t for k in (
-        "封装/代工", "贸易", "代理", "物流", "设备商", "设备经销",
-        "设备/科研", "科研院所", "仪器", "自动化", "焊接"
-    )):
-        return "L3"
-    if any(k in t for k in (
-        "上游材料", "材料/设备供应商", "加工件供应商", "锻件厂"
-    )):
-        return "L1"
-    raise ValueError(f"未覆盖的节点类型: {t!r}")
-
+# ---------------------------------------------------------------- 视图② 关系图数据
 
 def grade_class(grade):
     if grade.startswith("实边(已死"):
@@ -144,8 +113,40 @@ def load_csv():
     return nodes, edges
 
 
-def build_graph():
-    nodes, edges = load_csv()
+def layer_for_type(node_type):
+    """按「类型」字段归层；顺序用于消解复合类型，不使用节点名称映射。"""
+    t = (node_type or "").strip()
+
+    if any(k in t for k in ("算力终端", "云巨头")):
+        return "L7"
+    if any(k in t for k in (
+        "芯片", "DSP", "半导体", "半导体IDM", "驱动控制", "功率器件封测"
+    )):
+        return "L2"
+    if any(k in t for k in (
+        "代工(EMS)", "线缆/系统/终端", "系统设备商", "网络设备OEM",
+        "CATV设备商", "CATV分销商", "消费电子终端", "汽车电机厂"
+    )):
+        return "L6"
+    if "光器件" in t or "模块/器件" in t:
+        return "L4"
+    if any(k in t for k in (
+        "模块/光电子商", "光模块厂", "光模块/宽带", "供应链主体", "旭创关联方"
+    )):
+        return "L5"
+    if any(k in t for k in (
+        "封装/代工", "贸易", "代理", "物流", "设备商", "设备经销",
+        "设备/科研", "科研院所", "仪器", "自动化", "焊接"
+    )):
+        return "L3"
+    if any(k in t for k in (
+        "上游材料", "材料/设备供应商", "加工件供应商", "锻件厂"
+    )):
+        return "L1"
+    raise ValueError(f"未覆盖的节点类型: {t!r}")
+
+
+def build_graph(nodes, edges):
     node_map = {}
     for row in nodes:
         name = row["名称"].strip()
@@ -232,239 +233,180 @@ def build_graph():
     }
 
 
-# ---------------------------------------------------------------- 视图② 数据
+# ---------------------------------------------------------------- 视图①③ 全景 v1.1 解析
 
-def parse_layer_md():
-    """解析 supply-chain-nodes-v0.md：分层组 + 节点行 + 分层方法。"""
-    lines = open(LAYER_MD, encoding="utf-8").read().splitlines()
-    groups, methods = [], []
+# 叶子定义：状态照 v1.1「空节点缺口任务汇总」原文；候选数由解析行动态追加。
+LEAF_DEFS = {
+    "M1":      {"title": "衬底 / 靶材 / MO源 / 特气 / 掩模", "sub": "材料 → A1a · A2a"},
+    "M1-lead": {"title": "InP 衬底线索级候选", "sub": "pilot-s0a · 未过判定闸 · 未入台账"},
+    "M2":      {"title": "石英 / 树脂 / 光纤", "sub": "材料 → A3"},
+    "M-rest":  {"title": "材料对象未细分", "sub": "仅类型归层 · 无法判定喂入叶"},
+    "A1a":     {"title": "A1a 激光器芯片", "sub": "EEL / DFB / EML / VCSEL", "status": "有主"},
+    "A1b":     {"title": "A1b 陶瓷插芯", "status": "有主"},
+    "A1c":     {"title": "A1c 陶瓷管壳", "status": "空"},
+    "A1d":     {"title": "A1d 透镜", "status": "弱覆盖"},
+    "A2a":     {"title": "A2a 探测器芯片", "sub": "PIN / APD", "status": "有主"},
+    "A3":      {"title": "A3 无源器件", "sub": "隔离器 / AWG / 分路器 / 连接器", "status": "有主（隔离器空）"},
+    "A-rest":  {"title": "A-其余光器件", "sub": "未细分至具体叶 · 仅类型归层"},
+    "B1":      {"title": "B1 电芯片", "sub": "DSP / Driver / TIA / CDR", "status": "空（4家仅类型归层）"},
+    "B2":      {"title": "B2 PCB板", "sub": "新叶", "status": "空"},
+    "C1":      {"title": "C 结构件", "sub": "底座 / 壳体 / 金手指 · 新叶", "status": "空"},
+    "MOD":     {"title": "光模块（总成）", "sub": "A / B / C 三分支汇聚节点"},
+    "EMS":     {"title": "代工 EMS"},
+    "SYS":     {"title": "系统设备商 / 云巨头终端 / 线缆", "sub": "直销或经代工 EMS"},
+    "PROC1":   {"title": "芯片封装（委托加工）", "sub": "跨光 / 电芯片工序"},
+    "PROC2":   {"title": "组件封装（TOSA/ROSA）", "sub": "工序执行者 · 非零件供应商", "status": "空"},
+    "EQ":      {"title": "设备 / 仪器纵轴", "sub": "贯穿封装-器件-模块-测试 · 不插入主链序"},
+    "X1":      {"title": "贸易 / 代理 / 物流"},
+    "X2":      {"title": "边界外 / 跨行业 / 科研 / 非BOM"},
+    "X3":      {"title": "匿名槽位 / 待核 / 类型过宽主体"},
+}
+
+HEADER_TO_LEAF = [
+    ("#### A1a 激光器芯片", "A1a"),
+    ("#### A1b 陶瓷插芯", "A1b"),
+    ("#### A1c 陶瓷管壳", "A1c"),
+    ("#### A1d 透镜", "A1d"),
+    ("#### A2a 探测器芯片", "A2a"),
+    ("#### 波分复用器 / AWG", "A3"),
+    ("#### 隔离器", "A3"),
+    ("### A-其余光器件", "A-rest"),
+    ("### B1 电芯片", "B1"),
+    ("### B2 PCB板", "B2"),
+    ("## C. 结构件分支", "C1"),
+    ("## 光模块（总成）", "MOD"),
+    ("### 材料 → A1a·A2a", "M1"),
+    ("#### InP 衬底线索级候选", "M1-lead"),
+    ("### 材料 → A3", "M2"),
+    ("### 材料对象未细分", "M-rest"),
+    ("### 芯片封装（委托加工", "PROC1"),
+    ("### 组件封装（TOSA/ROSA", "PROC2"),
+    ("## 设备 / 仪器纵轴", "EQ"),
+    ("### 代工 EMS", "EMS"),
+    ("### 系统设备商 / 云巨头终端 / 线缆", "SYS"),
+    ("### 贸易 / 代理 / 物流", "X1"),
+    ("### 边界外 / 跨行业 / 科研 / 非BOM", "X2"),
+    ("### 匿名槽位 / 待核 / 类型过宽主体", "X3"),
+]
+
+NOTE_KEYS = ("未识别", "定向任务", "缺口", "委托加工业务", "注：", "假友元",
+             "核对", "另见", "在研", "候选")
+STANCE_KEYS = ("发行人自述", "同业描述", "披露方产品列", "竞品描述")
+
+
+def anchor_cls(text, nid):
+    t = text.strip()
+    if t.startswith("半锚"):
+        return "semi"
+    if t.startswith("弱锚"):
+        return "weak"
+    if t.startswith("有锚"):
+        return "ok"
+    if t.startswith("部分证实"):
+        return "part"
+    if t.startswith("线索级"):
+        return "lead"
+    if not nid:
+        return "cand"
+    return "pending"
+
+
+def parse_panorama():
+    lines = open(PANORAMA_MD, encoding="utf-8").read().splitlines()
+    leaves = {k: {"rows": [], "notes": []} for k in LEAF_DEFS}
     cur = None
-    in_method = False
+    proc_intro = []
+    in_proc = False
     for ln in lines:
-        m = re.match(r"^## (L\d+|V|X)\s+(.+)$", ln)
-        if m:
-            key = m.group(1)
-            kind = "main" if re.fullmatch(r"L[1-8]", key) else ("v" if key == "V" else "x")
-            cur = {"key": key, "title": m.group(2).strip(), "kind": kind, "nodes": []}
-            groups.append(cur)
-            in_method = False
-            continue
-        if ln.startswith("## "):
-            in_method = ln.startswith("## 分层方法")
+        if ln.lstrip().startswith("#"):
+            in_proc = ln.startswith("## 横切工序轴")
             cur = None
+            for prefix, leaf in HEADER_TO_LEAF:
+                if ln.startswith(prefix):
+                    cur = leaf
+                    break
             continue
-        if in_method and re.match(r"^\d+\.\s", ln):
-            methods.append(re.sub(r"\*\*", "", ln).strip())
+        if in_proc:
+            s = ln.strip()
+            if s.startswith(">"):
+                s = s[1:].strip()
+            if s and not s.startswith("|"):
+                proc_intro.append(s.replace("**", ""))
             continue
-        if cur is not None and ln.startswith("| N"):
-            cells = [c.strip() for c in ln.strip().strip("|").split("|")]
-            if len(cells) != 4:
-                raise ValueError(f"节点行单元格数异常: {ln[:60]}")
-            m2 = re.match(r"^(N\d+)\s+(.+)$", cells[0])
-            if not m2:
-                raise ValueError(f"节点行首格异常: {cells[0]!r}")
-            status = cells[3]
-            anchored = status.startswith("有锚")
-            stance = ""
-            sm = re.search(r"stance=(.+)$", status)
-            if sm:
-                stance = sm.group(1).strip()
-            cur["nodes"].append({
-                "nid": m2.group(1),
-                "name": m2.group(2).strip(),
-                "doing": cells[1],
-                "anchor": "" if cells[2] == "—" else cells[2],
-                "anchored": anchored,
-                "stance": stance,
-            })
-    anchored_n = sum(1 for g in groups for n in g["nodes"] if n["anchored"])
-    total = sum(len(g["nodes"]) for g in groups)
-    return {
-        "meta": {
-            "total": total,
-            "anchored": anchored_n,
-            "pending": total - anchored_n,
-            "seq": "材料→光芯片→DSP→封装→器件→模块→代工EMS→终端；设备/仪器为纵轴",
-            "source": "flows/out/supply-chain-nodes-v0.md · 节点层宽准入 v0 · 生成日 2026-07-24",
-        },
-        "methods": methods,
-        "groups": groups,
-    }
-
-
-# ---------------------------------------------------------------- 视图③ 数据
-
-BULLET_PAIR = re.compile(r"\*\*([^*]+)\*\*：")
-
-
-def parse_bullet(line):
-    """把 '- **k**：v ｜ **k2**：v2' 解析为有序 (k, v) 列表。"""
-    parts = re.split(r"(?=\*\*[^*]+\*\*：)", line.lstrip("- ").strip())
-    out = []
-    for p in parts:
-        m = re.match(r"\*\*([^*]+)\*\*：(.*)$", p.strip())
-        if m:
-            val = m.group(2).strip().rstrip("｜").strip().rstrip()
-            out.append((m.group(1).strip(), val))
-    return out
-
-
-QUOTE_KEY = re.compile(r"引语|锚点")
-
-
-def parse_content_md(path, cid_prefix):
-    """解析内容层 markdown 为条目列表 + 诚实边界 + 统一锚点。"""
-    lines = open(path, encoding="utf-8").read().splitlines()
-    entries, boundaries = [], []
-    cur = None
-    section = "head"
-    anchor_url = ""
-    for ln in lines:
-        if ln.startswith("## 诚实边界"):
-            section = "boundary"
-            cur = None
+        if cur is None:
             continue
-        if ln.startswith("## 报告") or ln.startswith("## 汇总"):
-            section = "report"
-            cur = None
-            continue
-        m = re.match(r"^## ([①②③④⑤])", ln)
-        if m:
-            section = "entries"
-            cur = None
-            continue
-        if ln.startswith("## "):
-            cur = None
-            continue
-        if section == "head" and "统一锚点" in ln:
-            um = re.search(r"https?://\S+", ln)
-            if um:
-                anchor_url = um.group(0).rstrip("。)）")
-        if section == "entries":
-            em = re.match(r"^### ((?:" + cid_prefix + r")\d+)\s*$", ln)
-            if em:
-                cur = {"cid": em.group(1), "pairs": []}
-                entries.append(cur)
+        if ln.startswith("|"):
+            if "身份依据一句" in ln or set(ln) <= set("|-: "):
                 continue
-            if cur is not None and ln.startswith("- **"):
-                cur["pairs"].extend(parse_bullet(ln))
+            cells = [c.strip() for c in ln.strip().strip("|").split("|")]
+            if len(cells) != 4 or cells[0] == "名称":
+                continue
+            m = re.match(r"^(N\d+)\s+(.+)$", cells[0])
+            if m:
+                nid, name = m.group(1), m.group(2).strip()
+            else:
+                nid, name = "", cells[0].strip()
+            anch = cells[2].replace("**", "")
+            leaves[cur]["rows"].append({
+                "nid": nid,
+                "name": name,
+                "doing": cells[1].replace("**", ""),
+                "cls": anchor_cls(anch, nid),
+                "stance": next((s for s in STANCE_KEYS if s in anch), ""),
+                "anchor": anch,
+                "hasEdge": cells[3].strip().startswith("有"),
+                "edgeText": cells[3].replace("**", ""),
+                "edgeIds": re.findall(r"E\d{3}", cells[3]),
+            })
             continue
-        if section == "boundary":
-            if re.match(r"^\d+\.\s", ln):
-                boundaries.append(re.sub(r"\*\*", "", ln).strip())
-            elif boundaries and ln.strip() and not ln.startswith("---"):
-                boundaries[-1] += re.sub(r"\*\*", "", ln).strip()
-    return entries, boundaries, anchor_url
+        s = ln.strip()
+        if s.startswith(">"):
+            s = s[1:].strip()
+        s = s.replace("**", "").strip()
+        if not s or s.startswith("---"):
+            continue
+        if any(k in s for k in NOTE_KEYS):
+            leaves[cur]["notes"].append(s)
+    return leaves, " ".join(proc_intro)
 
 
-def shape_entry(raw, schema):
-    """把无序 (k, v) 对整理成前端渲染结构。"""
-    pairs = raw["pairs"]
-    get = lambda k: next((v for kk, v in pairs if kk == k), "")
-    type_label = get("事实类型") or get("类型")
-    tm = re.match(r"^([①②③④⑤])", type_label)
-    tnum = tm.group(1) if tm else "?"
-    content = get("内容")
-    if not content:
-        raise ValueError(f"{raw['cid']} 缺内容")
-    stance_raw = get("stance") or ""
-    stance_cls = ""
-    if stance_raw:
-        stance_cls = stance_raw.split("（")[0].strip()
-    if schema == "lieqi" and tnum == "⑤":
-        stance_cls = "issuer_self"
-        stance_raw = "发行人竞争陈述（红线：不得转写为客观事实）"
-    tense = get("时态")
-    quotes, meta, notes = [], [], []
-    for k, v in pairs:
-        if k in ("事实类型", "类型", "内容", "stance", "时态"):
-            continue
-        if QUOTE_KEY.search(k):
-            quotes.append([k, v])
-        elif k in ("章节位置", "source_chain", "验证态", "关联", "立场标注"):
-            meta.append([k, v])
-        else:
-            notes.append([k, v])
+def build_tree(node_rows):
+    node_ids = {r["node_id"] for r in node_rows}
+    nid_name = {r["node_id"]: r["名称"].strip() for r in node_rows}
+    leaves, proc_intro = parse_panorama()
+    payload_leaves = {}
+    cls_counts = Counter()
+    cand_total = 0
+    for key, definition in LEAF_DEFS.items():
+        rows = leaves[key]["rows"]
+        for r in rows:
+            cls_counts[r["cls"]] += 1
+        cand_total += sum(1 for r in rows if not r["nid"])
+        payload_leaves[key] = {
+            "title": definition["title"],
+            "sub": definition.get("sub", ""),
+            "status": definition.get("status", ""),
+            "rows": rows,
+            "notes": leaves[key]["notes"],
+        }
+    parsed_nids = {r["nid"] for lf in payload_leaves.values()
+                   for r in lf["rows"] if r["nid"]}
+    stats = {
+        "leafTotal": 9,
+        "leafOwn": 4,
+        "leafEmpty": 4,
+        "leafWeak": 1,
+        "nodes": len(node_ids),
+        "candidates": cand_total,
+        "clsCounts": dict(cls_counts),
+    }
     return {
-        "cid": raw["cid"],
-        "tnum": tnum,
-        "typeLabel": type_label,
-        "content": content,
-        "stanceCls": stance_cls,
-        "stanceText": stance_raw,
-        "tense": tense,
-        "quotes": quotes,
-        "meta": meta,
-        "notes": notes,
-    }
-
-
-def build_content():
-    lieqi_raw, lieqi_bd, lieqi_anchor = parse_content_md(LIEQI_MD, "C")
-    yj_raw, yj_bd, yj_anchor = parse_content_md(YUANJIE_MD, "YJ")
-    lieqi = [shape_entry(r, "lieqi") for r in lieqi_raw]
-    yuanjie = [shape_entry(r, "yuanjie") for r in yj_raw]
-
-    def tcounts(entries):
-        c = Counter(e["tnum"] for e in entries)
-        return {k: c.get(k, 0) for k in ("①", "②", "③", "④", "⑤")}
-
-    yj_stance = Counter(e["stanceCls"] for e in yuanjie)
-    payload = {
-        "lieqi": {
-            "title": "猎奇智能 · 招股说明书（申报稿）第五节「业务与技术」",
-            "status": "内容层样品 · 未准入",
-            "schema": "五类：①工序步骤 ②技术参数 ③产品代际 ④设备-工序映射 ⑤发行人竞争陈述",
-            "corpus": "flows/input/lieqi_prospectus.txt（行约 8237–10520 精读）· 抽取日 2026-07-24",
-            "anchor": lieqi_anchor,
-            "discipline": "只记原文逐字存在的内容；类型⑤不得转写为客观事实；「命中引语」为原文完整一句。",
-            "total": len(lieqi),
-            "tcounts": tcounts(lieqi),
-            "tlabels": {"①": "工序步骤", "②": "技术参数", "③": "产品代际", "④": "设备-工序映射", "⑤": "发行人竞争陈述"},
-            "entries": lieqi,
-            "boundaries": lieqi_bd,
-        },
-        "yuanjie": {
-            "title": "源杰科技（688498）· 2023年年度报告 第三节「管理层讨论与分析」",
-            "status": "内容台账有界试点 v1.7b · 未准入",
-            "schema": "冻结 schema v1：①工序步骤 ②技术参数 ③产品构成 ④代际事件 ⑤设备-工序能力；stance 横切",
-            "corpus": "688498_2023年报.txt（行 497–1300 精读）· 抽取日 2026-07-24 · 约3.5小时等效",
-            "anchor": yj_anchor,
-            "discipline": "39/39 条引语级机械验证命中；双闸自查无一条可读作关系边证据；去重扣减 3 条（YJ25/YJ26/YJ32 与猎奇样品知识域重叠），净新增 36 条。",
-            "total": len(yuanjie),
-            "tcounts": tcounts(yuanjie),
-            "tlabels": {"①": "工序步骤", "②": "技术参数", "③": "产品构成", "④": "代际事件", "⑤": "设备-工序能力"},
-            "stanceCounts": {k: yj_stance.get(k, 0) for k in ("neutral", "industry", "issuer_self")},
-            "entries": yuanjie,
-            "boundaries": yj_bd,
-        },
-        "mapLanes": [
-            {
-                "title": "光模块封测主流程",
-                "sub": "猎奇智能招股书视角 · 依据 C01 / C06",
-                "steps": [
-                    {"name": "贴片", "cids": ["C21", "C22"]},
-                    {"name": "引线键合", "cids": [], "gap": "发行人产品不覆盖本环（C01 及样品诚实边界 3）"},
-                    {"name": "光学耦合", "cids": ["C23"]},
-                    {"name": "老化测试", "cids": ["C24", "C25", "C26"]},
-                ],
-                "notes": ["C27", "C28"],
-            },
-            {
-                "title": "光芯片 IDM 制造流程",
-                "sub": "源杰科技年报视角 · 依据 YJ01 / YJ02",
-                "steps": [
-                    {"name": "芯片设计", "cids": []},
-                    {"name": "晶圆制造", "cids": ["YJ05", "YJ06"]},
-                    {"name": "芯片加工", "cids": ["YJ04"]},
-                    {"name": "测试", "cids": ["YJ38"]},
-                ],
-                "subflow": {"ref": "YJ02", "steps": ["MOCVD 外延生长", "光栅工艺", "光波导制作", "金属化工艺", "端面镀膜", "自动化芯片测试", "芯片高频测试", "可靠性测试验证"]},
-                "notes": ["YJ33", "YJ34", "YJ35", "YJ36", "YJ37", "YJ07"],
-            },
-        ],
-    }
-    return payload
+        "leaves": payload_leaves,
+        "nidName": nid_name,
+        "procIntro": proc_intro,
+        "stats": stats,
+        "source": "output/光模块供应链全景-v1.1.md（结构重排版 · 生成日 2026-07-24）",
+    }, parsed_nids
 
 
 # ---------------------------------------------------------------- HTML 模板
@@ -474,7 +416,7 @@ HTML = r"""<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>光模块产业图谱 v1.6 · 三合一</title>
+<title>光模块产业图谱 v1.6 · 供应链树×关系图×工序</title>
 <style>
 :root{
   --void:#080B14;--panel:#0F1420;--panel2:#161D2B;--grid:#1B2333;
@@ -500,7 +442,7 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;
 h1{max-width:17ch;margin:0 0 18px;font-size:clamp(34px,5vw,60px);line-height:1.04;
   letter-spacing:-.025em;font-weight:650}
 h1 span{color:var(--lit);text-shadow:0 0 24px rgba(79,224,196,.45)}
-.thesis{max-width:76ch;margin:0 0 30px;color:var(--mute);font-size:clamp(15px,1.6vw,18px);
+.thesis{max-width:80ch;margin:0 0 30px;color:var(--mute);font-size:clamp(15px,1.6vw,18px);
   line-height:1.68}.thesis b{color:var(--ink);font-weight:550}
 .stats{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));margin-bottom:28px;
   border:1px solid var(--faint);border-radius:14px;overflow:hidden;
@@ -508,7 +450,7 @@ h1 span{color:var(--lit);text-shadow:0 0 24px rgba(79,224,196,.45)}
 .stat{padding:16px 18px;border-right:1px solid var(--faint)}.stat:last-child{border:0}
 .stat .n{font-family:var(--mono);font-size:27px;font-weight:650}.stat .k{margin-top:4px;
   color:var(--mute);font-size:11px;letter-spacing:.04em}
-.legend{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:16px}
+.legend{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:16px;align-items:center}
 .chip{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid var(--faint);
   border-radius:999px;background:rgba(15,20,32,.72);color:var(--mute);font-family:var(--mono);
   font-size:11px;cursor:pointer;user-select:none;transition:.18s}
@@ -520,6 +462,7 @@ h1 span{color:var(--lit);text-shadow:0 0 24px rgba(79,224,196,.45)}
   border-top-style:dashed}.chip[data-c=dead] .sw{border-color:var(--dead);
   border-top-style:dotted}.chip[data-c=leak] .sw{border-color:var(--leak);
   border-top-style:dashed}
+.chip.static{cursor:default}
 .stage{position:relative;overflow:auto;border:1px solid var(--faint);border-radius:18px;
   background:linear-gradient(180deg,rgba(11,15,24,.86),rgba(8,11,20,.95));
   box-shadow:0 28px 80px rgba(0,0,0,.22)}
@@ -551,7 +494,7 @@ svg{display:block;width:100%;min-width:1180px;height:auto}
 .drawer.open{transform:none}.drawer h3{margin:0 42px 5px 0;font-size:20px;line-height:1.25}
 .close{position:absolute;top:20px;right:20px;width:32px;height:32px;border:1px solid var(--faint);
   border-radius:8px;background:none;color:var(--mute);cursor:pointer}
-.gradetag{display:inline-block;margin:8px 0 18px;padding:4px 9px;border-radius:6px;
+.gradetag{display:inline-block;margin:8px 8px 18px 0;padding:4px 9px;border-radius:6px;
   font-family:var(--mono);font-size:10px}.gt-lit{background:rgba(79,224,196,.14);color:var(--lit)}
 .gt-infer{background:rgba(255,179,71,.14);color:var(--infer)}
 .gt-shadow{background:rgba(74,84,112,.22);color:#9aa6c4}
@@ -564,12 +507,21 @@ svg{display:block;width:100%;min-width:1180px;height:auto}
 .edge-row{width:100%;padding:12px 0;border:0;border-top:1px solid var(--grid);
   background:none;color:inherit;text-align:left;cursor:pointer}.edge-row:hover .val{color:#fff}
 .hint{margin:15px 0 5px;color:var(--mute);font-family:var(--mono);font-size:10px;
-  letter-spacing:.12em}.foot{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;
+  letter-spacing:.12em}
+.ebtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.ebtn{padding:5px 9px;border:1px solid var(--faint);border-radius:7px;background:none;
+  color:var(--lit);font-family:var(--mono);font-size:10px;cursor:pointer}
+.ebtn:hover{border-color:var(--lit)}
+.gjump{margin-top:18px;width:100%;padding:11px;border:1px solid var(--lit);border-radius:10px;
+  background:rgba(79,224,196,.08);color:var(--lit);font-size:13px;cursor:pointer}
+.gjump:hover{background:rgba(79,224,196,.16)}
+.foot{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;
   margin-top:30px;padding-top:20px;border-top:1px solid var(--grid);color:var(--mute);
   font-size:13px;line-height:1.72}.foot-copy{max-width:88ch}.foot b{color:var(--ink)}
+.foot .base{display:block;margin-top:8px;font-family:var(--mono);font-size:10px;color:var(--faint)}
 .badge{flex:none;padding:8px 12px;border:1px solid var(--lit);border-radius:999px;color:var(--lit);
   font-family:var(--mono);font-size:11px;box-shadow:0 0 18px rgba(79,224,196,.08)}
-/* ---- v1.6 三合一 ---- */
+/* ---- 三视图框架 ---- */
 .tabs{display:flex;gap:10px;margin:0 0 26px;flex-wrap:wrap}
 .tab{flex:1;min-width:210px;padding:13px 18px;border:1px solid var(--faint);border-radius:12px;
   background:rgba(15,20,32,.72);color:var(--mute);cursor:pointer;text-align:left;
@@ -588,40 +540,6 @@ svg{display:block;width:100%;min-width:1180px;height:auto}
   border:1px solid currentColor;border-radius:6px;padding:3px 7px;margin-top:1px}
 .banner.cyan{border-color:var(--leak);background:rgba(72,215,232,.05);color:var(--leak)}
 .banner.cyan b{color:var(--ink)}
-/* ---- 视图② 节点层 ---- */
-.lband{margin-bottom:4px}
-.lband-head{display:flex;align-items:baseline;gap:12px;padding:12px 4px 10px;
-  border-bottom:1px solid var(--grid)}
-.lband-head .idx{font-family:var(--mono);color:var(--lit);font-size:12px;letter-spacing:.1em}
-.lband-head h3{margin:0;font-size:16px;font-weight:600}
-.lband-head .cnt{font-family:var(--mono);font-size:10px;color:var(--mute)}
-.lcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(204px,1fr));gap:9px;
-  padding:12px 0 8px}
-.lcard{padding:10px 12px;border:1px solid var(--faint);border-radius:10px;
-  background:rgba(15,20,32,.6);cursor:pointer;transition:.15s}
-.lcard:hover{border-color:var(--mute)}
-.lcard.pending{border-style:dashed;opacity:.72}
-.lcard .nid{font-family:var(--mono);font-size:9px;color:var(--faint);letter-spacing:.08em}
-.lcard .nm{font-size:13px;font-weight:600;margin:2px 0 4px;line-height:1.35}
-.lcard .doing{font-size:11px;color:var(--mute);line-height:1.5;display:-webkit-box;
-  -webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.lcard .st{display:flex;gap:7px;align-items:center;margin-top:7px;font-family:var(--mono);
-  font-size:9px;flex-wrap:wrap}
-.dot{width:7px;height:7px;border-radius:50%;flex:none}
-.dot.ok{background:var(--lit);box-shadow:0 0 6px var(--lit)}
-.dot.no{background:var(--veil)}
-.ok-t{color:var(--lit)}.no-t{color:var(--veil)}
-.stance{color:var(--infer)}
-.flow-arrow{text-align:center;color:var(--faint);font-family:var(--mono);font-size:10px;
-  letter-spacing:.24em;padding:3px 0}
-.vband{border:1px solid rgba(255,207,94,.45);border-radius:12px;padding:2px 14px 12px;
-  margin-top:14px;background:rgba(255,207,94,.03)}
-.vband .lband-head .idx{color:var(--jt)}
-.xzone{margin-top:18px;border-top:1px dashed var(--faint);padding-top:10px}
-.xzone>h3{color:var(--mute);font-size:12px;font-family:var(--mono);letter-spacing:.14em;
-  font-weight:500;margin:6px 0 2px}
-.xzone .lband-head .idx{color:var(--veil)}
-.filterbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
 .search{flex:1;min-width:180px;padding:8px 14px;border:1px solid var(--faint);border-radius:999px;
   background:rgba(15,20,32,.72);color:var(--ink);font-family:var(--mono);font-size:11px;outline:none}
 .search:focus{border-color:var(--lit)}
@@ -629,77 +547,89 @@ svg{display:block;width:100%;min-width:1180px;height:auto}
   color:var(--mute);font-size:12px;line-height:1.8}
 .noteblock h4{margin:0 0 8px;color:var(--ink);font-size:12px;font-family:var(--mono);
   letter-spacing:.1em;font-weight:500}
-.noteblock ol{margin:0;padding-left:18px}
-.noteblock li{margin-bottom:5px}
-/* ---- 视图③ 工序/内容 ---- */
-.proc-lane{border:1px solid var(--faint);border-radius:14px;padding:16px 16px 12px;
-  margin-bottom:16px;background:rgba(15,20,32,.5)}
-.proc-lane-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
-  margin-bottom:13px;align-items:baseline}
-.proc-lane-head h3{margin:0;font-size:15px;font-weight:600}
-.proc-lane-head span{font-family:var(--mono);font-size:10px;color:var(--mute)}
-.proc-steps{display:flex;gap:7px;align-items:stretch;flex-wrap:wrap}
-.proc-step{flex:1;min-width:150px;border:1px solid var(--grid);border-radius:10px;
-  padding:10px;background:rgba(8,11,20,.5)}
-.proc-step.gap{opacity:.6;border-style:dashed}
-.ps-name{font-size:13px;font-weight:650;margin-bottom:6px}
-.ps-arrow{align-self:center;color:var(--faint);font-size:12px}
-.ps-note{font-size:10.5px;color:var(--infer);line-height:1.55}
-.cidchip{display:block;width:100%;text-align:left;margin:6px 0 0;padding:7px 9px;
-  border:1px solid var(--faint);border-radius:8px;background:none;color:var(--mute);
-  cursor:pointer;font-size:10.5px;line-height:1.5;font-family:var(--disp);transition:.15s}
-.cidchip:hover{border-color:var(--lit);color:var(--ink)}
-.cidchip b{font-family:var(--mono);color:var(--lit);font-weight:600;margin-right:5px}
-.subflow{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;align-items:center}
-.subflow .sfref{font-family:var(--mono);font-size:9.5px;color:var(--lit)}
-.subflow .sf{font-family:var(--mono);font-size:9.5px;color:var(--mute);
-  border:1px solid var(--grid);border-radius:6px;padding:4px 8px}
-.proc-notes{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:10px;
-  border-top:1px dashed var(--grid)}
-.proc-notes .cidchip{width:auto;margin:0}
-.ledger{margin-top:30px}
-.ledger-head{border-top:1px solid var(--grid);padding-top:18px;margin-bottom:14px}
-.ledger-head h3{margin:0 0 6px;font-size:18px;font-weight:650}
-.ledger-head .lmeta{font-family:var(--mono);font-size:10.5px;color:var(--mute);
-  line-height:1.9;word-break:break-all}
-.ledger-head .lmeta a{color:var(--us);text-decoration:none}
-.ledger-head .lmeta a:hover{text-decoration:underline}
-.ledger-head .disc{margin-top:8px;font-size:12px;color:var(--infer);line-height:1.65}
-.centry{border:1px solid var(--faint);border-radius:12px;margin-bottom:10px;
-  background:rgba(15,20,32,.55)}
-.centry.flash{animation:flash 1.8s}
-@keyframes flash{0%{border-color:var(--lit);box-shadow:0 0 26px rgba(79,224,196,.4)}100%{}}
-.centry>summary{display:block;padding:12px 14px;cursor:pointer;list-style:none}
-.centry>summary::-webkit-details-marker{display:none}
-.centry .crow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.centry .cid{font-family:var(--mono);font-size:11px;color:var(--lit)}
-.centry .openhint{margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--faint)}
-.centry[open] .openhint{color:var(--lit)}
-.centry h4{margin:8px 0 0;font-size:13.5px;font-weight:550;line-height:1.65;color:var(--ink)}
-.tbadge{font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:6px}
-.tb1{background:rgba(79,224,196,.13);color:var(--lit)}
-.tb2{background:rgba(91,157,240,.15);color:var(--us)}
-.tb3{background:rgba(255,207,94,.13);color:var(--jt)}
-.tb4{background:rgba(255,179,71,.13);color:var(--infer)}
-.tb5{background:rgba(159,123,234,.16);color:#B79CED}
-.sbadge{font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:6px}
-.sb-neutral{background:rgba(135,146,171,.16);color:var(--other)}
-.sb-industry{background:rgba(91,157,240,.15);color:var(--us)}
-.sb-issuer{background:rgba(224,90,106,.16);color:#F08391;border:1px solid rgba(224,90,106,.45)}
-.sb-tense{background:none;color:var(--faint);border:1px solid var(--faint)}
-.cbody{padding:2px 14px 13px}
-.cbody blockquote{margin:9px 0;padding:9px 12px;border-left:2px solid var(--lit);
-  background:rgba(8,11,20,.6);font-size:12px;line-height:1.75;color:#C9D2E4}
-.cbody blockquote .qlab{display:block;font-family:var(--mono);font-size:9px;color:var(--mute);
-  letter-spacing:.1em;margin-bottom:4px}
-.kv{display:flex;gap:10px;font-size:11px;padding:6px 0;border-top:1px solid var(--grid)}
-.kv .k{flex:none;width:118px;color:var(--mute);font-family:var(--mono);font-size:9px;
-  letter-spacing:.05em;padding-top:2px;word-break:break-all}
-.kv .v{color:#C9D2E4;line-height:1.65;word-break:break-word}
-.kv.warn .v{color:var(--infer)}
+/* ---- 视图① 供应链树 ---- */
+.tree{position:relative}
+.wires{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:visible}
+.wire{fill:none;stroke:#3D4A66;stroke-width:1.3;opacity:.85}
+.wire.dashed{stroke-dasharray:5 5;opacity:.55}
+.zone{position:relative;z-index:1;border:1px solid var(--faint);border-radius:16px;
+  padding:14px 16px 16px;margin-bottom:40px;background:rgba(13,18,29,.88)}
+.zone-title{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.zone-title .zt{font-size:14px;font-weight:650;letter-spacing:.04em}
+.zone-title .zs{font-family:var(--mono);font-size:10px;color:var(--mute)}
+.z-a{border-color:rgba(79,224,196,.42)}
+.z-b{border-color:rgba(91,157,240,.42)}
+.z-c{border-color:rgba(255,207,94,.42)}
+.z-mod{border-color:var(--lit);box-shadow:0 0 34px rgba(79,224,196,.1)}
+.z-x{border-style:dashed;opacity:.92}
+.duo{display:flex;gap:16px}.duo .zone{flex:1;min-width:0}
+.leafrow{display:flex;gap:12px;flex-wrap:wrap}
+.leaf{flex:1;min-width:235px;border:1px solid var(--grid);border-radius:12px;
+  padding:10px 12px;background:rgba(8,11,20,.55)}
+.leaf.empty{border-style:dashed}
+.leaf-head{display:flex;align-items:baseline;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.leaf-head .lt{font-size:13px;font-weight:650}
+.leaf-head .ls{font-family:var(--mono);font-size:9px;color:var(--mute)}
+.leaf-head .cnt{margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--faint)}
+.stbadge{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:6px}
+.st-own{background:rgba(79,224,196,.12);color:var(--lit)}
+.st-weak{background:rgba(255,179,71,.12);color:var(--infer)}
+.st-empty{background:rgba(90,100,128,.16);color:#9aa6c4;border:1px dashed var(--veil)}
+.st-cand{background:rgba(72,215,232,.1);color:var(--leak);border:1px dashed rgba(72,215,232,.5)}
+.lempty{font-size:11px;color:var(--veil);font-family:var(--mono);margin-bottom:8px}
+.cos{display:flex;flex-wrap:wrap;gap:6px}
+.co{display:inline-flex;flex-direction:column;gap:2px;max-width:200px;padding:6px 9px;
+  border:1px solid var(--faint);border-radius:8px;background:rgba(15,20,32,.6);color:var(--ink);
+  cursor:pointer;text-align:left;font-family:var(--disp);transition:.15s}
+.co:hover{border-color:var(--mute)}
+.co.cand{border-style:dashed;border-color:rgba(72,215,232,.45)}
+.cline{display:flex;align-items:center;gap:6px}
+.cname{font-size:12px;font-weight:550;line-height:1.3;max-width:180px;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.nid{font-family:var(--mono);font-size:8.5px;color:var(--faint);letter-spacing:.06em}
+.eb{font-family:var(--mono);font-size:8.5px;color:var(--us)}
+.dot{width:7px;height:7px;border-radius:50%;flex:none}
+.dot.ok{background:var(--lit);box-shadow:0 0 6px var(--lit)}
+.dot.semi{background:var(--infer)}
+.dot.weak{background:var(--jt)}
+.dot.part{background:var(--infer);box-shadow:0 0 0 2px rgba(255,179,71,.25)}
+.dot.lead{background:var(--leak)}
+.dot.cand{background:none;border:1.5px dashed var(--leak);width:5px;height:5px}
+.dot.pending{background:var(--veil)}
+.lnote{margin:8px 0 0;padding-top:7px;border-top:1px dashed var(--grid);color:var(--mute);
+  font-size:10.5px;line-height:1.7}
+.conv{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0}
+.conv-chip{flex:1;min-width:260px;border:1px dashed var(--lit);border-radius:999px;
+  padding:9px 18px;background:rgba(79,224,196,.05);display:flex;align-items:baseline;
+  gap:10px;flex-wrap:wrap}
+.conv-chip b{font-size:13px;color:var(--lit);font-weight:650}
+.conv-chip span{font-family:var(--mono);font-size:9px;color:var(--mute)}
+.conv-marker{text-align:center;margin:-22px 0 12px;color:var(--faint);font-family:var(--mono);
+  font-size:10px;letter-spacing:.22em;position:relative;z-index:1}
+.proc-teaser{position:relative;z-index:1;margin-top:-14px;padding:12px 16px;border:1px dashed var(--faint);
+  border-radius:12px;color:var(--mute);font-size:12px;text-align:center}
+.proc-teaser button{margin-left:8px;padding:5px 12px;border:1px solid var(--leak);border-radius:8px;
+  background:none;color:var(--leak);font-family:var(--mono);font-size:11px;cursor:pointer}
+.proc-teaser button:hover{background:rgba(72,215,232,.1)}
+/* ---- 视图③ 工序 ---- */
+.pstages{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap;margin-bottom:18px}
+.pstage{flex:1;min-width:210px;border:1px solid var(--faint);border-radius:12px;
+  padding:12px;background:rgba(15,20,32,.6)}
+.pstage.gap{border-style:dashed}
+.pstage .ps-name{font-size:13.5px;font-weight:650;margin-bottom:3px}
+.pstage .ps-sub{font-family:var(--mono);font-size:9px;color:var(--mute);line-height:1.6;
+  margin-bottom:9px}
+.ps-arrow{align-self:center;color:var(--faint);font-size:13px}
+.ptags{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}
+.ptag{font-family:var(--mono);font-size:8.5px;color:var(--leak);border:1px solid rgba(72,215,232,.4);
+  border-radius:5px;padding:1px 5px}
+.peq{border:1px solid rgba(255,207,94,.45);border-radius:14px;padding:14px 16px;
+  background:rgba(255,207,94,.03)}
+.peq .zone-title .zt{color:var(--jt)}
 @media(max-width:900px){.stats{grid-template-columns:repeat(3,1fr)}.stat:nth-child(3){border-right:0}
   .stat:nth-child(-n+3){border-bottom:1px solid var(--faint)}.foot{display:block}.badge{display:inline-block;
-  margin-top:16px}}@media(max-width:620px){.wrap{padding:30px 14px 58px}.stats{grid-template-columns:repeat(2,1fr)}
+  margin-top:16px}.duo{flex-direction:column}}
+@media(max-width:620px){.wrap{padding:30px 14px 58px}.stats{grid-template-columns:repeat(2,1fr)}
   .stat:nth-child(odd){border-right:1px solid var(--faint)}.stat:nth-child(even){border-right:0}
   .stat{border-bottom:1px solid var(--faint)}.stat:nth-last-child(-n+2){border-bottom:0}}
 @media(prefers-reduced-motion:reduce){.flow{display:none}.edge,.node{transition:none}}
@@ -707,22 +637,45 @@ svg{display:block;width:100%;min-width:1180px;height:auto}
 </head>
 <body>
 <main class="wrap">
-  <div class="eyebrow">披露证据图谱 · v1.6 · 三合一 · 2026-07</div>
+  <div class="eyebrow">披露证据图谱 · v1.6 · 供应链树×关系图×工序 · 2026-07</div>
   <h1>光模块产业，<span>被证据分层</span>的结构</h1>
-  <p class="thesis">一个文件，三种看法，三套纪律。<b>①关系图</b>回答「我们凭什么看得见这条
-    供货关系」——只有它承重；<b>②节点分层</b>回答「谁在哪一层、做什么」——宽准入、
-    <b>不承重</b>；<b>③工序/内容</b>回答「设备与工序的能力事实」——未准入样品，
-    <b>不作关系边证据</b>。</p>
+  <p class="thesis">一个文件，三种看法，一条纪律主线。<b>①供应链树</b>（主视图）回答「谁做什么
+    零件、放在 BOM 树哪一叶」——照全景 v1.1 并行三分支骨架：材料分喂、A/B/C 三分支汇聚成
+    总成；双闸：<b>不表达供货关系</b>，空叶如实标空。<b>②关系图</b>回答「我们凭什么看得见这条
+    供货关系」——236 边唯一承重，四硬约束不变。<b>③工序视图</b>回答「同一批零件按什么工序被
+    加工」——与 BOM 树是两个坐标轴，<b>不是链环</b>。</p>
   <nav class="tabs" role="tablist" aria-label="视图切换">
-    <button class="tab active" data-view="graph" role="tab">① 关系图
-      <span>证据承重 · 236边 / 169节点 · 四硬约束</span></button>
-    <button class="tab" data-view="layers" role="tab">② 节点分层
-      <span>宽准入 · 不承重 · 48有锚 / 121待锚</span></button>
-    <button class="tab" data-view="content" role="tab">③ 工序 / 内容
-      <span>未准入样品 · 猎奇34条 + 源杰39条</span></button>
+    <button class="tab active" data-view="tree" role="tab">① 供应链树 · 主视图
+      <span>并行三分支 × 每节点公司名单 · 双闸不承重</span></button>
+    <button class="tab" data-view="graph" role="tab">② 关系图 · 证据承重
+      <span>236边 / 169节点 · 四硬约束</span></button>
+    <button class="tab" data-view="proc" role="tab">③ 工序视图 · 横切轴
+      <span>工序×设备 · 与 BOM 树两个坐标轴</span></button>
   </nav>
 
-  <section class="view active" id="view-graph">
+  <section class="view active" id="view-tree">
+    <section class="stats" id="tstats" aria-label="树统计"></section>
+    <div class="banner"><span class="tag">双闸 · 不承重</span><div>
+      本树只回答<b>「谁做什么、放在哪一叶」</b>，<b>不表达供货关系</b>——供货关系唯一承重台账是
+      ②关系图（<code>output/edges.csv</code>）。公司卡上的 <b>⇄台账有边</b> 仅如实标注该公司名已作为
+      供方/需方出现在 edges.csv，<b>不代表该边证明了本叶所述产品身份</b>（双闸不可传递）。空叶如实标
+      「未识别到公开可锚的专产主体」并附定向任务；虚线框公司为 <b>T1 候选 · 未入关系台账</b>，不升格。</div></div>
+    <nav class="legend" aria-label="锚档图例">
+      <span class="chip static"><span class="dot ok"></span>有锚</span>
+      <span class="chip static"><span class="dot semi"></span>半锚</span>
+      <span class="chip static"><span class="dot weak"></span>弱锚</span>
+      <span class="chip static"><span class="dot part"></span>部分证实</span>
+      <span class="chip static"><span class="dot lead"></span>线索级待锚</span>
+      <span class="chip static"><span class="dot cand"></span>T1候选 · 未入台账</span>
+      <span class="chip static"><span class="dot pending"></span>仅类型归层 · 待锚</span>
+      <span class="chip static">⇄n = 台账有边（n 条可跳转）</span>
+      <span class="chip static">树连线：实线 = BOM 汇聚 · 虚线 = 同左复用 / 未细分 / 直销旁路</span>
+      <input class="search" id="tsearch" placeholder="检索公司 / N编号 / 做什么…">
+    </nav>
+    <div class="tree" id="tree"><svg class="wires" id="wires"></svg></div>
+  </section>
+
+  <section class="view" id="view-graph">
     <section class="stats" id="stats" aria-label="数据统计"></section>
     <nav class="legend" id="legend" aria-label="边等级筛选"></nav>
     <section class="stage">
@@ -731,38 +684,24 @@ svg{display:block;width:100%;min-width:1180px;height:auto}
     </section>
   </section>
 
-  <section class="view" id="view-layers">
-    <div class="banner"><span class="tag">宽准入 · 不承重</span><div>
-      本视图只回答<b>「谁在哪一层、做什么」</b>。<b>禁止</b>把归层或「做什么」读成供货/采购关系；
-      关系承重只在 ①关系图（<code>output/edges.csv</code> / 关系台账，双闸纪律）。准入：单源 T1 锚
-      （招股书/年报主营句，或抽取件现成产品列）即可标「做什么」；找不到锚 →
-      <b>仅类型归层，待锚</b>，不编造。</div></div>
-    <div class="filterbar" id="lfilter">
-      <button class="chip on" data-f="all">全部 169</button>
-      <button class="chip" data-f="anchored">有锚 48</button>
-      <button class="chip" data-f="pending">待锚 121</button>
-      <input class="search" id="lsearch" placeholder="检索节点名 / N编号 / 做什么…">
-    </div>
-    <div id="layers-root"></div>
-    <div class="noteblock"><h4>分层方法（源文件原文）</h4><ol id="lmethods"></ol></div>
-  </section>
-
-  <section class="view" id="view-content">
-    <div class="banner cyan"><span class="tag">未准入 · 不承重</span><div>
-      下列 34 + 39 条为<b>内容层样品/试点条目</b>：均<b>未准入</b> <code>output/edges.csv</code> 与关系台账，
-      <b>不得作为关系边证据</b>；<b>issuer_self（发行人自述）条目永不承重</b>。工序地图只组织已抽取条目，
-      点击条目编号可跳转到台账原文与命中引语。</div></div>
-    <div id="proc-root"></div>
-    <div class="ledger" id="ledger-lieqi"></div>
-    <div class="ledger" id="ledger-yuanjie"></div>
+  <section class="view" id="view-proc">
+    <div class="banner cyan"><span class="tag">两坐标轴 · 非链环</span><div>
+      横切工序轴与 BOM 树是<b>两个不同的坐标轴</b>（全景 v1.1 原文）：树回答「谁做什么零件」，
+      本视图回答「同一批零件按什么工序顺序被加工」。<b>工序执行者 ≠ 零件供应商</b>——「组件封装
+      （TOSA/ROSA）」的工序执行者目前仍为空（诚实缺口），零件供应商归 ①供应链树 A 分支各叶。
+      设备/仪器纵轴贯穿全流程，不插入主链序。</div></div>
+    <div id="proc"></div>
+    <div class="noteblock"><h4>横切工序轴 · 全景 v1.1 原文</h4><div id="procintro"></div></div>
   </section>
 
   <footer class="foot">
-    <div class="foot-copy"><b>诚实边界。</b> ①关系图中，阴影虚线只表示公开披露留下了槽位，
-      不能据此点名对手方；DSP 芯片层的 Marvell 与博通使用虚线描边，标为<b>产品映射盲区</b>。
-      ②节点分层为宽准入 v0，归层与「做什么」<b>不构成</b>供货/采购关系。③工序/内容为未准入样品，
-      issuer_self 条目永不承重。点击 ① 中任意节点查看其全部入边与出边，点击边查看证据文件、
-      年份、金额与锚点。</div>
+    <div class="foot-copy"><b>诚实边界。</b> ①供应链树的公司名单与锚只回答「谁做什么」，
+      「台账有边」仅表示公司名出现于 edges.csv，<b>不代表该边证明其产品身份</b>（双闸不可传递）；
+      空叶 = 未识别到公开可锚的专产主体，附定向任务，不编造；T1 候选未入台账、不升格。
+      ②关系图中，阴影虚线只表示公开披露留下了槽位，不能据此点名对手方；DSP 芯片层的 Marvell
+      与博通使用虚线描边，标为<b>产品映射盲区</b>。③工序轴与 BOM 树是两个坐标轴，工序执行者
+      ≠ 零件供应商。点击②中任意节点查看其全部入边与出边，点击边查看证据文件、年份、金额与锚点。
+      <span class="base" id="baseline"></span></div>
     <div class="badge" id="badge"></div>
   </footer>
 </main>
@@ -771,12 +710,20 @@ svg{display:block;width:100%;min-width:1180px;height:auto}
   <div id="dbody"></div>
 </aside>
 <script id="data" type="application/json">__DATA__</script>
-<script id="layerdata" type="application/json">__LAYERS__</script>
-<script id="contentdata" type="application/json">__CONTENT__</script>
+<script id="treedata" type="application/json">__TREE__</script>
 <script>
-/* ================= 视图① 关系图（v1.5 交互语言不变） ================= */
+/* ================= 公共 ================= */
 const D=JSON.parse(document.getElementById('data').textContent);
+const T=JSON.parse(document.getElementById('treedata').textContent);
 const NS='http://www.w3.org/2000/svg';
+function esc(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function field(lab,val,mono=false){return val?`<div class="field"><div class="lab">${esc(lab)}</div>
+  <div class="val${mono?' mono':''}">${esc(val)}</div></div>`:''}
+const drawer=document.getElementById('drawer'),dbody=document.getElementById('dbody');
+document.getElementById('dclose').onclick=()=>drawer.classList.remove('open');
+document.addEventListener('keydown',e=>{if(e.key==='Escape')drawer.classList.remove('open')});
+
+/* ================= 视图② 关系图（v1.5 交互语言不变） ================= */
 const CK={cn:'中国',us:'美国',jt:'日本/台湾',other:'其他',veil:'待核/匿名'};
 const CLSNAME={lit:'实边 · 强制披露实名',infer:'推断边 · A/B级判定',
   shadow:'半边槽位 · 对手方不可见',dead:'实边 · 已死亡',
@@ -895,10 +842,6 @@ function hover(id){const nb=neighbors(id);edgeEls.forEach(p=>{
 function clearHover(){edgeEls.forEach(p=>p.classList.remove('hot','dim'));
   document.querySelectorAll('.node').forEach(g=>g.classList.remove('hot','dim'))}
 
-const drawer=document.getElementById('drawer'),dbody=document.getElementById('dbody');
-function esc(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-function field(lab,val,mono=false){return val?`<div class="field"><div class="lab">${esc(lab)}</div>
-  <div class="val${mono?' mono':''}">${esc(val)}</div></div>`:''}
 function openEdge(e,a,b){
   const anchor=/^https?:/.test(e.anchor)?`<div class="field"><div class="lab">锚点 URL</div>
     <div class="val"><a href="${esc(e.anchor)}" target="_blank" rel="noopener">${esc(e.anchor)}</a></div></div>`:
@@ -925,8 +868,6 @@ function openNode(n){
     const e=edgeMap[el.dataset.eid];openEdge(e,idmap[e.s],idmap[e.d])}));
   drawer.classList.add('open');
 }
-document.getElementById('dclose').onclick=()=>drawer.classList.remove('open');
-document.addEventListener('keydown',e=>{if(e.key==='Escape')drawer.classList.remove('open')});
 
 const g=D.gradeCounts;
 document.getElementById('stats').innerHTML=[
@@ -942,11 +883,198 @@ const legend=document.getElementById('legend');
     flowEls.forEach(f=>{if(f.dataset.cls===c)f.style.display=off?'none':''})};
   legend.appendChild(el);
 });
-const countries=document.createElement('div');countries.className='chip';countries.style.cursor='default';
+const countries=document.createElement('div');countries.className='chip static';
 countries.innerHTML=Object.entries(CK).map(([k,v])=>`<span style="display:inline-flex;align-items:center;
   gap:4px"><span style="width:7px;height:7px;border-radius:50%;background:var(--${k})"></span>${v}</span>`).join(' · ');
 legend.appendChild(countries);
 document.getElementById('badge').textContent=D.badge;
+
+/* ================= 视图① 供应链树 ================= */
+const LT=T.leaves;
+const CLSLBL={ok:'有锚',semi:'半锚',weak:'弱锚',part:'部分证实',lead:'线索级待锚',
+  cand:'T1候选 · 未入台账',pending:'仅类型归层 · 待锚'};
+function statusBadge(lf){
+  const s=lf.status||'';if(!s)return'';
+  if(s.startsWith('有主'))return `<span class="stbadge st-own">${esc(s)}</span>`;
+  if(s.startsWith('弱'))return `<span class="stbadge st-weak">${esc(s)}</span>`;
+  return `<span class="stbadge st-empty">${esc(s)}</span>`;
+}
+function coChip(leafId,r,idx,tags){
+  const eb=r.edgeIds.length?`<span class="eb">⇄${r.edgeIds.length}</span>`:'';
+  return `<button class="co${r.nid?'':' cand'}" data-leaf="${leafId}" data-idx="${idx}"
+    data-key="${esc((r.nid+' '+r.name+' '+r.doing).toLowerCase())}" title="${esc(r.doing)}">
+    <span class="cline"><span class="dot ${r.cls}"></span>
+    <span class="nid">${esc(r.nid||'候选')}</span>${eb}</span>
+    <span class="cname">${esc(r.name)}</span>${tags||''}</button>`;
+}
+function leafCard(id){
+  const lf=LT[id],rows=lf.rows;
+  const candN=rows.filter(r=>!r.nid).length;
+  const empty=rows.length===0;
+  const notes=(lf.notes||[]).map(n=>`<p class="lnote">${esc(n)}</p>`).join('');
+  return `<div class="leaf${empty?' empty':''}" id="leaf-${id}">
+    <div class="leaf-head"><span class="lt">${esc(lf.title)}</span>
+      ${lf.sub?`<span class="ls">${esc(lf.sub)}</span>`:''}
+      ${statusBadge(lf)}
+      ${candN?`<span class="stbadge st-cand">候选 ${candN} · 未入台账</span>`:''}
+      <span class="cnt">${rows.length?rows.length+' 行':''}</span></div>
+    ${empty?`<div class="lempty">— 未识别到公开可锚的专产主体 —</div>`:''}
+    <div class="cos">${rows.map((r,i)=>coChip(id,r,i)).join('')}</div>
+    ${notes}</div>`;
+}
+function renderTree(){
+  const t=document.getElementById('tree');
+  t.innerHTML=`<svg class="wires" id="wires"></svg>
+  <div class="zone"><div class="zone-title"><span class="zt">上游材料</span>
+    <span class="zs">衬底/靶材/MO源/特气/掩模 → A1a·A2a；石英/树脂/光纤 → A3</span></div>
+    <div class="leafrow">${leafCard('M1')}${leafCard('M2')}${leafCard('M-rest')}</div>
+    <div class="leafrow" style="margin-top:12px">${leafCard('M1-lead')}</div></div>
+  <div class="zone z-a"><div class="zone-title"><span class="zt">A · 光器件分支</span>
+    <span class="zs">组件级子部件汇入 TOSA / ROSA；无源器件独立进入模块</span></div>
+    <div class="leafrow">${['A1a','A1b','A1c','A1d','A2a'].map(leafCard).join('')}</div>
+    <div class="conv">
+      <div class="conv-chip" id="leaf-TOSA"><b>A1 有源组件 TOSA</b><span>汇聚 A1a+A1b+A1c+A1d · 结构节点 · 无单列公司</span></div>
+      <div class="conv-chip" id="leaf-ROSA"><b>A2 有源组件 ROSA</b><span>汇聚 A2a + A1b-d 同左 · 结构节点 · 无单列公司</span></div>
+    </div>
+    <div class="leafrow">${leafCard('A3')}${leafCard('A-rest')}</div></div>
+  <div class="duo">
+    <div class="zone z-b"><div class="zone-title"><span class="zt">B · 功能电路分支</span>
+      <span class="zs">电芯片 + PCB板</span></div>
+      <div class="leafrow">${leafCard('B1')}${leafCard('B2')}</div></div>
+    <div class="zone z-c"><div class="zone-title"><span class="zt">C · 结构件分支</span>
+      <span class="zs">底座 / 壳体 / 金手指 · 新叶</span></div>
+      <div class="leafrow">${leafCard('C1')}</div></div>
+  </div>
+  <div class="conv-marker">▼ 三 分 支 汇 聚（ A1 / A2 / A3 / B1 / B2 / C1 ）</div>
+  <div class="zone z-mod">${leafCard('MOD')}</div>
+  <div class="duo">
+    <div class="zone"><div class="zone-title"><span class="zt">代工 EMS</span>
+      <span class="zs">经代工</span></div>${leafCard('EMS')}</div>
+    <div class="zone"><div class="zone-title"><span class="zt">系统商 / 云巨头 / 线缆</span>
+      <span class="zs">直销或经代工 EMS</span></div>${leafCard('SYS')}</div>
+  </div>
+  <div class="zone z-x"><div class="zone-title"><span class="zt">X · 非主链节点</span>
+    <span class="zs">不属 BOM 骨架 · 随台账收录 · 同样不承重</span></div>
+    <div class="leafrow">${leafCard('X1')}${leafCard('X2')}${leafCard('X3')}</div></div>
+  <div class="proc-teaser">横切工序轴（芯片制造 → 芯片封装 → 组件封装 → 模块组装 → 测试）与设备/仪器纵轴是另一坐标轴，不是链环
+    <button id="goproc">→ ③ 工序视图</button></div>`;
+  document.getElementById('goproc').addEventListener('click',()=>switchView('proc'));
+  t.querySelectorAll('.co').forEach(el=>el.addEventListener('click',()=>
+    openCompany(el.dataset.leaf,+el.dataset.idx)));
+}
+
+const WIRES=[
+  ['M1','A1a'],['M1','A2a'],['M2','A3'],
+  ['A1a','TOSA'],['A1b','TOSA'],['A1c','TOSA'],['A1d','TOSA'],
+  ['A2a','ROSA'],['A1b','ROSA','d'],['A1c','ROSA','d'],['A1d','ROSA','d'],
+  ['TOSA','MOD'],['ROSA','MOD'],['A3','MOD'],['A-rest','MOD','d'],
+  ['B1','MOD'],['B2','MOD'],['C1','MOD'],
+  ['MOD','EMS'],['MOD','SYS','d'],['EMS','SYS','h'],
+];
+function drawWires(){
+  const tree=document.getElementById('tree'),wires=document.getElementById('wires');
+  if(!tree||!wires||!tree.offsetParent)return;
+  const tr=tree.getBoundingClientRect();
+  wires.setAttribute('width',tree.scrollWidth);wires.setAttribute('height',tree.scrollHeight);
+  wires.setAttribute('viewBox',`0 0 ${tree.scrollWidth} ${tree.scrollHeight}`);
+  wires.innerHTML='';
+  WIRES.forEach(([f,t2,st])=>{
+    const a=document.getElementById('leaf-'+f),b=document.getElementById('leaf-'+t2);
+    if(!a||!b)return;
+    const ra=a.getBoundingClientRect(),rb=b.getBoundingClientRect();
+    let d;
+    if(st==='h'){
+      const x1=ra.right-tr.left,y1=ra.top+ra.height/2-tr.top,
+            x2=rb.left-tr.left,y2=rb.top+rb.height/2-tr.top;
+      d=`M${x1},${y1} C${x1+46},${y1} ${x2-46},${y2} ${x2},${y2}`;
+    }else{
+      const x1=ra.left+ra.width/2-tr.left,y1=ra.bottom-tr.top,
+            x2=rb.left+rb.width/2-tr.left,y2=rb.top-tr.top;
+      const dd=Math.max(16,Math.min(90,(y2-y1)*.45));
+      d=`M${x1},${y1} C${x1},${y1+dd} ${x2},${y2-dd} ${x2},${y2}`;
+    }
+    const p=document.createElementNS(NS,'path');
+    p.setAttribute('d',d);p.setAttribute('class','wire'+(st==='d'?' dashed':''));
+    wires.appendChild(p);
+  });
+}
+
+function openCompany(leafId,idx){
+  const lf=LT[leafId],r=lf.rows[idx];if(!r)return;
+  const gname=r.nid?T.nidName[r.nid]:null;
+  const ebtns=r.edgeIds.map(id=>`<button class="ebtn" data-e="${id}">${id}</button>`).join('');
+  dbody.innerHTML=`<h3>${esc(r.name)}</h3>
+    <span class="gradetag gt-${r.cls==='ok'?'lit':r.cls==='pending'?'shadow':r.cls==='cand'?'leak':'infer'}">${CLSLBL[r.cls]||esc(r.cls)}</span>
+    ${r.stance?`<span class="gradetag gt-leak">${esc(r.stance)}</span>`:''}
+    ${r.nid?'':`<span class="gradetag gt-infer">未入 nodes.csv / edges.csv</span>`}
+    ${field('所属叶',lf.title+(lf.sub?' · '+lf.sub:''))}
+    ${field('节点编号',r.nid||'—（候选，未入 nodes.csv）',true)}
+    ${field('身份依据一句',r.doing)}
+    ${field('锚（原文照录）',r.anchor)}
+    ${field('关系台账有边?',r.edgeText)}
+    ${ebtns?`<div class="hint">跳转到②关系图的边 ↓</div><div class="ebtns">${ebtns}</div>`:''}
+    <div class="hint">双闸：「做什么」与「台账有边」不可互推 · 供应链树不承重</div>
+    ${gname&&idmap[gname]?`<button class="gjump" id="gj">→ 在②关系图中打开该节点</button>`:''}`;
+  dbody.querySelectorAll('.ebtn').forEach(b=>b.addEventListener('click',()=>jumpGraphEdge(b.dataset.e)));
+  const gj=document.getElementById('gj');if(gj)gj.addEventListener('click',()=>jumpGraphNode(gname));
+  drawer.classList.add('open');
+}
+function jumpGraphNode(name){
+  if(!idmap[name])return;
+  switchView('graph');
+  setTimeout(()=>openNode(idmap[name]),90);
+}
+function jumpGraphEdge(eid){
+  const e=edgeMap[eid];if(!e)return;
+  switchView('graph');
+  setTimeout(()=>openEdge(e,idmap[e.s],idmap[e.d]),90);
+}
+
+document.getElementById('tstats').innerHTML=[
+  [T.stats.leafTotal,'BOM 终端叶'],[T.stats.leafOwn,'有主叶'],[T.stats.leafEmpty,'空叶'],
+  [T.stats.leafWeak,'弱覆盖叶'],[T.stats.nodes,'节点公司 · 全落位'],[T.stats.candidates,'T1候选 · 未入台账']
+].map(([n,k])=>`<div class="stat"><div class="n">${n}</div><div class="k">${k}</div></div>`).join('');
+document.getElementById('tsearch').addEventListener('input',e=>{
+  const q=e.target.value.trim().toLowerCase();
+  document.querySelectorAll('#tree .co').forEach(el=>{
+    el.style.display=!q||el.dataset.key.includes(q)?'':'none'});
+});
+
+/* ================= 视图③ 工序视图 ================= */
+const EQKW=['贴片','耦合','老化','测试','焊接','封装','组装','测量','键合','CPO'];
+const STAGES=[
+  {name:'芯片制造',sub:'即①供应链树 A1a / A2a 两叶本身（v1.1 不重复列表）',leaves:['A1a','A2a']},
+  {name:'芯片封装（委外）',sub:'跨光/电芯片工序 · 源杰招股书委托加工表',leaves:['PROC1']},
+  {name:'组件封装（TOSA/ROSA）',sub:'工序执行者 · 非零件供应商',leaves:['PROC2']},
+  {name:'模块组装（贴片/耦合/固化）',sub:'产出即①供应链树「光模块（总成）」',leaves:['MOD']},
+  {name:'测试',sub:'所用设备见下方设备/仪器纵轴（v1.1 不重复列表）',leaves:[]},
+];
+function renderProc(){
+  const root=document.getElementById('proc');let html='<div class="pstages">';
+  STAGES.forEach((st,i)=>{
+    if(i>0)html+=`<div class="ps-arrow">→</div>`;
+    const rows=st.leaves.flatMap(id=>LT[id].rows.map((r,j)=>({id,r,j})));
+    const gap=rows.length===0||st.leaves.every(id=>LT[id].status&&LT[id].status.startsWith('空'));
+    html+=`<div class="pstage${gap?' gap':''}"><div class="ps-name">${esc(st.name)}</div>
+      <div class="ps-sub">${esc(st.sub)}</div>
+      ${rows.length?`<div class="cos">${rows.map(({id,r,j})=>coChip(id,r,j)).join('')}</div>`
+        :`<div class="lempty">— 未识别到公开可锚的专产主体 —</div>`}
+    </div>`;
+  });
+  html+='</div>';
+  const eq=LT.EQ;
+  html+=`<div class="peq"><div class="zone-title"><span class="zt">设备 / 仪器纵轴 · ${eq.rows.length} 家</span>
+    <span class="zs">${esc(eq.sub)} · 工序标签由各行「做什么」原文关键词机械提取</span></div>
+    <div class="cos">${eq.rows.map((r,i)=>{
+      const tags=EQKW.filter(k=>(r.doing+r.anchor).includes(k));
+      const tagHtml=tags.length?`<span class="ptags">${tags.map(k=>`<span class="ptag">${k}</span>`).join('')}</span>`:'';
+      return coChip('EQ',r,i,tagHtml);
+    }).join('')}</div></div>`;
+  root.innerHTML=html;
+  root.querySelectorAll('.co').forEach(el=>el.addEventListener('click',()=>
+    openCompany(el.dataset.leaf,+el.dataset.idx)));
+  document.getElementById('procintro').textContent=T.procIntro;
+}
 
 /* ================= 视图切换 ================= */
 function switchView(v){
@@ -954,189 +1082,16 @@ function switchView(v){
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id==='view-'+v));
   history.replaceState(null,'','#'+v);
   drawer.classList.remove('open');
+  if(v==='tree')requestAnimationFrame(drawWires);
 }
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>switchView(t.dataset.view)));
-if(['graph','layers','content'].includes(location.hash.slice(1)))switchView(location.hash.slice(1));
 
-/* ================= 视图② 节点分层 ================= */
-const L=JSON.parse(document.getElementById('layerdata').textContent);
-function lcard(n){
-  return `<div class="lcard ${n.anchored?'':'pending'}" data-anchored="${n.anchored?1:0}"
-    data-text="${esc(n.nid+' '+n.name+' '+n.doing).toLowerCase()}">
-    <div class="nid">${esc(n.nid)}</div><div class="nm">${esc(n.name)}</div>
-    <div class="doing">${esc(n.doing)}</div>
-    <div class="st"><span class="dot ${n.anchored?'ok':'no'}"></span>
-      <span class="${n.anchored?'ok-t':'no-t'}">${n.anchored?'有锚':'待锚'}</span>
-      ${n.stance?`<span class="stance">${esc(n.stance)}</span>`:''}</div></div>`;
-}
-(function renderLayers(){
-  const root=document.getElementById('layers-root');let html='';let mi=0;
-  L.groups.forEach(gr=>{
-    if(gr.kind==='main'){
-      mi++;
-      if(mi>1)html+=`<div class="flow-arrow">▼ 下游</div>`;
-      const an=gr.nodes.filter(n=>n.anchored).length;
-      html+=`<div class="lband"><div class="lband-head"><span class="idx">L${mi}</span>
-        <h3>${esc(gr.title)}</h3><span class="cnt">${gr.nodes.length} 节点 · 有锚 ${an} / 待锚 ${gr.nodes.length-an}</span></div>
-        <div class="lcards">${gr.nodes.map(lcard).join('')}</div></div>`;
-    }
-  });
-  const vg=L.groups.find(g=>g.kind==='v');
-  if(vg){
-    const an=vg.nodes.filter(n=>n.anchored).length;
-    html+=`<div class="vband"><div class="lband"><div class="lband-head"><span class="idx">V</span>
-      <h3>${esc(vg.title)}</h3><span class="cnt">${vg.nodes.length} 节点 · 有锚 ${an} / 待锚 ${vg.nodes.length-an}</span></div>
-      <div class="lcards">${vg.nodes.map(lcard).join('')}</div></div></div>`;
-  }
-  const xgs=L.groups.filter(g=>g.kind==='x');
-  if(xgs.length){
-    html+=`<div class="xzone"><h3>X · 非 BOM 主链 / 边界外 / 匿名槽位（同样不承重）</h3>`;
-    xgs.forEach(gr=>{
-      const an=gr.nodes.filter(n=>n.anchored).length;
-      html+=`<div class="lband"><div class="lband-head"><span class="idx">X</span>
-        <h3>${esc(gr.title)}</h3><span class="cnt">${gr.nodes.length} 节点 · 有锚 ${an} / 待锚 ${gr.nodes.length-an}</span></div>
-        <div class="lcards">${gr.nodes.map(lcard).join('')}</div></div>`;
-    });
-    html+='</div>';
-  }
-  root.innerHTML=html;
-  document.getElementById('lmethods').innerHTML=L.methods.map(m=>`<li>${esc(m)}</li>`).join('');
-  root.querySelectorAll('.lcard').forEach(el=>{
-    el.addEventListener('click',()=>{
-      const nid=el.querySelector('.nid').textContent;
-      let found=null,gt='';
-      L.groups.forEach(gr=>gr.nodes.forEach(n=>{if(n.nid===nid){found=n;gt=gr.title}}));
-      if(!found)return;
-      dbody.innerHTML=`<h3>${esc(found.name)}</h3>
-        <span class="gradetag ${found.anchored?'gt-lit':'gt-shadow'}">${found.anchored?'有锚':'仅类型归层 · 待锚'}</span>
-        ${found.stance?`<span class="gradetag gt-infer">stance=${esc(found.stance)}</span>`:''}
-        ${field('节点编号',found.nid,true)}${field('归层',gt)}
-        ${field('做什么',found.doing)}${field('锚（原文照录）',found.anchor||'—')}
-        <div class="hint">节点层宽准入 · 不承重：归层与「做什么」不得读作供货/采购关系</div>`;
-      drawer.classList.add('open');
-    });
-  });
-  let lf='all';
-  function applyL(){
-    const q=document.getElementById('lsearch').value.trim().toLowerCase();
-    document.querySelectorAll('#layers-root .lcard').forEach(el=>{
-      const okF=lf==='all'||(lf==='anchored'&&el.dataset.anchored==='1')||(lf==='pending'&&el.dataset.anchored==='0');
-      const okQ=!q||el.dataset.text.includes(q);
-      el.style.display=okF&&okQ?'':'none';
-    });
-  }
-  document.querySelectorAll('#lfilter .chip').forEach(c=>c.addEventListener('click',()=>{
-    lf=c.dataset.f;
-    document.querySelectorAll('#lfilter .chip').forEach(x=>x.classList.toggle('on',x===c));
-    applyL();
-  }));
-  document.getElementById('lsearch').addEventListener('input',applyL);
-})();
-
-/* ================= 视图③ 工序/内容 ================= */
-const C=JSON.parse(document.getElementById('contentdata').textContent);
-const EIDX={};
-['lieqi','yuanjie'].forEach(k=>C[k].entries.forEach(e=>EIDX[e.cid]={e,ledger:k}));
-const TBC={ '①':'tb1','②':'tb2','③':'tb3','④':'tb4','⑤':'tb5' };
-function shortLabel(e){
-  const first=e.content.split(/[；;。]/)[0];
-  return first.length>32?first.slice(0,31)+'…':first;
-}
-(function renderProc(){
-  const root=document.getElementById('proc-root');let html='';
-  C.mapLanes.forEach(lane=>{
-    html+=`<div class="proc-lane"><div class="proc-lane-head"><h3>${esc(lane.title)}</h3>
-      <span>${esc(lane.sub)}</span></div><div class="proc-steps">`;
-    lane.steps.forEach((st,i)=>{
-      if(i>0)html+=`<div class="ps-arrow">→</div>`;
-      html+=`<div class="proc-step ${st.gap?'gap':''}"><div class="ps-name">${esc(st.name)}</div>`;
-      if(st.gap)html+=`<div class="ps-note">${esc(st.gap)}</div>`;
-      st.cids.forEach(cid=>{const rec=EIDX[cid];if(rec)
-        html+=`<button class="cidchip" data-cid="${cid}"><b>${cid}</b>${esc(shortLabel(rec.e))}</button>`});
-      html+='</div>';
-    });
-    html+='</div>';
-    if(lane.subflow){
-      html+=`<div class="subflow"><span class="sfref">${lane.subflow.ref} 自主生产线工序 →</span>
-        ${lane.subflow.steps.map(s=>`<span class="sf">${esc(s)}</span>`).join('')}</div>`;
-    }
-    if(lane.notes&&lane.notes.length){
-      html+=`<div class="proc-notes">${lane.notes.map(cid=>{
-        const rec=EIDX[cid];return rec?`<button class="cidchip" data-cid="${cid}"><b>${cid}</b>${esc(shortLabel(rec.e))}</button>`:''}).join('')}</div>`;
-    }
-    html+='</div>';
-  });
-  root.innerHTML=html;
-  root.querySelectorAll('[data-cid]').forEach(el=>el.addEventListener('click',()=>jumpTo(el.dataset.cid)));
-})();
-function stanceBadge(e){
-  let h='';
-  if(e.stanceCls==='issuer_self')h+=`<span class="sbadge sb-issuer">issuer_self · 永不承重</span>`;
-  else if(e.stanceCls==='industry')h+=`<span class="sbadge sb-industry">industry</span>`;
-  else if(e.stanceCls==='neutral')h+=`<span class="sbadge sb-neutral">neutral</span>`;
-  if(e.tense)h+=`<span class="sbadge sb-tense">${esc(e.tense)}</span>`;
-  return h;
-}
-function entryHtml(e){
-  const quotes=e.quotes.map(([k,v])=>`<blockquote><span class="qlab">${esc(k)}</span>${esc(v)}</blockquote>`).join('');
-  const meta=e.meta.map(([k,v])=>`<div class="kv"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`).join('');
-  const notes=e.notes.map(([k,v])=>`<div class="kv warn"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`).join('');
-  return `<details class="centry" id="entry-${e.cid}" data-tnum="${e.tnum}" data-stance="${esc(e.stanceCls)}"
-    data-text="${esc((e.cid+' '+e.content+' '+e.quotes.map(q=>q[1]).join(' ')).toLowerCase())}">
-    <summary><div class="crow"><span class="cid">${e.cid}</span>
-      <span class="tbadge ${TBC[e.tnum]||''}">${esc(e.typeLabel)}</span>${stanceBadge(e)}
-      <span class="openhint">引语与溯源 ▾</span></div>
-      <h4>${esc(e.content)}</h4></summary>
-    <div class="cbody">${quotes}${meta}${notes}</div></details>`;
-}
-function renderLedger(key,mountId){
-  const ld=C[key],mount=document.getElementById(mountId);
-  const tchips=Object.entries(ld.tlabels).map(([t,lab])=>
-    `<button class="chip" data-t="${t}">${t}${lab} ${ld.tcounts[t]||0}</button>`).join('');
-  const schips=ld.stanceCounts?Object.entries(ld.stanceCounts).map(([s,n])=>
-    `<button class="chip" data-s="${s}">${s} ${n}</button>`).join(''):'';
-  mount.innerHTML=`<div class="ledger-head"><h3>${esc(ld.title)}</h3>
-    <div class="lmeta">${esc(ld.status)} · ${esc(ld.schema)}<br>语料：${esc(ld.corpus)}<br>
-    统一锚点：<a href="${esc(ld.anchor)}" target="_blank" rel="noopener">${esc(ld.anchor)}</a></div>
-    <div class="disc">${esc(ld.discipline)}</div></div>
-    <div class="filterbar"><button class="chip on" data-t="all">全部 ${ld.total}</button>${tchips}${schips}
-    <input class="search" placeholder="检索编号 / 内容 / 引语…"></div>
-    <div class="elist">${ld.entries.map(entryHtml).join('')}</div>
-    <div class="noteblock"><h4>诚实边界（源文件原文）</h4><ol>${ld.boundaries.map(b=>`<li>${esc(b)}</li>`).join('')}</ol></div>`;
-  let ft='all',fs='all';
-  const q=mount.querySelector('.search');
-  function apply(){
-    const qq=q.value.trim().toLowerCase();
-    mount.querySelectorAll('.centry').forEach(el=>{
-      const okT=ft==='all'||el.dataset.tnum===ft;
-      const okS=fs==='all'||el.dataset.stance===fs;
-      const okQ=!qq||el.dataset.text.includes(qq);
-      el.style.display=okT&&okS&&okQ?'':'none';
-    });
-  }
-  mount.querySelectorAll('.filterbar .chip').forEach(c=>c.addEventListener('click',()=>{
-    if(c.dataset.s){fs=fs===c.dataset.s?'all':c.dataset.s;
-      mount.querySelectorAll('[data-s]').forEach(x=>x.classList.toggle('on',x.dataset.s===fs));}
-    else{ft=c.dataset.t;
-      mount.querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('on',x.dataset.t===ft));}
-    apply();
-  }));
-  q.addEventListener('input',apply);
-  mount._reset=function(){ft='all';fs='all';q.value='';
-    mount.querySelectorAll('.filterbar .chip').forEach(x=>x.classList.toggle('on',x.dataset.t==='all'));
-    apply();};
-}
-renderLedger('lieqi','ledger-lieqi');
-renderLedger('yuanjie','ledger-yuanjie');
-function jumpTo(cid){
-  const rec=EIDX[cid];if(!rec)return;
-  switchView('content');
-  document.getElementById(rec.ledger==='lieqi'?'ledger-lieqi':'ledger-yuanjie')._reset();
-  const el=document.getElementById('entry-'+cid);
-  el.open=true;
-  setTimeout(()=>{el.scrollIntoView({behavior:'smooth',block:'center'});
-    el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');},60);
-}
+renderTree();
+renderProc();
+let rsz;window.addEventListener('resize',()=>{clearTimeout(rsz);rsz=setTimeout(drawWires,120)});
+window.addEventListener('load',drawWires);
+if(['tree','graph','proc'].includes(location.hash.slice(1)))switchView(location.hash.slice(1));
+else switchView('tree');
 </script>
 </body>
 </html>
@@ -1146,19 +1101,26 @@ function jumpTo(cid){
 # ---------------------------------------------------------------- 装配与断言
 
 def main():
-    graph = build_graph()
-    layers = parse_layer_md()
-    content = build_content()
+    nodes, edges = load_csv()
+    graph = build_graph(nodes, edges)
+    tree, parsed_nids = build_tree(nodes)
 
     def payload(obj):
         return json.dumps(obj, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
 
+    baseline = "数据基线：output/光模块供应链全景-v1.1.md @ {} · output/edges.csv 236边 · output/nodes.csv 169节点 · 装配 {}".format(
+        time.strftime("%Y-%m-%d %H:%M", time.localtime(os.path.getmtime(PANORAMA_MD))),
+        time.strftime("%Y-%m-%d %H:%M"),
+    )
     html = (HTML
             .replace("__DATA__", payload(graph))
-            .replace("__LAYERS__", payload(layers))
-            .replace("__CONTENT__", payload(content)))
+            .replace("__TREE__", payload(tree)))
+    html = html.replace('<span class="base" id="baseline"></span>',
+                        f'<span class="base" id="baseline">{baseline}</span>')
 
-    # 视图① 四硬约束
+    node_ids = {r["node_id"] for r in nodes}
+
+    # 视图② 四硬约束
     assert graph["edgeCount"] == 236, graph["edgeCount"]
     assert graph["canonicalNodeCount"] == 169, graph["canonicalNodeCount"]
     assert sum(graph["layerCounts"].values()) == 169
@@ -1171,52 +1133,33 @@ def main():
         r'<(?:script|link)[^>]+(?:src|href)\s*=\s*["\']https?://', html, re.I
     ), "HTML 含外部脚本或样式依赖"
 
-    # 视图② 与源文件元数据对账
-    assert layers["meta"]["total"] == 169, layers["meta"]
-    assert layers["meta"]["anchored"] == 48, layers["meta"]
-    assert layers["meta"]["pending"] == 121, layers["meta"]
-    assert len(layers["groups"]) == 12
-    assert len(layers["methods"]) == 4
-
-    # 视图③ 与源文件汇总对账
-    lq, yj = content["lieqi"], content["yuanjie"]
-    assert lq["total"] == 34 and lq["tcounts"] == {"①": 6, "②": 8, "③": 6, "④": 8, "⑤": 6}
-    assert yj["total"] == 39 and yj["tcounts"] == {"①": 8, "②": 8, "③": 8, "④": 8, "⑤": 7}
-    assert yj["stanceCounts"] == {"neutral": 25, "industry": 10, "issuer_self": 4}
-    issuer_cids = {e["cid"] for e in yj["entries"] if e["stanceCls"] == "issuer_self"}
-    assert issuer_cids == {"YJ16", "YJ24", "YJ32", "YJ39"}, issuer_cids
-    overlap = {e["cid"] for e in yj["entries"] if any("重叠" in k for k, _ in e["notes"])}
-    assert overlap == {"YJ25", "YJ26", "YJ32"}, overlap
-    all_cids = {e["cid"] for e in lq["entries"]} | {e["cid"] for e in yj["entries"]}
-    c01 = next(e for e in lq["entries"] if e["cid"] == "C01")
-    for kw in ("贴片", "引线键合", "光学耦合", "老化测试", "不含引线键合设备"):
-        assert kw in c01["content"], kw
-    yj01 = next(e for e in yj["entries"] if e["cid"] == "YJ01")
-    for kw in ("芯片设计", "晶圆制造", "芯片加工", "测试"):
-        assert kw in yj01["content"], kw
-    yj02 = next(e for e in yj["entries"] if e["cid"] == "YJ02")
-    for lane in content["mapLanes"]:
-        for st in lane["steps"]:
-            for cid in st["cids"]:
-                assert cid in all_cids, cid
-        for cid in lane.get("notes", []):
-            assert cid in all_cids, cid
-        if "subflow" in lane:
-            for kw in lane["subflow"]["steps"]:
-                assert kw in yj02["content"], kw
+    # 视图① 结构完整性与 169 节点落位对账
+    unknown = parsed_nids - node_ids
+    assert not unknown, f"全景出现 nodes.csv 之外的 NID: {sorted(unknown)}"
+    missing = node_ids - parsed_nids
+    if missing:
+        print(f"WARN: {len(missing)} 个 nodes.csv 节点未在全景 v1.1 落位（并发编辑容忍）: "
+              f"{sorted(missing)}")
+    for marker in ('id="view-tree"', 'id="view-graph"', 'id="view-proc"',
+                   "leaf-TOSA", "leaf-ROSA", "id=\"wires\""):
+        assert marker in html, marker
+    assert "两个不同的坐标轴" in tree["procIntro"], "横切工序轴原文未捕获"
 
     with open(OUT_PATH, "w", encoding="utf-8") as f:
         f.write(html)
 
+    row_total = sum(len(lf["rows"]) for lf in tree["leaves"].values())
     print(f"wrote {OUT_PATH} {len(html)} bytes")
-    print(f"视图①: {graph['edgeCount']}边 / {graph['canonicalNodeCount']}节点 / "
+    print(f"视图①: {row_total} 公司行 / 唯一NID {len(parsed_nids)} / "
+          f"T1候选 {tree['stats']['candidates']} / 锚档 {tree['stats']['clsCounts']}")
+    for key in LEAF_DEFS:
+        lf = tree["leaves"][key]
+        print(f"  {key:8s} rows={len(lf['rows']):3d} notes={len(lf['notes'])}")
+    print(f"视图②: {graph['edgeCount']}边 / {graph['canonicalNodeCount']}节点 / "
           f"幽灵槽位{graph['ghostCount']} / 等级{dict(graph['gradeCounts'])}")
-    print(f"视图②: {layers['meta']['total']}节点 有锚{layers['meta']['anchored']} "
-          f"待锚{layers['meta']['pending']} 共{len(layers['groups'])}组")
-    print(f"视图③: 猎奇{lq['total']}条 {lq['tcounts']} / 源杰{yj['total']}条 {yj['tcounts']} "
-          f"stance{yj['stanceCounts']}")
-    print("自测: 236边✓ 169节点✓ 徽章✓ 零外部依赖✓ 节点层48/121✓ 内容34+39✓ "
-          "issuer_self红线✓ 工序图cid闭环✓")
+    print(f"视图③: 工序5阶段 + 设备纵轴 {len(tree['leaves']['EQ']['rows'])}家")
+    print("自测: 236边✓ 169节点✓ 徽章✓ 零外部依赖✓ 三视图标记✓ 工序轴原文✓")
+    print(baseline)
 
 
 if __name__ == "__main__":
