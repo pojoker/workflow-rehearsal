@@ -6,7 +6,9 @@ validate_edges.py — 供应链图谱 demo 边生成器校验器（Stage3 终验
 只依赖 Python 标准库。
 
 功能一 结构校验（无 --truth 也执行）
-  1. edges.csv 每行必须恰好 10 列，逐行报告缺列/多列。
+  1. edges.csv 前 10 列必须匹配 EDGE_COLS 契约；旧 10 列文件逐行照常校验。
+     允许在前 10 列之后附带可选扩展列（D1 新增：edge_type / edge_subtype /
+     scope），见功能四。向后兼容：缺少这些列的现有 236 边文件仍 RESULT=PASS。
   2. 四件套非空：供方/需方/占比或金额/财年/边等级/证据文件/锚点 任一为空 -> FAIL。
   3. edge_id 唯一性；锚点列须为 http(s) URL、或"同E/同D"式引用（须能解析到存在的 edge_id）。
   4. nodes.csv 须 6 列；实名节点引用完整性（供方/需方 不含"(匿名)"者须在 nodes.csv
@@ -14,6 +16,12 @@ validate_edges.py — 供应链图谱 demo 边生成器校验器（Stage3 终验
   5. 边等级枚举检查：只允许
      {实边, 实边(已死亡), 推断边(A级), 推断边(B级), 推断边(C级), 推断边(D级),
       半边, 半边槽位, 程序段落泄漏}。
+
+功能四 可选扩展字段校验（D1 / C项 / E项，仅当 edges.csv 含这些列时执行）
+  - edge_type：非空前必须在 {supply, equity, guarantee, legal_event, other}。
+  - edge_subtype：非空前必须在 EDGE_SUBTYPES 受控词表内。
+  - scope：非空前必须在 {group, legal_entity, branch}（E 项 counterparty_scope）。
+  以上三项均【可选】：列缺失或非空不填时不报错，保证对现有 236 边零回归。
 
 功能二 真值比对（提供 --truth 时执行）
   truth.json: {"checks":[{"id","desc","where":{...},"expect":{"field","contains"}}]}
@@ -92,6 +100,34 @@ EDGE_LEVELS = {
     "推断边(A级)", "推断边(B级)", "推断边(C级)", "推断边(D级)",
     "半边", "半边槽位", "程序段落泄漏",
 }
+# ----------------------------------------------------------------------
+# 可选扩展字段（v1.7a 治理还债 D1 / C项 / E项）：向后兼容的旧 10 列文件
+# 不含这些列；它们只在前 10 列之后作为可选扩展列出现时才被校验。
+#   edge_type    —— 边的基础类型（C 项 edge type/subtype schema）
+#   edge_subtype —— 边子类型（供货/股权/担保/裁判文书/环评/专利等细分）
+#   scope        —— 本条披露数字的反方观察口径（E 项 counterparty_scope：
+#                   group | legal_entity | branch）
+# 枚举取值直接取自 ROADMAP-v1.7a §C/§E 与证据类型边界最小条款。
+# ----------------------------------------------------------------------
+EDGE_TYPES = {"supply", "equity", "guarantee", "legal_event", "other"}
+EDGE_SUBTYPES = {
+    # 供货类
+    "代工", "分销", "直销", "主供", "采购",
+    # 股权类（C 项：直持/间持、比例或区间、持股链、有效期）
+    "股权直持", "股权间持",
+    # 担保类（C 项：额度/余额、担保期间、是否已解除）
+    "担保",
+    # 裁判文书默认产出（证据类型边界最小条款）
+    "历史合同", "纠纷事件",
+    # 环评/能评默认产出
+    "产能事件", "设备供货",
+    # 专利（v1.8 先定义两 subtype，均不得转为供货边）
+    "共同申请", "专利转让",
+    # 兜底
+    "其他",
+}
+SCOPE_LEVELS = {"group", "legal_entity", "branch"}
+EXTENDED_FIELDS = ["edge_type", "edge_subtype", "scope"]
 ANON_MARK = "(匿名)"
 REF_RE = re.compile(r"^同[ED]\d+$")
 URL_RE = re.compile(r"^([A-Za-z][A-Za-z0-9+.\-]*)://")
@@ -435,26 +471,48 @@ def main():
         fail("edges.csv 为空")
         n_err += 1
         edges, edge_ids = [], set()
+        ext_header = []
     else:
         header = edge_rows[0]
         data_rows = edge_rows[1:]
-        if header != EDGE_COLS:
-            warn("edges.csv 表头与契约不符: %s" % header)
+        if header[:10] != EDGE_COLS:
+            warn("edges.csv 前 10 列表头与契约不符: %s" % header[:10])
+
+        # 可选扩展列（出现在前 10 列之后；缺失则维持旧契约，零回归）
+        ext_header = header[10:] if len(header) > 10 else []
+        ext_idx = {name: 10 + k for k, name in enumerate(ext_header)}
+        if ext_header:
+            unknown = [c for c in ext_header if c not in EXTENDED_FIELDS]
+            if unknown:
+                warn("检测到未识别的扩展列（跳过其校验）: %s" % unknown)
+            known = [c for c in ext_header if c in EXTENDED_FIELDS]
+            if known:
+                ok("可选扩展字段已识别: %s" % ", ".join(known))
+        else:
+            ok("无可选扩展字段（维持 10 列契约，向后兼容）")
 
         edges = []
         edge_ids = set()
         for i, row in enumerate(data_rows, start=2):  # 第 1 行为表头
-            if len(row) != 10:
+            if len(row) < 10:
                 n_err += 1
                 eid_hint = row[0] if row else ""
-                if len(row) < 10:
-                    missing = EDGE_COLS[len(row):]
-                    fail("行 %d (edge_id=%s): 缺列 %s" % (i, eid_hint, missing))
-                else:
-                    fail("行 %d (edge_id=%s): 多列，多余 %s" % (i, eid_hint, row[10:]))
-            d = dict(zip(EDGE_COLS, row))
+                missing = EDGE_COLS[len(row):]
+                fail("行 %d (edge_id=%s): 缺列 %s" % (i, eid_hint, missing))
+                d = dict(zip(EDGE_COLS, row))
+            else:
+                if len(row) > len(header):
+                    n_err += 1
+                    eid_hint = row[0] if row else ""
+                    fail("行 %d (edge_id=%s): 列数 %d 多于表头 %d，多余 %s"
+                         % (i, eid_hint, len(row), len(header), row[len(header):]))
+                d = dict(zip(EDGE_COLS, row))
             for c in EDGE_COLS:
                 d.setdefault(c, "")
+            # 扩展列映射（按名索引，避免位置依赖）
+            for c in ext_header:
+                j = ext_idx[c]
+                d[c] = row[j] if j < len(row) else ""
             edges.append(d)
             eid = (d.get("edge_id") or "").strip()
             if eid:
@@ -521,6 +579,26 @@ def main():
             fail("边等级非法: edge_id=%s 值=%r" % (eid, lvl))
     else:
         ok("边等级枚举 (均在允许集合内)")
+
+    # 可选扩展字段枚举校验（D1 / C项 / E项；仅当对应列存在且非空时校验）
+    if ext_header:
+        ext_fail = []
+        for d in edges:
+            eid = d.get("edge_id") or ""
+            for fld, allowed in (("edge_type", EDGE_TYPES),
+                                 ("edge_subtype", EDGE_SUBTYPES),
+                                 ("scope", SCOPE_LEVELS)):
+                if fld not in ext_header:
+                    continue
+                v = (d.get(fld) or "").strip()
+                if v and v not in allowed:
+                    ext_fail.append((eid, fld, v))
+        if ext_fail:
+            n_err += len(ext_fail)
+            for eid, fld, v in ext_fail:
+                fail("扩展字段非法: edge_id=%s %s=%r 不在受控词表" % (eid, fld, v))
+        else:
+            ok("可选扩展字段枚举 (edge_type/edge_subtype/scope 均在受控词表内)")
 
     # ---------------- nodes ----------------
     node_rows = load_csv(args.nodes)

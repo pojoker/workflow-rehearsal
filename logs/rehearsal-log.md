@@ -1266,3 +1266,55 @@
 - 偏差: 无。
 - 摩擦: 无。
 - [v1.7a冻结] codex确认审(1/3/5/7满足,2/4/6部分)四项最小条款**逐字并入**(证据类型边界/C_layer-G_layer覆盖率公式与候选处理率/F三产物最小schema/S0c改"必要接口清单(非边)")——因采纳为逐字无裁量,不再发起第三轮确认。v1.7a冻结commit,讨论版归档。下一步=四段制第1段一次性治理还债(基线数字/E两层契约+首批5组裁决/代码零实体名改造/C股权担保回收/S0b可枚举化/D-F指标文本)。
+
+## 2026-07-24 v1.7a 第1段·治理还债开工（事前日志，目标级派工）
+
+车道与目标（实现路径各车道自主）：[D1-hy3]entity-registry数据化(两层schema机器可读)+校验器扩展(edge type/subtype/scope字段) [D2-kimi(k3)]硬化discovery_queue原型(闸台账schema+六类裁决+文档,仍标原型直至终验) [D3-codex]S0b枚举器(nodes.csv公开主体识别+证券代码补齐→flows/out/s0b-candidates.csv)+C项edge subtype schema提案 [D4-grok]C项回收备证:裁剪台账中1股权+4担保行的四件套证据整理(旭创-源杰历史阈值边等,只备证不入图) [D5-我]BOM词表v0(出处=猎奇BOM+源杰/仕佳供应商表部件列)+首批5组实体裁决+全部终验。红线不变:台账写入权在终验;词表不从研报抄。
+- [D5部分结果] BOM词表v0落盘(flows/BOM-词表-v0.md):14词全部带台账/抽取件出处,试点三窄词预登记=InP衬底/三甲基铟/AWG(生产环节专属,预期低噪,分属三层);DSP/TIA词因台账无出处显式待补不预支。首批5组实体裁决与终验等D1-D4返回后做。
+- [D4结果] C项股权/担保备证完成:从v16-cuts-ledger筛出非供货方向之1股权+4担保(EG-01旭创→源杰间接≥5%;GG-01博创→蓉博母子担保;GG-02/03/04仕佳←河南仕佳信息技术/葛海泉/葛海泉·耿树霞)。逐条回源flows/input/v16年报PDF整理四件套(证据文件/年份/命中引语/锚点URL)→flows/out/equity-guarantee-evidence.md。旭创-源杰强制标截至2023年3月前历史阈值边(2024年报稀释边界);持股链6.71%×86.46%仅作解释禁止机械相乘。只备证不入图,准入归终验。
+
+### [D3-01] 读取冻结路线与终审裁决
+- 意图: 锁定 S0b 枚举与 C 项 subtype schema 的冻结要求，避免越过 D3 写入权或误把非供货关系混入供货层。
+- 动作: 完整读取 `flows/ROADMAP-v1.7a.md`；读取 `flows/discussion-v1.7.md` 的“终审裁决”与冻结记录；随后读取 `REHEARSAL.md` 日志纪律、主日志尾部、`assets/MANIFEST.md` 与 seed/assets/flows/out 文件清单。
+- 耗时: 0 次外部检索，约 5 分钟。
+- 产出: 确认 D3 边界：公开主体证券/挂牌标识需机械枚举；股权/担保进入独立层且不参与供货集中度；裁判文书关系默认 `historical_contract`/`dispute_event`，不得外推当前供货；台账写入权仍归终验。
+- 偏差: 首个读取动作沿用主日志中既有的 D3 目标级事前日志，未另起六字段条目；本条补齐细粒度执行记录。
+- 摩擦: 无。
+
+### [D3-02] 装配证券身份核验路径与节点清单
+- 意图: 在不猜测代码的前提下确定可用金融数据底座、节点字段现状和本地既有识别依据。
+- 动作: 按 `wind-find-finance-skill` 约束执行更新检查、读取 skill catalog 并核对所需数据 skill 是否已安装；随后检查 `output/nodes.csv` 的 schema、169 行完整性、既有代码/上市状态字段与本地 registry/报告线索。
+- 耗时: 0 次外部网页检索，约 8 分钟。
+- 产出: `wind-mcp-skill` 已安装；本任务归类为“必需数据底座 skill”，无额外必需工作流 skill。`nodes.csv` 可正常解析为 169 行、字段为 `node_id/名称/类型/国别/代码/备注`；前 48 行含既有证券身份，N49–N169 的代码栏全部为空，是本轮主要补债区。
+- 偏差: 无。
+- 摩擦: Wind 的 A/港/美股数据底座不覆盖新三板历史挂牌主体，后者须优先用本地一手招股书/年报及全国股转披露证据确认；无法形成证据闭环即标 `unknown`。
+
+### [D3-03] 建立上市挂牌候选集并逐项核验
+- 意图: 从 169 节点中找全可触发 S0b 的公开主体，同时把集团口径、子公司、重名、跨市场和历史挂牌状态显式隔离。
+- 动作: 使用本地 `flows/input` 年报/招股书与既有输出按名称检索证券代码、挂牌市场和主体同一性；对 A股/港股/美股疑似主体调用 Wind `stock_data.get_stock_basicinfo` 核验；新三板疑似主体仅采纳一手文件明确给出的简称/代码/挂牌状态。未确认或名称粒度不是上市法人本身的行写 `unknown`，不把母公司代码机械赋给子公司。
+- 耗时: 6 组本地检索/结构检查 + 42 次 Wind 单标的取数调用（含无结果项），约 35 分钟。
+- 产出: 已写入 `flows/out/s0b-candidates.csv`：66 行候选，49 行高置信、9 行中置信、8 行低置信；10 行代码为 `unknown`。已覆盖现有代码主体、代码栏为空但核验成功的 A/科创/北证候选/新三板/港美股主体、历史退市/摘牌主体，以及易误配的 unknown 样本。
+- 偏差: 原计划 Wind 不覆盖新三板，实测 `get_stock_basicinfo/get_stock_events` 可返回部分 NQ 主体；因此以 Wind 返回为核验依据，但对云岭光电“874775.BJ/北证”与空挂牌/首发日期的冲突仍标市场 unknown。
+- 摩擦: 英文法人名在 Wind 中偶有无结果，需用已知中文法定简称做一次确定性修正；洛阳中超被误配为南京中超，已按公司名不一致拒绝赋码。股份制名称不等于挂牌，飞博/瑞谷/昱升/芯思杰均未猜代码。
+
+### [D3-04] 设计非供货边 subtype 字段契约
+- 意图: 给 C 项股权边/担保边提供可验证、可分层、不会污染供货集中度的字段设计，并把确认审要求的历史合同/争议/产能/专利语义固化为互斥 subtype。
+- 动作: 读取 D1 车道当前的 `flows/entity-registry.yaml` 与 `demo/src/validate_edges.py`（只读，不覆盖并发改动），读取 D4 的 `flows/out/equity-guarantee-evidence.md`、现行 `output/edges.csv` 字段和 v1.7a 的证据类型边界；据此写 `flows/out/edge-subtype-schema-proposal.md`。
+- 耗时: 0 次外部检索，约 15 分钟。
+- 产出: 已写入 `flows/out/edge-subtype-schema-proposal.md`；提出共享核心字段、股权/担保扩展字段、英文 canonical subtype、D4 五条映射及 8 条校验不变式。
+- 偏差: D1 并发校验器目前只校验 `edge_type/edge_subtype/scope` 三列且 subtype 为中文；本提案不覆盖其代码，而是建议终验将确认审逐字要求的 `historical_contract/dispute_event/co_application/assignment` 设为机器值，中文保留为展示标签。
+- 摩擦: 当前单表 schema 无法无损表示共同担保人、阈值运算符、零发生额授权和多证据重述；提案采用核心表 + 类型扩展表解决，实施留给终验。
+
+### [D3-05] 交付终检
+- 意图: 确认两个 D3 产物可解析、覆盖范围可复算、未触碰正式台账或并发车道文件，并按用户要求追加结果行。
+- 动作: 校验候选 CSV 表头/行数/唯一 node_id/代码与市场枚举；核对所有候选 node_id 均存在于 169 节点；搜索 schema 提案中的强制 subtype 与排除规则；运行目标文件 `git diff --check`；最后追加 `[D3结果]` 一行。
+- 耗时: 0 次外部检索，约 4 分钟。
+- 产出: CSV 校验通过：66 行、66 个唯一 node_id、56 行有代码、10 行代码 unknown，全部 node_id 与名称逐字匹配 169 节点；schema 关键机器值与隔离规则均命中；三份目标文件 `git diff --check` 通过；`output/nodes.csv`、`output/edges.csv` 未修改。
+- 偏差: 无。
+- 摩擦: 无。
+- [D3结果] S0b枚举器完成：`flows/out/s0b-candidates.csv` 共66候选（56行有代码、10行unknown，含A/科创/北证状态待闭环/新三板/港美股及历史摘退市，集团scope不冒充法人）；C项提案完成：`flows/out/edge-subtype-schema-proposal.md` 固化股权/担保扩展字段与 `historical_contract/dispute_event/co_application/assignment` 等subtype语义，所有非supply强制排除供货集中度；正式台账未改，待终验。
+
+[D1结果] 2026-07-24 | 动作:①将 flows/entity-registry.md 的 5 条归并裁决数据化为机器可读两层契约 flows/entity-registry.yaml（身份层 identity_layer:15实体=4 group+11 legal_entity，含 aliases/rename_evidence 改名证据锚 status=pending 1处；观察 scope 层 observation_scope_layer:6 条=3 group+3 legal_entity，含 members+scope_effective_period+disclosure_basis），并回填 entity-registry.md 顶部两层说明与字段 schema；②扩展 demo/src/validate_edges.py 支持可选扩展列 edge_type/edge_subtype/scope（受控词表 enum 校验，列缺失则跳过，零回归）| 产出: flows/entity-registry.yaml + entity-registry.md(更新) + validate_edges.py(扩展) | 自测:真实236边(10列)→RESULT=PASS(structural=0)；有效扩展字段(含 equity/股权间持/group)→PASS；非法扩展字段(量子代工/集团)→FAIL 且指明 edge_id=E002；yaml 解析通过、scope.members 无悬空引用 | 结论:向后兼容，D1 完成
+[D2结果] 2026-07-24 | 动作:硬化 flows/src/discovery_queue.py——①闸台账schema落地:六类裁决(生产中/拟生产/采购使用/销售代理/仅提及/无法判断)为唯一合法值集,裁决四件套(闸裁决/裁决人owner=终验/裁决时间戳ISO8601/理由)同空同填不变式,A5校验器实跑(正例必过+旧裁决词/半填/非ISO时间戳/悬空queue_id四类反例必拦,仅内存不落盘),真实台账仍交空骨架(本车道不代判);②真实算子接口落地:DiscoveryOperator契约(name/trigger/object_type/scan→new_row)+OPERATOR_REGISTRY,media_lead/customs_diff真实,bom_scan(S0a)/bfs_jump(S0b)同构MOCK占位,gap_list(S0c必要接口清单非边)算子id保留接口预留,旧must_edge命名退役;③D项对齐v1.7a:查全率改候选集覆盖率(C_layer/G_layer/∩/覆盖率+候选处理率+待裁决老化,三硬条件与A6防线入口径备注),删除过时proto-recall-rate-mock.csv | 产出: discovery_queue.py(D2硬化版)+flows/discovery-queue-README.md(用法/队列schema/闸台账schema/算子接入/D项口径/红线)+proto-coverage-mock.csv(新MOCK演示行) | 自测: python3 flows/src/discovery_queue.py→exit=0,A1-A6通过;队列26行(media_lead 10/customs_diff 14/MOCK 2),全部待闸 | 结论:仍标**原型-未准入**,D2完成,待终验硬化评审决定是否转正
+- [治理变更-监控] 用户指令:弃用bash pgrep等待循环(已两次自匹配空转,F08),改为每车道独立subagent监控/预验收。D1-D4四路交付确认落盘(entity-registry.yaml 16KB/s0b-candidates.csv/equity-guarantee-evidence.md/discovery-queue-README.md),派预验收subagent,终验裁决随后。
+- [D1-D4终验] 预验收subagent报告(flows/out/d1-d4-preacceptance.md):四路全过,无阻断缺陷。终验裁决:**全部验收**。两项遗留登记待办:①edge subtype英文名与校验器中文枚举需对齐(D3自报);②SC_SF_MERGED的branch scope仅在notes未单列。待办(下一工作段):首批5组实体identity_decision由我逐组裁决(海信/旭创/长飞/昱升/顺丰)+subtype命名对齐,完成后第1段收口,进入第2段债券试点。

@@ -1,8 +1,53 @@
-# flows/entity-registry.md — 节点实体归并登记册（v1.7-E 项，骨架）
+# flows/entity-registry.md — 节点实体归并登记册（v1.7-E 项）
 
 **状态：随 ROADMAP-v1.7 草案建立，未冻结。** 规则：每个涉归并节点标注
 法人/集团两级；裁决三选一——**集团口径合并 / 母子分列 / 按披露口径照录**——
 逐条登记理由。时间轴别名表与 nodes.csv 统一引用本册，消除双标。
+
+## 数据化两层契约（v1.7a 治理还债 · D1）
+
+本册的 5 条归并裁决已数据化为机器可读两层契约：
+
+> **`flows/entity-registry.yaml`** —— 身份层 + 观察 scope 层（YAML，PyYAML 可读）。
+
+设计依据：`ROADMAP-v1.7a.md §E` + `flows/out/roadmap-v17-review-codex.md §E`
+（三表合并为两层：实体主表/关系别名表 → 身份层；观察 scope 表 → scope 层）。
+冻结基线：236 边 / 169 节点 (commit 6b6d491)。
+
+### 第一层：身份层（identity_layer）
+回答“这些名称是不是同一法人 / 是否属同一集团 / 何时生效”。
+每个实体字段：
+
+| 字段 | 含义 |
+|---|---|
+| `entity_id` | 稳定主键（GROUP_/LEGAL_ 前缀） |
+| `identity_type` | `legal_entity` \| `group` |
+| `canonical_name` / `legal_name` | 规范名 / 法定全称 |
+| `identifiers` | 代码/证券/信源代码（待 S0b 补全） |
+| `aliases[]` | `{name, effective_from, effective_to}` 别名与有效期 |
+| `rename_evidence` | `{status: confirmed\|pending\|none, anchor, retrieved}` 更名证据锚 |
+| `related` | `member_of` / `parent_of` / `possible_same_as` / `predecessor_of`（均指 entity_id） |
+| `identity_decision` | `same_legal_entity` \| `distinct_legal_entities` \| `pending`（取代原三选一） |
+| `registry_ruling` / `registry_status` | 原样保留本册下方表格的治理状态 |
+
+### 第二层：观察 scope 层（observation_scope_layer）
+回答“这一条披露数字究竟是集团 / 法人 / 分支口径”。
+每条 scope 字段：
+
+| 字段 | 含义 |
+|---|---|
+| `scope_id` | 稳定主键（SC_ 前缀） |
+| `scope_level` | `group` \| `legal_entity` \| `branch` |
+| `based_on_entity` | 指向身份层 entity_id |
+| `members[]` | 构成该 scope 的成员 entity_id |
+| `scope_effective_period` | `{start, end}` 期间 |
+| `disclosure_basis` / `anchor` | 披露出处 / 锚点（URL 或同E引用；未补留空） |
+
+**默认策略**：未显式声明 scope 的边默认按 `legal_entity` 口径；仅原文明示合并
+（集团/分支）口径时才登记 `group` / `branch` scope。
+
+> 下方表格为裁决原文（治理状态以 `registry_ruling` / `registry_status` 镜像进 YAML）。
+
 
 | # | 涉及名称 | 法人层 | 集团层 | 裁决 | 理由 | 状态 |
 |---|---|---|---|---|---|---|
