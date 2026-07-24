@@ -82,7 +82,7 @@ def invariants():
     for i,l in enumerate(open(os.path.join(ROOT,'words.txt'),encoding='utf-8')) if os.path.exists(os.path.join(ROOT,'words.txt')) else []:
         if l.strip() and not l.startswith('#') and l.count('|')!=3: fail('⑤',f"words.txt 第{i+1}行竖线数≠3")
     # ⑥白名单
-    WL={'README.md','CLAUDE.md','tree.yaml','points.csv','edges.csv','triage.csv','words.txt','scan.py','render.py','RESTART-v2.md','.gitignore','.DS_Store'}
+    WL={'README.md','CLAUDE.md','tree.yaml','points.csv','edges.csv','triage.csv','words.txt','scan.py','render.py','.gitignore','.DS_Store'}
     for f in os.listdir(ROOT):
         if os.path.isfile(os.path.join(ROOT,f)) and f not in WL: fail('⑥',f'根目录白名单外文件: {f}')
     refs=os.listdir(os.path.join(ROOT,'refs')) if os.path.isdir(os.path.join(ROOT,'refs')) else []
