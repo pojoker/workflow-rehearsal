@@ -104,6 +104,7 @@ EXT: [云巨头, 系统设备商, 线缆集团]   # 宇宙外终端,只作边端
 # BOM流向骨架(常识层,免锚;渲染时叠加edges.csv已证边计数)
 flows:
   - {from: M1, to: [M2a, M2b]}
+  - {from: M1, to: [C1]}   # 衬底直供IDM芯片厂捷径(codex复核并入)
   - {from: M2a, to: [C1, C3, C6]}
   - {from: M2b, to: [C2]}
   - {from: M2c, to: [C4]}
@@ -130,6 +131,7 @@ flows:
   - {from: C6, to: [MOD2]}
   - {from: B1, to: [MOD1, MOD2, MOD3]}
   - {from: B2, to: [MOD1, MOD2, MOD3]}
+  - {from: D12, to: [EMS1]}   # 光引擎/器件入模块代工(codex复核并入)
   - {from: EMS1, to: [MOD1, MOD3]}
   - {from: EQ1, to: [M2a, M2b]}
   - {from: EQ2, to: [C1, C4]}
