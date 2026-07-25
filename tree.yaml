@@ -17,6 +17,10 @@ observation_list:             # 宇宙外观察点合法名录（点准入路径
   - {名称: 全新光电, 市场: 台股, 理由: III-V外延片}
   - {名称: IQE, 市场: 伦敦, 理由: 化合物半导体外延}
   - {名称: 海思, 市场: 未上市(华为子公司), 理由: 光模块DSP自研}
+  - {名称: AIXTRON, 市场: 欧股, 理由: InP MOCVD设备(EQ1)}
+  - {名称: Veeco, 市场: 美股, 理由: MBE设备硅光/GaAs(EQ1)}
+  - {名称: Oxford Instruments, 市场: 欧股, 理由: InP等离子刻蚀(EQ2)}
+  - {名称: Samco, 市场: 日股, 理由: InP刻蚀(EQ2)}
 
 tree:
 - id: M
@@ -39,7 +43,7 @@ tree:
     - {cell_id: C2, 名称: VCSEL, 路线: 数通COB/硅光, 工艺备注: 多模短距;流程=外延→晶圆制造→晶圆测试→切割→分选,介质膜沉积控翘曲(台账蒸馏-长光华芯)}
     - {cell_id: C3, 名称: 探测器芯片(PIN/APD), 路线: 共用}
     - {cell_id: C4, 名称: 硅光PIC, 路线: 数通COB/硅光, 工艺备注: SOI平台,CMOS代工}
-    - {cell_id: C5, 名称: 电芯片(DSP/Driver/TIA/CDR), 路线: 共用}
+    - {cell_id: C5, 名称: 电芯片(DSP/Driver/TIA/CDR/主控MCU), 路线: 共用}
     - {cell_id: C6, 名称: 可调谐激光器/相干光组件, 路线: 相干, 工艺备注: 气密金盒}
 - id: P
   名称: 芯片封装/委外
