@@ -30,6 +30,33 @@ def build(outdir):
                 L.append(f"{'#'*min(dep,6)} {n.get('名称',n.get('id',''))}"); L.append('')
                 for c in n.get('children',[]): walk(c,dep+1)
     walk(tr['tree'],2)
+    # BOM流向:骨架(常识层)+已证边计数(edges.csv经point_id→cell聚合)
+    names={}
+    def nm(n):
+        if isinstance(n,list):
+            for x in n: nm(x)
+        elif isinstance(n,dict):
+            if 'cell_id' in n: names[n['cell_id']]=n['名称']
+            for c in n.get('children',[]): nm(c)
+    nm(tr['tree'])
+    pid2cell={p['point_id']:p['cell_id'] for p in pts}
+    cnt={}
+    for e in egs:
+        sc,dc=pid2cell.get(e.get('供方point_id','')),pid2cell.get(e.get('需方point_id',''))
+        if sc and dc and sc!=dc: cnt[(sc,dc)]=cnt.get((sc,dc),0)+1
+    L+=['---','## BOM流向（骨架=常识层免锚；括号=已证公司级边数，来自edges.csv）','']
+    skel=set()
+    for f in tr.get('flows',[]):
+        s=f['from']
+        for d in f['to']:
+            skel.add((s,d))
+            c=cnt.get((s,d),0)
+            L.append(f"- {s} {names.get(s,'')} → {d} {names.get(d,'')}"+(f"  **(已证{c}边)**" if c else ''))
+    extra=sorted((k,v) for k,v in cnt.items() if k not in skel)
+    if extra:
+        L+=['','骨架外已证流向（现实先于常识，待并入骨架或复核归格）：']
+        for (s,d),c in extra: L.append(f"- {s} {names.get(s,'')} → {d} {names.get(d,'')} ({c}边)")
+    L.append('')
     dates=[p['检索日期'] for p in pts if p.get('检索日期')]
     cov=f"{len(pts)}点/{len(egs)}边"
     L+=['---',f"页脚：宇宙={tr['universe']['count']}家(冻结{tr['universe']['frozen_date']}) | 数据截至={max(dates) if dates else '—'} | 覆盖={cov} | 空叶格={len(empty)}个: {','.join(empty) if empty else '无'}"]

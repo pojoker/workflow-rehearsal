@@ -11,8 +11,15 @@ def rows(f):
     p=os.path.join(ROOT,f)
     return list(csv.DictReader(open(p,encoding='utf-8-sig'))) if os.path.exists(p) else []
 
+def observation_names():
+    """Read the small observation-list contract without requiring PyYAML."""
+    text=open(os.path.join(ROOT,'tree.yaml'),encoding='utf-8').read()
+    match=re.search(r'^observation_list:.*?^tree:',text,flags=re.M|re.S)
+    if not match: return set()
+    return set(re.findall(r'\{名称:\s*([^,}]+)',match.group(0)))
+
 E_状态={'生产中','在建','传闻','宇宙外观察'}
-E_标签={'A股','美股','港股','台股','未上市私企','未解析'}
+E_标签={'A股','美股','港股','台股','日股','欧股','新三板','未上市私企','未上市国企','未上市(母上市)','未解析'}
 E_数值类型={'占比','金额'}
 E_单位={'元','万元','亿元','美元','万美元','百万美元','亿美元','欧元','万欧元'}
 E_边等级={'实边','半边','推断A','推断B','推断C'}
@@ -44,9 +51,7 @@ def invariants():
         for col in ('供方point_id','需方point_id'):
             if e.get(col,'') and e[col] not in pid: fail('②',f"{e.get('edge_id')} {col}={e[col]} 悬空")
     # ③自指(零豁免): 上市且非宇宙外观察 ⇒ 公司须∈_frozen名称或代码; 宇宙外观察须在tree观察名单
-    import yaml
-    tr=yaml.safe_load(open(os.path.join(ROOT,'tree.yaml'),encoding='utf-8'))
-    obs={o['名称'] for o in tr.get('observation_list',[])}
+    obs=observation_names()
     fro_names={r['名称'] for r in rows('corpus/_frozen.csv')}
     for p in pts:
         if p['状态']=='宇宙外观察':
@@ -82,7 +87,7 @@ def invariants():
     for i,l in enumerate(open(os.path.join(ROOT,'words.txt'),encoding='utf-8')) if os.path.exists(os.path.join(ROOT,'words.txt')) else []:
         if l.strip() and not l.startswith('#') and l.count('|')!=3: fail('⑤',f"words.txt 第{i+1}行竖线数≠3")
     # ⑥白名单
-    WL={'README.md','CLAUDE.md','tree.yaml','points.csv','edges.csv','triage.csv','words.txt','scan.py','render.py','.gitignore','.DS_Store'}
+    WL={'README.md','CLAUDE.md','tree.yaml','points.csv','edges.csv','triage.csv','words.txt','scan.py','render.py','participation.py','make_participation_pdf.py','.gitignore','.DS_Store'}
     for f in os.listdir(ROOT):
         if os.path.isfile(os.path.join(ROOT,f)) and f not in WL: fail('⑥',f'根目录白名单外文件: {f}')
     refs=os.listdir(os.path.join(ROOT,'refs')) if os.path.isdir(os.path.join(ROOT,'refs')) else []
@@ -104,7 +109,7 @@ def scan():
             w,cell,ex,ctx=[x.strip() for x in l.split('|')]
             words.append((w,cell,ex,ctx))
     done={t['hit_id'] for t in rows('triage.csv')}
-    pts=rows('points.csv'); filled={p['cell_id'] for p in pts}
+    pts=rows('points.csv'); filled={p['cell_id'] for p in pts}; known_companies={p['公司'] for p in pts}
     q=[]
     for d in sorted(glob.glob(os.path.join(ROOT,'corpus/annual/*/'))):
         for pdf in glob.glob(d+'**/*.pdf',recursive=True):
@@ -114,17 +119,20 @@ def scan():
             except: continue
             m=re.search(r'_([^_]+)_em_',os.path.basename(pdf)); co=m.group(1) if m else os.path.basename(d.rstrip('/'))
             for w,cell,ex,ctx in words:
+                if cell=='ANY' and co in known_companies: continue
                 for mm in list(re.finditer(re.escape(w),t))[:2]:
                     seg=t[max(0,mm.start()-40):mm.end()+40]
                     if ex and re.search(ex,seg): continue
                     if ctx and ctx not in seg: continue
                     hid=f'{co}+{cell}+{os.path.basename(pdf)[:40]}'
                     if hid in done: continue
-                    q.append((0 if cell not in filled else 1,hid,co,cell,w,seg))
+                    priority=1 if cell=='ANY' else (0 if cell not in filled else 2)
+                    q.append((priority,hid,co,cell,w,seg))
                     break
     q.sort()
     print(f'净队列 {len(q)} 条(空叶格优先排序)')
-    for pr,hid,co,cell,w,seg in q[:40]: print(f'  [{"空格" if pr==0 else "  "}] {co} | {cell} | {w} | {seg[:50]}')
+    labels={0:'空格',1:'参与',2:'  '}
+    for pr,hid,co,cell,w,seg in q[:40]: print(f'  [{labels[pr]}] {co} | {cell} | {w} | {seg[:50]}')
     return q
 
 if __name__=='__main__':
