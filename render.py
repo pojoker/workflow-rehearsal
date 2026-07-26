@@ -116,7 +116,10 @@ def build(outdir):
             K.append(f"**{e['谁']}**")
             if e.get('原话'): K.append(f"> {e['原话']}")
             K.append(f"　出处：{e.get('出处','—')}")
-            K.append(f"　锚：{e.get('锚','—')}")
+            a=e.get('锚','—')
+            if isinstance(a,dict):  # search_protocol 负证据协议
+                a='；'.join(f"{x}：{a[x]}" for x in ('关键词','语料范围','检索日期','命中数') if x in a)
+            K.append(f"　锚（{e.get('锚型','?')}）：{a}")
             if e.get('说明'): K.append(f"　为什么算证据：{e['说明']}")
             K.append('')
         if k.get('关联点'): K+=[f"**关联点**：{'、'.join(k['关联点'])}",'']

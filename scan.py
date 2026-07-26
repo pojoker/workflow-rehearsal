@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""scan.py — 扫描+八不变量。用法: python3 scan.py [--check]
+"""scan.py — 扫描+九不变量。用法: python3 scan.py [--check]
 --check: 只跑不变量(<10s)。扫描分母=corpus/annual(_frozen登记);legacy-input=证据库不参与扫描。"""
 import sys,os,csv,re,glob,time,subprocess
 
@@ -94,6 +94,7 @@ def invariants():
     WL={'README.md','CLAUDE.md','tree.yaml','knowledge.yaml','points.csv','edges.csv','triage.csv','words.txt',
         'scan.py','render.py','participation.py','make_participation_pdf.py',
         'build_detailed_capability_report.py','capability_details.csv',
+        'route_bom.csv','macro_evidence.csv',
         'RESTART-v2.md','.gitignore','.git','.DS_Store'}
     for f in os.listdir(ROOT):
         if os.path.isfile(os.path.join(ROOT,f)) and f not in WL: fail('⑥',f'根目录白名单外文件: {f}')
@@ -107,29 +108,69 @@ def invariants():
     pnames={p['公司'] for p in pts}
     for t in trg:
         if t['处置']=='已入点' and t['公司'] not in pnames: fail('⑦',f"triage {t['hit_id']} 已入点但points无此公司")
-    # ⑧知识库: 无证据的"常识"不许入库(每条须有标题/一句话/≥1条带出处+锚的证据;格须真实存在)
+    # ⑧知识库: 无证据的"常识"不许入库;锚按型核验("已核验"三个字过不了闸)
     kp=os.path.join(ROOT,'knowledge.yaml')
+    treetext=open(os.path.join(ROOT,'tree.yaml'),encoding='utf-8').read()
+    cells=set(re.findall(r'cell_id:\s*([A-Za-z0-9]+)',treetext))
+    eids={e['edge_id'] for e in egs}
+    pids={p['point_id'] for p in pts}
+    kn_ids=set()
     if os.path.exists(kp):
-        ktext=open(kp,encoding='utf-8').read()
-        cells=set(re.findall(r'cell_id:\s*([A-Za-z0-9]+)',open(os.path.join(ROOT,'tree.yaml'),encoding='utf-8').read()))
         try:
-            import yaml; kb=yaml.safe_load(ktext).get('knowledge',[]) or []
+            import yaml; kb=yaml.safe_load(open(kp,encoding='utf-8')).get('knowledge',[]) or []
         except Exception as e:
             kb=[]; fail('⑧',f'knowledge.yaml 不可解析: {e}')
-        ids=set()
         for k in kb:
             i=k.get('id','?')
-            if i in ids: fail('⑧',f'知识id重复: {i}')
-            ids.add(i)
+            if not re.fullmatch(r'KN\d{3}',str(i)): fail('⑧',f'知识id须为KN###: {i}')
+            if i in kn_ids: fail('⑧',f'知识id重复: {i}')
+            kn_ids.add(i)
             for f_ in ('标题','一句话'):
                 if not (k.get(f_) or '').strip(): fail('⑧',f'{i} 缺{f_}')
             ev=k.get('证据') or []
-            if not ev: fail('⑧',f'{i} 无证据(无证据的常识写tree.yaml,不入知识库)')
+            if not ev: fail('⑧',f'{i} 无证据(无证据的常识不入知识库)')
             for j,e in enumerate(ev):
-                for f_ in ('谁','出处','锚'):
-                    if not (str(e.get(f_,'')) or '').strip(): fail('⑧',f'{i} 证据[{j}] 缺{f_}')
+                for f_ in ('谁','出处','锚型','锚'):
+                    if not str(e.get(f_,'') or '').strip(): fail('⑧',f'{i} 证据[{j}] 缺{f_}'); break
+                else:
+                    t,a=e['锚型'],e['锚']
+                    if t=='url':
+                        if not str(a).startswith(('http://','https://')): fail('⑧',f'{i} 证据[{j}] url锚非链接: {str(a)[:40]}')
+                    elif t=='local_file':
+                        if '#' not in str(a): fail('⑧',f'{i} 证据[{j}] local_file锚缺#定位: {str(a)[:60]}')
+                        elif not os.path.exists(os.path.join(ROOT,str(a).split('#')[0])): fail('⑧',f'{i} 证据[{j}] 文件不存在: {str(a).split("#")[0]}')
+                    elif t=='ledger_ref':
+                        if str(a) not in pids|eids: fail('⑧',f'{i} 证据[{j}] ledger_ref {a} 不在points/edges')
+                    elif t=='search_protocol':
+                        if not isinstance(a,dict) or not all(x in a for x in ('关键词','语料范围','检索日期','命中数')):
+                            fail('⑧',f'{i} 证据[{j}] search_protocol须含 关键词/语料范围/检索日期/命中数')
+                    else: fail('⑧',f'{i} 证据[{j}] 锚型非法: {t}')
             for c in (k.get('格') or []):
                 if c not in cells: fail('⑧',f'{i} 格 {c} 不在tree.yaml')
+    # tree引用闭合: knowledge_ids/decision_ref 必须指向真实知识条目
+    for ref in re.findall(r'knowledge_ids:\s*\[([^\]]*)\]',treetext):
+        for x in [y.strip() for y in ref.split(',') if y.strip()]:
+            if x not in kn_ids: fail('⑧',f'tree knowledge_ids {x} 不在knowledge.yaml')
+    for x in re.findall(r'decision_ref:\s*(\S+?)[,}]',treetext):
+        if x not in kn_ids: fail('⑧',f'tree decision_ref {x} 不在knowledge.yaml')
+    # ⑨路线投影与宏观结论: route_bom每行必须映射或说明;宏观须MC###+A-D级
+    rb=rows('route_bom.csv')
+    rbid=set()
+    for r in rb:
+        i=r.get('route_item_id','?')
+        if not re.fullmatch(r'RB\d{3}',i): fail('⑨',f'route_bom id须为RB###: {i}')
+        if i in rbid: fail('⑨',f'route_bom id重复: {i}')
+        rbid.add(i)
+        st=r.get('mapping_status','')
+        if st not in ('mapped','architecture_only','gap'): fail('⑨',f'{i} mapping_status非法: {st}')
+        cs=[c.strip() for c in (r.get('cell_ids') or '').split(',') if c.strip()]
+        for c in cs:
+            if c not in cells: fail('⑨',f'{i} cell_id {c} 不在tree.yaml')
+        if st=='mapped' and not cs: fail('⑨',f'{i} mapped但cell_ids为空')
+        if st in ('architecture_only','gap') and not (r.get('mapping_note') or '').strip(): fail('⑨',f'{i} {st}须给mapping_note说明为何不映射')
+    for r in rows('macro_evidence.csv'):
+        if not re.fullmatch(r'MC\d{3}',r.get('claim_id','?')): fail('⑨',f"macro claim_id须为MC###: {r.get('claim_id')}")
+        if r.get('证据等级') not in ('A','B','C','D'): fail('⑨',f"macro {r.get('claim_id')} 证据等级非法")
 
 def scan():
     """全量扫描: words×corpus/annual → 净队列(剔除triage已处置), 空叶格优先(P6), hit_id=公司+cell+文件(P7)"""
@@ -170,5 +211,5 @@ if __name__=='__main__':
     invariants()
     if ERR:
         print('\n'.join('\033[31m'+e+'\033[0m' for e in ERR)); sys.exit(1)
-    print('八不变量: 全绿')
+    print('九不变量: 全绿')
     if '--check' not in sys.argv: scan()

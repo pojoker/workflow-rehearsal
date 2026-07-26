@@ -1,0 +1,11 @@
+﻿claim_id,量化结论,证据等级,证据类型,处理方式,来源
+MC001,2026数通光模块市场约228亿美元,C,机构预测/二手汇总,不再作为首页headline,
+MC002,中国厂商全球份额超过60%,C,行业机构排名汇总,仅保留为待核行业判断,
+MC003,芯片或上游占BOM成本70%-80%,C,多型号混合口径,不作为跨产品通用BOM比例,
+MC004,高端DSP国产化率低于3%,C,二手产业研究口径,仅保留方向性判断,
+MC005,1.6T CPO功耗9W而传统方案30W,D,缺少同边界同口径原始测试,从正文删除,
+MC006,800G DR8采用8路100G通道,A,IEEE 802.3df标准材料,进入路线BOM,https://www.ieee802.org/3/df/KeyMotions_3df_220914.pdf
+MC007,1.6TBASE-DR8采用8路200G方向,B,IEEE P802.3dj制定中材料,进入路线BOM并标记标准制定中,https://www.ieee802.org/3/B400G/email/msg01775.html
+MC008,400ZR采用单载波DP-16QAM与相干DSP,A,OIF Implementation Agreement,进入路线BOM,https://www.oiforum.com/oif-publishes-implementation-agreement-for-400zr-coherent-optical-interface/
+MC009,已确认公司数,A,内部证据账本可重算,首页展示,capability_details.csv
+MC010,能力记录数与覆盖节点数,A,内部证据账本可重算,首页展示,capability_details.csv
