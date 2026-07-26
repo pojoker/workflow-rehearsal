@@ -552,7 +552,8 @@ def route_section() -> str:
 
 def macro_evidence_panel() -> str:
     rows = read_csv(MACRO_EVIDENCE_CSV)
-    legacy = [row for row in rows if row["claim_id"] in {"K01", "K02", "K03", "K04", "K05"}]
+    # claim_id 已改制为 MC###(防与材料格M1/M2撞名);MC001-005=降级/删除的宏观叙事数字
+    legacy = [row for row in rows if row["claim_id"] in {"MC001", "MC002", "MC003", "MC004", "MC005"}]
     audit_rows = []
     for row in legacy:
         source = row["来源"]
@@ -1135,6 +1136,59 @@ def homepage_kpis(rows: list[dict[str, str]], edge_count: int) -> str:
 """
 
 
+def knowledge_section() -> str:
+    """产业知识层(knowledge.yaml):大白话结论+判定用法+锚型证据。无证据条目已被 scan.py 不变量⑧拦在库外。"""
+    kpath = ROOT / "knowledge.yaml"
+    if not kpath.exists():
+        return ""
+    import yaml
+
+    kb = yaml.safe_load(kpath.read_text(encoding="utf-8")).get("knowledge", []) or []
+    cards = []
+    for k in sorted(kb, key=lambda x: x["id"]):
+        cells = "、".join(k.get("格") or []) or "通用"
+        ev_html = []
+        for e in k.get("证据") or []:
+            a = e.get("锚", "")
+            if isinstance(a, dict):
+                a = "；".join(f"{x}：{a[x]}" for x in ("关键词", "语料范围", "检索日期", "命中数") if x in a)
+            a = str(a)
+            link = f'<a href="{html.escape(a)}" target="_blank">原文PDF</a>' if a.startswith("http") else html.escape(a[:110])
+            ev_html.append(
+                f'<li><b>{html.escape(e.get("谁",""))}</b>：{html.escape((e.get("原话") or "")[:120])}'
+                f'<br><span class="k-anchor">锚（{html.escape(e.get("锚型","?"))}）：{link}</span></li>'
+            )
+        judge = (k.get("怎么用它判断") or "").strip()
+        cards.append(f"""
+      <div class="k-card">
+        <div class="k-head"><b>{html.escape(k['id'])}</b>　{html.escape(k['标题'])}<span class="k-cells">适用：{html.escape(cells)}</span></div>
+        <div class="k-plain">{html.escape(k['一句话'].strip())}</div>
+        {f'<details><summary>怎么用它判断</summary><pre class="k-judge">{html.escape(judge)}</pre></details>' if judge else ''}
+        <details><summary>证据（{len(k.get('证据') or [])} 条，逐条带锚）</summary><ul class="k-ev">{''.join(ev_html)}</ul></details>
+      </div>""")
+    return f"""
+    <div class="sec" id="s8">
+      <h2><span class="tag">知识</span>产业知识层：这环节干嘛的、为什么难、怎么判断谁够格</h2>
+      <div class="desc">来自 knowledge.yaml。每条为大白话结论 + 判定用法 + 逐条证据（谁说的 / 原话 / 锚）。无证据的"常识"被校验器机器拦截，进不了本层；负证据（"查过没有"）必须附检索协议（关键词 / 语料范围 / 日期 / 命中数）。</div>
+      {''.join(cards)}
+    </div>
+"""
+
+
+KNOWLEDGE_CSS = """
+  .k-card{border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0;background:#fff}
+  .k-head{font-size:14px;margin-bottom:6px}
+  .k-cells{float:right;font-size:11px;color:var(--muted)}
+  .k-plain{font-size:13px;color:#374151;white-space:pre-line;background:#f8fafc;border-left:3px solid var(--accent);padding:8px 12px;border-radius:6px}
+  .k-card details{margin-top:8px;font-size:12.5px}
+  .k-card summary{cursor:pointer;color:var(--accent)}
+  .k-judge{white-space:pre-wrap;font-family:inherit;font-size:12.5px;background:#fffbeb;border:1px dashed #fde68a;border-radius:8px;padding:10px;margin:6px 0}
+  .k-ev{margin:6px 0 0 18px}
+  .k-ev li{margin:6px 0}
+  .k-anchor{color:var(--muted);font-size:11.5px}
+"""
+
+
 def build_html(template_path: Path, output_path: Path, rows: list[dict[str, str]]) -> None:
     source = template_path.read_text(encoding="utf-8")
     edges_by_company, edge_count = verified_edges_by_company(rows)
@@ -1177,10 +1231,19 @@ def build_html(template_path: Path, output_path: Path, rows: list[dict[str, str]
         "厂商名称、细分能力与少量已验证供货实边统一放在第 7 节能力卡；本节只解释产业分工。",
     )
     source = legacy_quantitative_badges(source)
-    source = source.replace("</style>", CAPABILITY_CSS + "\n</style>")
+    source = source.replace("</style>", CAPABILITY_CSS + KNOWLEDGE_CSS + "\n</style>")
+    source = source.replace(
+        '<a href="#s7">⑦ 公司能力卡</a>',
+        '<a href="#s7">⑦ 公司能力卡</a>\n    <a href="#s8">⑧ 产业知识</a>',
+    )
     source = source.replace(
         "  <footer>",
         capability_section(rows, edges_by_company) + "\n  <footer>",
+        1,
+    )
+    source = source.replace(
+        "  <footer>",
+        knowledge_section() + "\n  <footer>",
         1,
     )
     source = source.replace("</body>", CAPABILITY_JS + "\n</body>")
