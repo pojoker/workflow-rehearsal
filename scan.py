@@ -94,6 +94,7 @@ def invariants():
     WL={'README.md','CLAUDE.md','tree.yaml','knowledge.yaml','points.csv','edges.csv','triage.csv','words.txt',
         'scan.py','render.py','participation.py','make_participation_pdf.py',
         'build_detailed_capability_report.py','capability_details.csv',
+        'route_bom.csv','macro_evidence.csv',
         'RESTART-v2.md','.gitignore','.git','.DS_Store'}
     for f in os.listdir(ROOT):
         if os.path.isfile(os.path.join(ROOT,f)) and f not in WL: fail('⑥',f'根目录白名单外文件: {f}')

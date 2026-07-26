@@ -36,6 +36,9 @@ import participation
 
 ROOT = Path(__file__).resolve().parent
 DEFAULT_CSV = ROOT / "capability_details.csv"
+ROUTE_BOM_CSV = ROOT / "route_bom.csv"
+MACRO_EVIDENCE_CSV = ROOT / "macro_evidence.csv"
+EDGES_CSV = ROOT / "edges.csv"
 DEFAULT_PDF = ROOT / "output" / "pdf" / "光模块产业链公司能力明细.pdf"
 DEFAULT_TEMPLATE = Path(
     "/Users/jowang/Workbuddy/2026-07-26-11-49-54/"
@@ -46,6 +49,22 @@ DEFAULT_HTML = Path(
     "光模块产业链全景图_公司能力细化版.html"
 )
 FONT_PATH = Path("/System/Library/Fonts/STHeiti Light.ttc")
+
+# Reader-facing edges are deliberately curated: only named, original-source,
+# verified "实边" records are eligible.  The full edge ledger remains backend
+# audit data and is not dumped into the reader.
+READER_EDGE_IDS = {
+    "E001",
+    "E003",
+    "E043",
+    "E045",
+    "E048",
+    "E049",
+    "E074",
+    "E083",
+    "E085",
+    "E088",
+}
 
 STAGES = [
     ("材料层", ("M",), "#2C6E8F"),
@@ -428,6 +447,251 @@ def esc(value: str) -> str:
     return html.escape(value or "", quote=True)
 
 
+def read_csv(path: Path) -> list[dict[str, str]]:
+    with path.open(encoding="utf-8-sig", newline="") as stream:
+        return list(csv.DictReader(stream))
+
+
+def evidence_badge(grade: str, label: str | None = None) -> str:
+    grade = (grade or "D").upper()
+    safe_grade = grade if grade in {"A", "B", "C", "D"} else "D"
+    return (
+        f'<span class="ev ev-{safe_grade.lower()}" '
+        f'title="证据等级 {esc(safe_grade)}">{esc(label or safe_grade)}</span>'
+    )
+
+
+def route_section() -> str:
+    rows = read_csv(ROUTE_BOM_CSV)
+    routes: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for row in rows:
+        routes[row["产品路线"]].append(row)
+
+    axis_rows = [
+        (
+            "产品 / 标准轴",
+            "800G DR8、1.6T DR8、400ZR",
+            "定义速率、距离、调制与互操作边界；本节按这一轴拆 BOM。",
+        ),
+        (
+            "电接口 / 重定时轴",
+            "FRO、LRO、LPO",
+            "描述模块是否保留完整 DSP / Retimer，不能与产品标准并列替代。",
+        ),
+        (
+            "封装 / 系统架构轴",
+            "可插拔、NPO、CPO",
+            "描述光引擎与交换 ASIC 的物理位置、维护与散热方式。",
+        ),
+        (
+            "光子平台轴",
+            "离散 EML、硅光、相干光子集成",
+            "描述光器件实现平台；硅光可跨越多种产品与封装架构。",
+        ),
+    ]
+    axis_html = "".join(
+        f"<tr><td><b>{esc(axis)}</b></td><td>{esc(examples)}</td><td>{esc(boundary)}</td></tr>"
+        for axis, examples, boundary in axis_rows
+    )
+
+    route_cards = []
+    for route_name in ("800G DR8", "1.6T DR8", "400ZR"):
+        route_rows = routes[route_name]
+        first = route_rows[0]
+        bom_rows = []
+        for row in route_rows:
+            source = row["来源"]
+            source_html = (
+                f'<a href="{esc(source)}" target="_blank" rel="noreferrer">标准材料</a>'
+                if source.startswith(("http://", "https://"))
+                else "来源待补"
+            )
+            bom_rows.append(
+                "<tr>"
+                f"<td><b>{esc(row['BOM分组'])}</b></td>"
+                f"<td>{esc(row['关键组成'])}</td>"
+                f"<td>{esc(row['说明'])}</td>"
+                f"<td>{evidence_badge(row['证据等级'])} {source_html}</td>"
+                "</tr>"
+            )
+        route_cards.append(
+            f"""
+            <article class="route-card">
+              <div class="route-title">
+                <div><b>{esc(route_name)}</b><span>{esc(first['应用边界'])}</span></div>
+                <small>{esc(first['产品标准轴'])}</small>
+              </div>
+              <div class="route-meta">
+                <span><b>电接口</b>{esc(first['电接口轴'])}</span>
+                <span><b>封装</b>{esc(first['封装架构轴'])}</span>
+                <span><b>光子平台</b>{esc(first['光子平台轴'])}</span>
+              </div>
+              <table class="route-bom">
+                <tr><th>BOM 分组</th><th>关键组成</th><th>边界说明</th><th>证据</th></tr>
+                {''.join(bom_rows)}
+              </table>
+            </article>
+            """
+        )
+
+    return f"""
+  <!-- 3 产品路线 BOM -->
+  <div class="sec" id="s3">
+    <h2><span class="tag">路线</span>先分比较轴，再按产品路线拆 BOM</h2>
+    <div class="desc">800G DR8、1.6T DR8、400ZR属于产品 / 标准轴；LPO属于电接口实现轴，CPO属于封装与系统架构轴，硅光属于光子平台轴。四个轴可以组合，但不能放在同一列表中互相替代。</div>
+    <h3 class="sub">3.0 四个正交比较轴</h3>
+    <table class="axis-table">
+      <tr><th>比较轴</th><th>典型选项</th><th>回答的问题</th></tr>
+      {axis_html}
+    </table>
+    <div class="route-grid">{''.join(route_cards)}</div>
+    <div class="note">证据口径：A = 已发布标准 / Implementation Agreement；B = 制定中的 IEEE 项目材料或标准未限定的工程实现。路线 BOM 只描述“典型组成与标准边界”，不把某一厂商方案写成全行业唯一配置。</div>
+  </div>
+"""
+
+
+def macro_evidence_panel() -> str:
+    rows = read_csv(MACRO_EVIDENCE_CSV)
+    legacy = [row for row in rows if row["claim_id"] in {"K01", "K02", "K03", "K04", "K05"}]
+    audit_rows = []
+    for row in legacy:
+        source = row["来源"]
+        source_html = (
+            f'<a href="{esc(source)}" target="_blank" rel="noreferrer">来源</a>'
+            if source.startswith(("http://", "https://"))
+            else '<span class="source-gap">未建立逐项原始锚点</span>'
+        )
+        audit_rows.append(
+            "<tr>"
+            f"<td>{esc(row['claim_id'])}</td>"
+            f"<td>{esc(row['量化结论'])}</td>"
+            f"<td>{evidence_badge(row['证据等级'])}</td>"
+            f"<td>{esc(row['证据类型'])}</td>"
+            f"<td>{esc(row['处理方式'])} · {source_html}</td>"
+            "</tr>"
+        )
+    return f"""
+  <div class="sec evidence-audit" id="evidence-audit">
+    <h2><span class="tag">审计</span>首页量化结论证据分级</h2>
+    <div class="desc">首页只把可重算的能力数据和标准原文作为 headline。历史版本中的市场规模、份额、跨型号 BOM 占比、国产化率和功耗比较不再伪装成同等确定的事实。</div>
+    <div class="evidence-legend">
+      <span>{evidence_badge('A')} 原始标准 / 公司原始披露 / 可重算账本</span>
+      <span>{evidence_badge('B')} 标准制定中或边界清楚的工程材料</span>
+      <span>{evidence_badge('C')} 机构 / 二手口径，待逐项补原始锚点</span>
+      <span>{evidence_badge('D')} 缺少同边界可比证据，不进入正文结论</span>
+    </div>
+    <table class="evidence-table">
+      <tr><th>ID</th><th>历史量化结论</th><th>等级</th><th>证据类型</th><th>当前处理</th></tr>
+      {''.join(audit_rows)}
+    </table>
+  </div>
+"""
+
+
+def edge_year(row: dict[str, str]) -> int:
+    years = [int(value) for value in re.findall(r"20\d{2}", row.get("财年", ""))]
+    return max(years) if years else 0
+
+
+def resolve_edge_url(
+    row: dict[str, str],
+    by_id: dict[str, dict[str, str]],
+    seen: set[str] | None = None,
+) -> str:
+    direct = extract_url(row.get("锚点", ""))
+    if direct:
+        return direct
+    seen = set(seen or ())
+    edge_id = row.get("edge_id", "")
+    if edge_id in seen:
+        return ""
+    seen.add(edge_id)
+    for ref in re.findall(r"E\d{3}", row.get("锚点", "")):
+        if ref in by_id:
+            resolved = resolve_edge_url(by_id[ref], by_id, seen)
+            if resolved:
+                return resolved
+    return ""
+
+
+def normalized_party(value: str) -> str:
+    value = clean(value)
+    aliases = {
+        "中际旭创(作为客户)": "中际旭创",
+        "Fabrinet(解匿)": "Fabrinet",
+        "ficonTEC(罗博特科)": "罗博特科",
+    }
+    if value in aliases:
+        return aliases[value]
+    return re.sub(r"[（(].*?[）)]", "", value).strip()
+
+
+def company_for_party(party: str, company_names: set[str]) -> str:
+    normalized = normalized_party(party)
+    if normalized in company_names:
+        return normalized
+    matches = [
+        company
+        for company in company_names
+        if len(company) >= 3 and (company in normalized or normalized in company)
+    ]
+    return max(matches, key=len) if matches else ""
+
+
+def verified_edges_by_company(
+    rows: list[dict[str, str]],
+) -> tuple[dict[str, list[dict[str, str]]], int]:
+    company_names = {row["公司"] for row in rows}
+    all_edges = read_csv(EDGES_CSV)
+    by_id = {row["edge_id"]: row for row in all_edges}
+    eligible = []
+    for row in all_edges:
+        if row["edge_id"] not in READER_EDGE_IDS or row.get("边等级") != "实边":
+            continue
+        if "待" in row.get("验证状态", "") or edge_year(row) < 2023:
+            continue
+        if "匿名" in row.get("供方", "") + row.get("需方", ""):
+            continue
+        if "跨行业" in row.get("备注", ""):
+            continue
+        url = resolve_edge_url(row, by_id)
+        supplier = company_for_party(row["供方"], company_names)
+        customer = company_for_party(row["需方"], company_names)
+        if not url or not (supplier or customer):
+            continue
+        record = dict(row)
+        record["_url"] = url
+        record["_supplier_company"] = supplier
+        record["_customer_company"] = customer
+        eligible.append(record)
+
+    # One reader edge per named supplier-customer pair; retain the newest filing.
+    deduped: dict[tuple[str, str], dict[str, str]] = {}
+    for row in sorted(eligible, key=edge_year, reverse=True):
+        pair = (normalized_party(row["供方"]), normalized_party(row["需方"]))
+        deduped.setdefault(pair, row)
+
+    result: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for row in deduped.values():
+        for company in {row["_supplier_company"], row["_customer_company"]} - {""}:
+            if len(result[company]) < 2:
+                result[company].append(row)
+    displayed_ids = {
+        row["edge_id"]
+        for company_edges in result.values()
+        for row in company_edges
+    }
+    return result, len(displayed_ids)
+
+
+def edge_summary(row: dict[str, str]) -> str:
+    metric = clean(row.get("占比或金额原文", ""))
+    if not metric:
+        bits = [clean(row.get("数值", "")), clean(row.get("单位", ""))]
+        metric = "".join(bit for bit in bits if bit)
+    return metric or "实名关系已在原始披露中核验"
+
+
 def paragraph(value: str, style) -> Paragraph:
     normalized = (value or "").replace("<br/>", "\n")
     return Paragraph(esc(normalized).replace("\n", "<br/>"), style)
@@ -601,7 +865,10 @@ def build_pdf(path: Path, rows: list[dict[str, str]]) -> None:
     doc.build(story, onFirstPage=page_decor, onLaterPages=page_decor)
 
 
-def capability_section(rows: list[dict[str, str]]) -> str:
+def capability_section(
+    rows: list[dict[str, str]],
+    edges_by_company: dict[str, list[dict[str, str]]],
+) -> str:
     companies: dict[str, list[dict[str, str]]] = defaultdict(list)
     for row in rows:
         companies[row["公司"]].append(row)
@@ -656,6 +923,30 @@ def capability_section(rows: list[dict[str, str]]) -> str:
                 ],
             ]
         )
+        edge_rows = []
+        for edge in edges_by_company.get(company, []):
+            supplier = normalized_party(edge["供方"])
+            customer = normalized_party(edge["需方"])
+            edge_rows.append(
+                f"""
+                <li>
+                  <span class="edge-grade">实边</span>
+                  <b>{esc(supplier)}</b><span class="edge-arrow">→</span><b>{esc(customer)}</b>
+                  <small>{esc(edge['财年'])} · {esc(edge_summary(edge))}</small>
+                  <a href="{esc(edge['_url'])}" target="_blank" rel="noreferrer">原始披露</a>
+                </li>
+                """
+            )
+        edge_html = (
+            f"""
+            <div class="verified-edges">
+              <div class="verified-edges-title">已验证供货边 <span>仅展示实名、原文核验“实边”</span></div>
+              <ul>{''.join(edge_rows)}</ul>
+            </div>
+            """
+            if edge_rows
+            else ""
+        )
         cards.append(
             f"""
             <article class="company-cap" data-layer="{esc(caps[0]['主环节'])}"
@@ -664,6 +955,7 @@ def capability_section(rows: list[dict[str, str]]) -> str:
                 <div><b>{esc(company)}</b><span>{esc(first['公司代码'])}</span></div>
                 <small>{esc(first['市场'])} · {esc(first['行业分类'])} · {len(caps)}项能力</small>
               </div>
+              {edge_html}
               {''.join(cap_html)}
             </article>
             """
@@ -674,9 +966,9 @@ def capability_section(rows: list[dict[str, str]]) -> str:
         if any(row["主环节"] == stage for row in rows)
     )
     return f"""
-    <div class="sec" id="s8">
+    <div class="sec" id="s7">
       <h2><span class="tag">能力卡</span>公司 × 细分节点能力明细</h2>
-      <div class="desc">同一公司跨环节能力合并展示。每项记录包含产品、技术、工艺、规格、阶段、角色与证据；未被披露支持的字段明确标记为“披露未细分”。</div>
+      <div class="desc">公司清单已并入能力卡，不再单列“企业越多越完整”的重复图谱。每项能力包含产品、技术、工艺、规格、阶段、角色与证据；卡片顶部仅叠加少量实名、原文核验供货实边，不由公司同处一条产业链推断供货关系。</div>
       <div class="cap-summary">
         <div><b>{len(companies)}</b><span>已确认公司</span></div>
         <div><b>{len(rows)}</b><span>能力记录</span></div>
@@ -693,6 +985,27 @@ def capability_section(rows: list[dict[str, str]]) -> str:
 
 
 CAPABILITY_CSS = """
+  .ev{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;font:700 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;vertical-align:middle}
+  .ev-a{background:#dcfce7;color:#166534;border:1px solid #86efac}
+  .ev-b{background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
+  .ev-c{background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
+  .ev-d{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+  .evidence-legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin:12px 0;font-size:11px;color:var(--muted)}
+  .evidence-legend>span{display:flex;align-items:center;gap:6px}
+  .evidence-table td:nth-child(1){font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted)}
+  .source-gap{color:#b45309}
+  .axis-table td:first-child{white-space:nowrap}
+  .route-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:16px}
+  .route-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+  .route-title{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:13px 15px;background:#eaf1f6;border-bottom:1px solid #d5e1e8}
+  .route-title b{font-size:17px;color:var(--accent)}
+  .route-title span{font-size:11px;color:var(--muted);margin-left:8px}
+  .route-title small{color:var(--muted)}
+  .route-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0}
+  .route-meta span{font-size:11px;color:#475569}
+  .route-meta b{display:block;color:#64748b;margin-bottom:2px}
+  .route-bom{margin:0;border:0;border-radius:0}
+  .route-bom a{color:#2563eb;text-decoration:none;white-space:nowrap}
   .cap-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
   .cap-summary div{background:#eef4f8;border:1px solid #d5e1e8;border-radius:12px;padding:12px;text-align:center}
   .cap-summary b{display:block;font-size:20px;color:var(--accent)}
@@ -706,6 +1019,15 @@ CAPABILITY_CSS = """
   .company-cap-title b{font-size:16px;color:var(--accent)}
   .company-cap-title span{font-size:11px;margin-left:8px;color:var(--muted)}
   .company-cap-title small{color:var(--muted)}
+  .verified-edges{padding:10px 15px;background:#fffbeb;border-bottom:1px solid #fde68a}
+  .verified-edges-title{font-size:11px;font-weight:700;color:#92400e;margin-bottom:6px}
+  .verified-edges-title span{font-weight:400;color:#a16207;margin-left:6px}
+  .verified-edges ul{list-style:none;padding:0;margin:0;display:grid;gap:5px}
+  .verified-edges li{display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:11px;color:#475569}
+  .verified-edges li small{color:#78716c}
+  .verified-edges li a{color:#2563eb;text-decoration:none;margin-left:auto}
+  .edge-grade{border:1px solid #f59e0b;background:#fef3c7;color:#92400e;border-radius:8px;padding:1px 6px;font-size:9px;font-weight:700}
+  .edge-arrow{color:#d97706}
   .cap-item{padding:13px 15px;border-bottom:1px dashed var(--line)}
   .cap-item:last-child{border-bottom:0}
   .cap-head{display:flex;justify-content:space-between;gap:12px;font-size:13px;margin-bottom:8px}
@@ -716,7 +1038,7 @@ CAPABILITY_CSS = """
   .cap-item dd.quote{color:#64748b}
   .cap-source{font-size:10.5px;color:#94a3b8;margin-top:8px}
   .cap-source a{color:#2563eb;text-decoration:none}
-  @media(max-width:900px){.cap-tools{grid-template-columns:1fr}.cap-summary{grid-template-columns:1fr}.company-cap-title{align-items:flex-start;flex-direction:column}.cap-item dl{grid-template-columns:1fr}.cap-item dt{font-weight:600}}
+  @media(max-width:900px){.cap-tools{grid-template-columns:1fr}.cap-summary,.route-meta{grid-template-columns:1fr}.company-cap-title,.route-title{align-items:flex-start;flex-direction:column}.cap-item dl{grid-template-columns:1fr}.cap-item dt{font-weight:600}.route-card{overflow-x:auto}.route-bom{min-width:720px}.verified-edges li a{margin-left:0}}
 """
 
 CAPABILITY_JS = """
@@ -745,8 +1067,77 @@ CAPABILITY_JS = """
 """
 
 
+def legacy_quantitative_badges(source: str) -> str:
+    """Mark legacy non-primary numeric claims without touching CSS percentages."""
+    badge = ' <span class="ev ev-c" title="机构/二手口径，待逐项补原始锚点">C</span>'
+    claims = [
+        "100G→800G 用3年，800G→1.6T 仅2年",
+        "40-56%",
+        "60-65%",
+        "50-70%",
+        "30-50%",
+        "25-40%",
+        "15-20%",
+        "70-80%",
+        "40-50%",
+        "30-40%",
+        "5-10%",
+        "800G 模块功耗近 50%",
+        "数通占比&gt;70%",
+        "模块&gt;1.5万只",
+        "需求 &gt;1.5 万只",
+        "份额 &gt;60%",
+        "国产化 &gt;65%",
+        "份额 &gt;30%",
+        "市占 ~75%",
+        "国产化 &lt;3%",
+        "国产 &lt;20%",
+        "市占&gt;80%",
+        "占总投资 &gt;90%",
+        "1.6T 达 60%+",
+        "1.6T达60%+",
+        "毛利 60%+",
+        "毛利60%+",
+        "毛利 50%+",
+        "毛利 40-50%",
+        "毛利40-50%",
+        "毛利30-40%",
+        "毛利~20%",
+        "全球出货第一",
+        "10G DFB 全球出货第一",
+        "高端 EML &lt;10%",
+        "合计 &gt;80%",
+        "国产化 &lt;3%（最大短板）",
+        "数通市场（&gt;70%）",
+        "电信市场（≈30%，基本盘）",
+        "72 个 800G/1.6T",
+        "8-10 周压缩至 4 周以内",
+        "约 2-3 年窗口",
+        "交期排至 2027+",
+    ]
+    for claim in claims:
+        source = source.replace(claim, claim + badge)
+    return source
+
+
+def homepage_kpis(rows: list[dict[str, str]], edge_count: int) -> str:
+    companies = len({row["公司"] for row in rows})
+    nodes = len({row["cell_id"] for row in rows})
+    return f"""
+  <!-- KPI：只展示可重算或已核验数据 -->
+  <div class="kpis">
+    <div class="kpi"><div class="v">{companies}</div><div class="l">已确认公司 {evidence_badge('A')}</div><div class="s">生产中证据闸</div></div>
+    <div class="kpi"><div class="v">{len(rows)}</div><div class="l">能力记录 {evidence_badge('A')}</div><div class="s">公司 × 细分节点</div></div>
+    <div class="kpi"><div class="v">{nodes}</div><div class="l">覆盖节点 {evidence_badge('A')}</div><div class="s">由账本实时重算</div></div>
+    <div class="kpi"><div class="v">3</div><div class="l">产品路线 BOM {evidence_badge('A')}</div><div class="s">DR8 / 1.6T / 400ZR</div></div>
+    <div class="kpi"><div class="v">{edge_count}</div><div class="l">已验证供货实边 {evidence_badge('A')}</div><div class="s">实名 + 原始披露</div></div>
+  </div>
+"""
+
+
 def build_html(template_path: Path, output_path: Path, rows: list[dict[str, str]]) -> None:
     source = template_path.read_text(encoding="utf-8")
+    edges_by_company, edge_count = verified_edges_by_company(rows)
     source = source.replace(
         "<title>光模块行业产业链全景图 · 产业链优先版</title>",
         "<title>光模块行业产业链全景图 · 公司能力细化版</title>",
@@ -756,11 +1147,42 @@ def build_html(template_path: Path, output_path: Path, rows: list[dict[str, str]
         "<h1>光模块行业产业链全景图 · 公司能力细化版</h1>",
     )
     source = source.replace(
-        '<a href="#s7">⑦ 企业图谱</a>',
-        '<a href="#s7">⑦ 企业图谱</a>\n    <a href="#s8">⑧ 公司能力卡</a>',
+        '<a href="#s3">③ 技术路线对比</a>',
+        '<a href="#s3">③ 产品路线 BOM</a>',
     )
+    source = source.replace(
+        '<a href="#s7">⑦ 企业图谱</a>',
+        '<a href="#s7">⑦ 公司能力卡</a>',
+    )
+    source = re.sub(
+        r"  <!-- KPI -->.*?(?=  <!-- 1 价值分布 -->)",
+        homepage_kpis(rows, edge_count) + "\n" + macro_evidence_panel() + "\n",
+        source,
+        flags=re.S,
+    )
+    source = re.sub(
+        r"  <!-- 3 技术路线 -->.*?(?=  <!-- 4 中游制造与产品 -->)",
+        route_section() + "\n",
+        source,
+        flags=re.S,
+    )
+    source = re.sub(
+        r"  <!-- 7 企业图谱 -->.*?(?=  <footer>)",
+        "",
+        source,
+        flags=re.S,
+    )
+    source = source.replace(
+        "厂商名称与上市公司映射统一放在第 7 节；本节只解释产业分工，不展开具体供货关系。",
+        "厂商名称、细分能力与少量已验证供货实边统一放在第 7 节能力卡；本节只解释产业分工。",
+    )
+    source = legacy_quantitative_badges(source)
     source = source.replace("</style>", CAPABILITY_CSS + "\n</style>")
-    source = source.replace("  <footer>", capability_section(rows) + "\n  <footer>", 1)
+    source = source.replace(
+        "  <footer>",
+        capability_section(rows, edges_by_company) + "\n  <footer>",
+        1,
+    )
     source = source.replace("</body>", CAPABILITY_JS + "\n</body>")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(source, encoding="utf-8")

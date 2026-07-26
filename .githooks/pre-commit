@@ -1,12 +1,7 @@
 #!/bin/bash
+# 白名单唯一来源 = scan.py 不变量⑥（--check 已覆盖根目录白名单+refs文件数），钩子不再重复定义。
+# 历史教训：白名单曾在此处与 scan.py 各写一份，一天内三次因只改一份卡闸——单一来源后此病根除。
 cd "$(git rev-parse --show-toplevel)"
-# 须与 scan.py 不变量⑥的 WL 逐字一致(两处重复定义,改一处必改另一处——今日已三次因漏改卡闸)
-WL="README.md CLAUDE.md tree.yaml points.csv edges.csv triage.csv words.txt scan.py render.py participation.py make_participation_pdf.py knowledge.yaml build_detailed_capability_report.py capability_details.csv RESTART-v2.md .gitignore .git .DS_Store"
-for f in $(ls -p | grep -v /); do
-  echo "$WL" | tr ' ' '\n' | grep -qx "$f" || { echo "pre-commit拒绝: 根目录白名单外文件 [$f]"; exit 1; }
-done
-REFN=$(ls refs 2>/dev/null | wc -l | tr -d ' ')
-[ "$REFN" -gt 6 ] && { echo "pre-commit拒绝: refs/文件数$REFN>6"; exit 1; }
 [ -f scan.py ] && { python3 scan.py --check || exit 1; }
 [ -f render.py ] && { python3 render.py --verify || exit 1; }
 [ -f participation.py ] && { python3 participation.py --check || exit 1; }
