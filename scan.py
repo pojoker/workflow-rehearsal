@@ -89,12 +89,12 @@ def invariants():
     for i,l in enumerate(open(os.path.join(ROOT,'words.txt'),encoding='utf-8')) if os.path.exists(os.path.join(ROOT,'words.txt')) else []:
         if l.strip() and not l.startswith('#') and l.count('|')!=3: fail('⑤',f"words.txt 第{i+1}行竖线数≠3")
     # ⑥白名单
-    WL={
-        'README.md','CLAUDE.md','tree.yaml','points.csv','edges.csv','triage.csv',
-        'capability_details.csv','words.txt','scan.py','render.py','participation.py',
-        'make_participation_pdf.py','build_detailed_capability_report.py',
-        '.gitignore','.DS_Store'
-    }
+    # 须与 .githooks/pre-commit 的 WL 逐字一致(两处重复定义,改一处必改另一处——今日已三次因漏改卡闸)
+    # '.git': worktree 下 .git 是文件不是目录,不列入则误报越位(远程代理绕闸根因)
+    WL={'README.md','CLAUDE.md','tree.yaml','points.csv','edges.csv','triage.csv','words.txt',
+        'scan.py','render.py','participation.py','make_participation_pdf.py',
+        'build_detailed_capability_report.py','capability_details.csv',
+        'RESTART-v2.md','.gitignore','.git','.DS_Store'}
     for f in os.listdir(ROOT):
         if os.path.isfile(os.path.join(ROOT,f)) and f not in WL: fail('⑥',f'根目录白名单外文件: {f}')
     refs=os.listdir(os.path.join(ROOT,'refs')) if os.path.isdir(os.path.join(ROOT,'refs')) else []

@@ -19,7 +19,7 @@
 3. 判定闸会话：逐条判 入点/驳回/待判，写 points.csv 和 triage.csv，**会话末必跑 `python3 scan.py --check`**
 4. `python3 render.py` 重建全景图；`python3 participation.py` 重建参与识别名单（`--check` 校验分母、证据闭合与幂等）
 5. `python3 build_detailed_capability_report.py` 重建公司能力明细 CSV、PDF 与合并版 HTML
-6. 你只看 git diff 点头/摇头；commit 信息带"产出: +N点 +M边 驳回K"
+6. 你只看 git diff 点头/摇头；commit 信息带"产出: +N点 +M边 空格A/B 驳回K"（空格数取 `render.py` 页脚，纪律第8条）
 
 年报季提示：A股年报4月末集中披露；美股10-K财年后60-90天。
 边界：语料宇宙见 corpus/_frozen.csv（每文件一行带出处）；archive/ 为旧结构冷冻区（默认禁读）。
