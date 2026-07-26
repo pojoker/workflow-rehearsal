@@ -10,7 +10,34 @@ def build(outdir):
     pts,egs=rows('points.csv'),rows('edges.csv')
     bycell={}
     for p in pts: bycell.setdefault(p['cell_id'],[]).append(p)
-    L=['# 光模块供应链全景（点先行 v2）','','> 本页由 render.py 生成，勿手改（--verify 会拒绝）。','']
+    L=['# 光模块产业结构与公司能力地图（点先行 v2）','',
+       '> 本页由 render.py 生成，勿手改（--verify 会拒绝）。',
+       '> 回答三问：①产业由哪些环节构成 ②不同技术路线异同 ③每格谁在做、证据是什么。',
+       '> 不回答"A是不是B的供应商"——公司按证据挂结构节点，不因同格而声称供货关系。','']
+    # 先收元数据(名称+路线),供路线投影与流向复用
+    meta={}
+    def collect(n):
+        if isinstance(n,list):
+            for x in n: collect(x)
+        elif isinstance(n,dict):
+            if 'cell_id' in n: meta[n['cell_id']]=(n['名称'].strip(),(n.get('路线') or '未标').strip())
+            for c in n.get('children',[]): collect(c)
+    collect(tr['tree'])
+    # 路线对比:39格按路线标签投影(纯渲染,零数据变更——标签本就在tree上)
+    routes={}
+    for cid,(_,rt) in meta.items(): routes.setdefault(rt,[]).append(cid)
+    order=(['共用'] if '共用' in routes else [])+sorted(k for k in routes if k!='共用')
+    L+=['## 技术路线对比（tree.yaml 路线标签投影）','',
+        '共用骨干=三条路线都要经过的环节；独有格=该路线区别于其他路线之处。','',
+        '| 路线 | 格数 | 有公司 | 空格 |','|---|---|---|---|']
+    for r in order:
+        cs=sorted(routes[r]); e=[c for c in cs if not bycell.get(c)]
+        L.append(f"| {r} | {len(cs)} | {len(cs)-len(e)} | {','.join(e) if e else '—'} |")
+    L.append('')
+    for r in order:
+        cs=sorted(routes[r])
+        L.append(f"**{r}**（{len(cs)}格）："+'；'.join(f"{c} {meta[c][0]}({len(bycell.get(c,[]))}家)" for c in cs))
+        L.append('')
     empty=[]
     def walk(n,dep):
         if isinstance(n,list):
@@ -31,14 +58,7 @@ def build(outdir):
                 for c in n.get('children',[]): walk(c,dep+1)
     walk(tr['tree'],2)
     # BOM流向:骨架(常识层)+已证边计数(edges.csv经point_id→cell聚合)
-    names={}
-    def nm(n):
-        if isinstance(n,list):
-            for x in n: nm(x)
-        elif isinstance(n,dict):
-            if 'cell_id' in n: names[n['cell_id']]=n['名称']
-            for c in n.get('children',[]): nm(c)
-    nm(tr['tree'])
+    names={c:m[0] for c,m in meta.items()}
     pid2cell={p['point_id']:p['cell_id'] for p in pts}
     cnt={}
     for e in egs:
