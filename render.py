@@ -79,7 +79,7 @@ def build(outdir):
     L.append('')
     dates=[p['检索日期'] for p in pts if p.get('检索日期')]
     cov=f"{len(pts)}点/{len(egs)}边"
-    L+=['---',f"页脚：宇宙={tr['universe']['count']}家(冻结{tr['universe']['frozen_date']}) | 数据截至={max(dates) if dates else '—'} | 覆盖={cov} | 空叶格={len(empty)}个: {','.join(empty) if empty else '无'}"]
+    L+=['---',f"页脚：宇宙={tr['universe']['count']}家(冻结{tr['universe']['frozen_date']}) | 数据截至={max(dates) if dates else '—'} | 覆盖={cov} | 空叶格={len(empty)}/{len(meta)}: {','.join(empty) if empty else '无'}（纪律第8条 commit 取此数）"]
     os.makedirs(outdir,exist_ok=True)
     md='\n'.join(L)+'\n'
     open(os.path.join(outdir,'全景.md'),'w',encoding='utf-8').write(md)
