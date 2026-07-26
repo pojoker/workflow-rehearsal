@@ -10,6 +10,14 @@ def build(outdir):
     pts,egs=rows('points.csv'),rows('edges.csv')
     bycell={}
     for p in pts: bycell.setdefault(p['cell_id'],[]).append(p)
+    # 知识库: 为什么层(须带证据引语+出处)。按格索引,渲进对应格 + 独立页
+    kb=[]
+    kp=os.path.join(ROOT,'knowledge.yaml')
+    if os.path.exists(kp): kb=yaml.safe_load(open(kp,encoding='utf-8')).get('knowledge',[]) or []
+    kb=sorted(kb,key=lambda k:k['id'])
+    kbycell={}
+    for k in kb:
+        for c in (k.get('格') or []): kbycell.setdefault(c,[]).append(k)
     L=['# 光模块产业结构与公司能力地图（点先行 v2）','',
        '> 本页由 render.py 生成，勿手改（--verify 会拒绝）。',
        '> 回答三问：①产业由哪些环节构成 ②不同技术路线异同 ③每格谁在做、证据是什么。',
@@ -52,6 +60,13 @@ def build(outdir):
                         L.append(f"| {p['公司']} | {p['状态']} | {p['上市标签']} | {p['命中引语'][:60]} | [锚]({p['锚点URL']}) |")
                 else:
                     empty.append(n['cell_id']); L.append('（空格——未有公司过闸）')
+                for k in kbycell.get(n['cell_id'],[]):
+                    # 主格(格列表首位)出全文,其余格只给指针,避免同一条知识重复刷屏
+                    if (k.get('格') or [None])[0]==n['cell_id']:
+                        L.append(f"> 📖 **{k['标题']}**（{k['id']}，全文见 out/知识库.md）")
+                        for ln in k['一句话'].strip().split('\n'): L.append(f"> {ln}")
+                    else:
+                        L.append(f"> 📖 参见 {k['id']}　{k['标题']}（主格 {k['格'][0]}，全文见 out/知识库.md）")
                 L.append('')
             else:
                 L.append(f"{'#'*min(dep,6)} {n.get('名称',n.get('id',''))}"); L.append('')
@@ -85,10 +100,37 @@ def build(outdir):
     open(os.path.join(outdir,'全景.md'),'w',encoding='utf-8').write(md)
     html='<!DOCTYPE html><meta charset="utf-8"><title>光模块供应链全景v2</title><body style="font-family:sans-serif;max-width:960px;margin:2em auto"><pre style="white-space:pre-wrap">'+md.replace('&','&amp;').replace('<','&lt;')+'</pre></body>'
     open(os.path.join(outdir,'全景.html'),'w',encoding='utf-8').write(html)
+    # 知识库独立页: 每条=大白话结论+细说+判定用法+逐条证据(引语+出处+锚)
+    K=['# 光模块产业知识库','',
+       '> 本页由 render.py 从 knowledge.yaml 生成，勿手改（--verify 会拒绝）。',
+       '> 回答"这个环节到底是干嘛的、为什么难、怎么判断谁够格"。每条都带证据引语与出处；没证据的常识不进本库。','']
+    if not kb: K.append('（knowledge.yaml 为空）')
+    for k in kb:
+        cells='、'.join(k.get('格') or []) or '通用（不限某一格）'
+        K+=[f"## {k['id']}　{k['标题']}",'',f"**适用环节**：{cells}　|　**录入**：{k.get('录入日期','—')}",'',
+            '### 一句话','',k['一句话'].strip(),'']
+        if k.get('说细点'): K+=['### 说细点','',k['说细点'].strip(),'']
+        if k.get('怎么用它判断'): K+=['### 怎么用它判断','',k['怎么用它判断'].strip(),'']
+        K+=['### 证据','']
+        for e in (k.get('证据') or []):
+            K.append(f"**{e['谁']}**")
+            if e.get('原话'): K.append(f"> {e['原话']}")
+            K.append(f"　出处：{e.get('出处','—')}")
+            K.append(f"　锚：{e.get('锚','—')}")
+            if e.get('说明'): K.append(f"　为什么算证据：{e['说明']}")
+            K.append('')
+        if k.get('关联点'): K+=[f"**关联点**：{'、'.join(k['关联点'])}",'']
+        if k.get('关联判例'): K+=[f"**关联判例**：{k['关联判例']}",'']
+        K+=['---','']
+    K.append(f"页脚：知识条目 {len(kb)} 条 | 覆盖环节 {len(kbycell)} 个")
+    kmd='\n'.join(K)+'\n'
+    open(os.path.join(outdir,'知识库.md'),'w',encoding='utf-8').write(kmd)
+    khtml='<!DOCTYPE html><meta charset="utf-8"><title>光模块产业知识库</title><body style="font-family:sans-serif;max-width:900px;margin:2em auto;line-height:1.7"><pre style="white-space:pre-wrap">'+kmd.replace('&','&amp;').replace('<','&lt;')+'</pre></body>'
+    open(os.path.join(outdir,'知识库.html'),'w',encoding='utf-8').write(khtml)
 if __name__=='__main__':
     if '--verify' in sys.argv:
         tmp=tempfile.mkdtemp(); build(tmp)
-        ok=all(filecmp.cmp(os.path.join(tmp,f),os.path.join(ROOT,'out',f),shallow=False) for f in ('全景.md','全景.html') if os.path.exists(os.path.join(ROOT,'out',f)))
+        ok=all(filecmp.cmp(os.path.join(tmp,f),os.path.join(ROOT,'out',f),shallow=False) for f in ('全景.md','全景.html','知识库.md','知识库.html') if os.path.exists(os.path.join(ROOT,'out',f)))
         shutil.rmtree(tmp)
         if not ok: print('\033[31m[--verify] out/ 与重渲不一致(疑手改)\033[0m'); sys.exit(1)
         print('--verify: 一致')

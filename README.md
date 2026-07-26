@@ -1,6 +1,15 @@
 # 光模块产业结构与公司能力地图（点先行 v2）
 
-一个账本，两个产品。数据只有一份（points.csv / edges.csv / triage.csv / corpus/_frozen.csv），md/html 都是渲染。
+一个账本，三个产品 + 一层知识。数据只有一份（tree.yaml / knowledge.yaml / points.csv / edges.csv / triage.csv / corpus/_frozen.csv），md/html 都是渲染。
+
+四层分工，别混：
+
+| 层 | 文件 | 回答什么 | 举证要求 |
+|---|---|---|---|
+| 结构 | `tree.yaml` | 产业由哪些环节构成 | 常识骨架，免锚 |
+| **为什么** | **`knowledge.yaml`** | **这环节干嘛的、为什么难、怎么判断谁够格** | **须证据引语+出处+锚（不变量⑧机器强制）** |
+| 谁 | `points.csv` | 每个环节谁在做 | 自家披露件引语+锚 |
+| 供货 | `edges.csv` | 谁给谁供货（独立观察层） | 四件套 |
 
 本产品画的不是"谁给谁供货"，而是"产品如何被做出来，以及谁具备做各环节的能力"：结构骨架（tree.yaml）先于公司独立定义，公司按证据挂到结构节点上。北方华创挂在"MOCVD设备"、源杰挂在"激光器芯片"，**不因此声称北方华创向源杰供货**。供货关系只作为独立观察层存在（edges.csv 四件套），不参与结构完整性判定；空格不会因为没找到公司而从图中消失。
 
@@ -13,13 +22,21 @@
 **产品③ 公司能力明细**（`capability_details.csv` / `output/pdf/光模块产业链公司能力明细.pdf` / WorkBuddy HTML，由 `build_detailed_capability_report.py` 生成）
 以“公司 × 细分节点”为最小单元，把 `points.csv` 的已过闸证据标准化为具体产品、材料与技术、工艺能力、规格与应用、当前阶段和产业角色。PDF 与 HTML 使用同一份 `capability_details.csv`，未获披露支撑的字段显示“披露未细分”，不推断供货关系。
 
+**知识库**（`knowledge.yaml` → `out/知识库.md` / `.html`，由 `render.py` 生成）
+项目的"为什么"层。每条知识用不懂行的人能看懂的大白话写：一句话结论 + 说细点 + 怎么用它判断，
+后面跟逐条证据（谁说的、原话、出处、锚）。没有证据的常识不进这里——不变量⑧会拦。
+主格的知识摘要直接渲进全景图对应环节旁边，其余关联格只给一行指针。
+例：K001 讲清共晶固晶机为什么光模块用的和显示屏用的差一个数量级（±1~3µm vs ±50µm），
+并据此给出设备类公司的准入判断法；K002 讲清气密封装不是技术高低而是电信/数通两条路线的分野。
+
 ## 日常怎么用（全流程）
 1. 新年报/招股书 PDF 扔进 corpus/annual/<代码>/，在 corpus/_frozen.csv 记一行（带出处）
 2. `python3 scan.py` —— 关键词召回待办清单（`ANY` 词只召回"是否参与"，不预判格子；自动跳过已处置项）
 3. 判定闸会话：逐条判 入点/驳回/待判，写 points.csv 和 triage.csv，**会话末必跑 `python3 scan.py --check`**
-4. `python3 render.py` 重建全景图；`python3 participation.py` 重建参与识别名单（`--check` 校验分母、证据闭合与幂等）
-5. `python3 build_detailed_capability_report.py` 重建公司能力明细 CSV、PDF 与合并版 HTML
-6. 你只看 git diff 点头/摇头；commit 信息带"产出: +N点 +M边 空格A/B 驳回K"（空格数取 `render.py` 页脚，纪律第8条）
+4. 判定中若搞清了"这环节为什么难/怎么判够格"，写进 `knowledge.yaml`（须带证据引语+出处+锚）
+5. `python3 render.py` 重建全景图与知识库；`python3 participation.py` 重建参与识别名单（`--check` 校验分母、证据闭合与幂等）
+6. `python3 build_detailed_capability_report.py` 重建公司能力明细 CSV、PDF 与合并版 HTML
+7. 你只看 git diff 点头/摇头；commit 信息带"产出: +N点 +M边 空格A/B 驳回K"（空格数取 `render.py` 页脚，纪律第8条）
 
 年报季提示：A股年报4月末集中披露；美股10-K财年后60-90天。
 边界：语料宇宙见 corpus/_frozen.csv（每文件一行带出处）；archive/ 为旧结构冷冻区（默认禁读）。

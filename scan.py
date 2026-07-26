@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""scan.py — 扫描+七不变量。用法: python3 scan.py [--check]
+"""scan.py — 扫描+八不变量。用法: python3 scan.py [--check]
 --check: 只跑不变量(<10s)。扫描分母=corpus/annual(_frozen登记);legacy-input=证据库不参与扫描。"""
 import sys,os,csv,re,glob,time,subprocess
 
@@ -91,7 +91,7 @@ def invariants():
     # ⑥白名单
     # 须与 .githooks/pre-commit 的 WL 逐字一致(两处重复定义,改一处必改另一处——今日已三次因漏改卡闸)
     # '.git': worktree 下 .git 是文件不是目录,不列入则误报越位(远程代理绕闸根因)
-    WL={'README.md','CLAUDE.md','tree.yaml','points.csv','edges.csv','triage.csv','words.txt',
+    WL={'README.md','CLAUDE.md','tree.yaml','knowledge.yaml','points.csv','edges.csv','triage.csv','words.txt',
         'scan.py','render.py','participation.py','make_participation_pdf.py',
         'build_detailed_capability_report.py','capability_details.csv',
         'RESTART-v2.md','.gitignore','.git','.DS_Store'}
@@ -107,6 +107,29 @@ def invariants():
     pnames={p['公司'] for p in pts}
     for t in trg:
         if t['处置']=='已入点' and t['公司'] not in pnames: fail('⑦',f"triage {t['hit_id']} 已入点但points无此公司")
+    # ⑧知识库: 无证据的"常识"不许入库(每条须有标题/一句话/≥1条带出处+锚的证据;格须真实存在)
+    kp=os.path.join(ROOT,'knowledge.yaml')
+    if os.path.exists(kp):
+        ktext=open(kp,encoding='utf-8').read()
+        cells=set(re.findall(r'cell_id:\s*([A-Za-z0-9]+)',open(os.path.join(ROOT,'tree.yaml'),encoding='utf-8').read()))
+        try:
+            import yaml; kb=yaml.safe_load(ktext).get('knowledge',[]) or []
+        except Exception as e:
+            kb=[]; fail('⑧',f'knowledge.yaml 不可解析: {e}')
+        ids=set()
+        for k in kb:
+            i=k.get('id','?')
+            if i in ids: fail('⑧',f'知识id重复: {i}')
+            ids.add(i)
+            for f_ in ('标题','一句话'):
+                if not (k.get(f_) or '').strip(): fail('⑧',f'{i} 缺{f_}')
+            ev=k.get('证据') or []
+            if not ev: fail('⑧',f'{i} 无证据(无证据的常识写tree.yaml,不入知识库)')
+            for j,e in enumerate(ev):
+                for f_ in ('谁','出处','锚'):
+                    if not (str(e.get(f_,'')) or '').strip(): fail('⑧',f'{i} 证据[{j}] 缺{f_}')
+            for c in (k.get('格') or []):
+                if c not in cells: fail('⑧',f'{i} 格 {c} 不在tree.yaml')
 
 def scan():
     """全量扫描: words×corpus/annual → 净队列(剔除triage已处置), 空叶格优先(P6), hit_id=公司+cell+文件(P7)"""
@@ -147,5 +170,5 @@ if __name__=='__main__':
     invariants()
     if ERR:
         print('\n'.join('\033[31m'+e+'\033[0m' for e in ERR)); sys.exit(1)
-    print('七不变量: 全绿')
+    print('八不变量: 全绿')
     if '--check' not in sys.argv: scan()
