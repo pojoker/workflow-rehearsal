@@ -32,7 +32,9 @@ def staleness():
     if not fs: print('[饥饿] corpus/annual 无语料'); return
     n=(time.time()-max(os.path.getmtime(f) for f in fs))/86400
     frozen={r['代码'] for r in rows('corpus/_frozen.csv')}
-    have={os.path.basename(d) for d in glob.glob(os.path.join(ROOT,'corpus/annual/*')) if os.path.isdir(d)}
+    # 有目录≠有语料: 须真含pdf才算覆盖(否则空目录静默冒充已覆盖,实测曾把31家缺口谎报成3家)
+    have={os.path.basename(d) for d in glob.glob(os.path.join(ROOT,'corpus/annual/*'))
+          if os.path.isdir(d) and glob.glob(d+'/**/*.pdf',recursive=True)}
     miss=sorted(frozen-have)
     print(f"[语料] 最新文件距今{n:.0f}天; 宇宙内缺席年报 {len(miss)} 家"+(f"(样例:{','.join(miss[:5])})" if miss else ''))
     if n>120: print("[黄灯] 语料距今>120天,该投喂了(README年报季提示)")
