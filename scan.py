@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""scan.py — 扫描+九不变量。用法: python3 scan.py [--check]
+"""scan.py — 扫描+十不变量。用法: python3 scan.py [--check]
 --check: 只跑不变量(<10s)。扫描分母=corpus/annual(_frozen登记);legacy-input=证据库不参与扫描。"""
 import sys,os,csv,re,glob,time,subprocess
 
@@ -171,6 +171,25 @@ def invariants():
     for r in rows('macro_evidence.csv'):
         if not re.fullmatch(r'MC\d{3}',r.get('claim_id','?')): fail('⑨',f"macro claim_id须为MC###: {r.get('claim_id')}")
         if r.get('证据等级') not in ('A','B','C','D'): fail('⑨',f"macro {r.get('claim_id')} 证据等级非法")
+    # ⑩互动易qa车道: jsonl格式合法+必备键;点锚引用的qa快照必须存在且真含引语
+    for qf in glob.glob(os.path.join(ROOT,'corpus/qa/*/qa.jsonl')):
+        try:
+            import json as _j
+            for i,l in enumerate(open(qf,encoding='utf-8')):
+                o=_j.loads(l)
+                for k in ('code','question','answer','answer_date','index_id','empty','fetch_date'):
+                    if k not in o: fail('⑩',f'{os.path.basename(os.path.dirname(qf))} qa.jsonl 第{i+1}行缺{k}'); break
+        except Exception as e: fail('⑩',f'{qf} 不可解析: {e}')
+    for p in pts:
+        m=re.search(r'corpus/qa/(\d+)/qa\.jsonl',p.get('锚点URL','') or '')
+        if m:
+            qf=os.path.join(ROOT,f'corpus/qa/{m.group(1)}/qa.jsonl')
+            if not os.path.exists(qf): fail('⑩',f"{p['point_id']} 引用qa快照不存在: {m.group(1)}"); continue
+            quote=re.sub(r'\s+','',(p.get('命中引语') or '').strip('"').split('(互动易')[0].strip('"'))
+            blob=re.sub(r'\s+','',open(qf,encoding='utf-8').read())
+            if quote and quote not in blob: fail('⑩',f"{p['point_id']} 引语未在qa快照命中")
+
+
 
 def scan():
     """全量扫描: words×corpus/annual → 净队列(剔除triage已处置), 空叶格优先(P6), hit_id=公司+cell+文件(P7)"""
@@ -211,5 +230,5 @@ if __name__=='__main__':
     invariants()
     if ERR:
         print('\n'.join('\033[31m'+e+'\033[0m' for e in ERR)); sys.exit(1)
-    print('九不变量: 全绿')
+    print('十不变量: 全绿')
     if '--check' not in sys.argv: scan()
