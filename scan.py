@@ -144,6 +144,12 @@ def invariants():
                     elif t=='search_protocol':
                         if not isinstance(a,dict) or not all(x in a for x in ('关键词','语料范围','检索日期','命中数')):
                             fail('⑧',f'{i} 证据[{j}] search_protocol须含 关键词/语料范围/检索日期/命中数')
+                    elif t=='web_snapshot':
+                        if not isinstance(a,dict) or not all(x in a for x in ('原URL','存档路径','抓取日期')):
+                            fail('⑧',f'{i} 证据[{j}] web_snapshot须含 原URL/存档路径/抓取日期')
+                        else:
+                            if not str(a['原URL']).startswith(('http://','https://')): fail('⑧',f'{i} 证据[{j}] web_snapshot原URL非法')
+                            if not os.path.exists(os.path.join(ROOT,str(a['存档路径']))): fail('⑧',f'{i} 证据[{j}] web_snapshot存档不存在: {a["存档路径"]}')
                     else: fail('⑧',f'{i} 证据[{j}] 锚型非法: {t}')
             for c in (k.get('格') or []):
                 if c not in cells: fail('⑧',f'{i} 格 {c} 不在tree.yaml')
