@@ -14,6 +14,7 @@ meta:
       local_file      锚格式 "路径#章节或页码定位"，路径必须真实存在于仓库
       ledger_ref      锚必须是真实存在的 point_id / edge_id
       search_protocol 负证据专用：锚为映射，须含 关键词/语料范围/检索日期/命中数 四键
+      web_snapshot    官网规格证据专用(只入知识库,不得为点锚)：锚为映射，须含 原URL/存档路径/抓取日期，存档必须真实存在于 corpus/web/
   写法要求: |
     一句话/说细点 必须是不懂行的人能看懂的大白话：不用未解释的缩写，
     先说是什么、再说为什么难，数字要有对比对象。写完自问一句
@@ -326,4 +327,16 @@ knowledge:
     出处: points.csv 已过闸能力点
     锚型: ledger_ref
     锚: P055
+  - 谁: ficonTEC（罗博特科子公司，官网技术页）
+    原话: providing high-precision positioning (nm-resolution coupled with 50 nm and sub-arcsecond accuracy)——运动平台纳米级分辨率、50纳米定位精度
+    出处: ficontec.com Technologies 页（datasheet试点快照）
+    锚型: web_snapshot
+    锚: {原URL: 'https://www.ficontec.com/technologies/', 存档路径: corpus/web/www.ficontec.com/2026-07-27/technologies.html, 抓取日期: '2026-07-27'}
+    说明: 印证"耦合设备核心=高精密运动平台"且给出档位量级(50nm),与猎奇耦合设备最小运动增量50nm互证
+  - 谁: ficonTEC（同上，电/光档位差原厂自述）
+    原话: typical contact pads of 80 x 80 µm². Optical probing, however, requires much higher positional accuracies – in the submicron range——电学探针接触垫80×80微米即可,光学探针却须亚微米级定位
+    出处: ficontec.com Technologies 页（datasheet试点快照）
+    锚型: web_snapshot
+    锚: {原URL: 'https://www.ficontec.com/technologies/', 存档路径: corpus/web/www.ficontec.com/2026-07-27/technologies.html, 抓取日期: '2026-07-27'}
+    说明: 电/光两个世界的精度档位差由设备原厂直接说出——支撑KN001"同名设备不同档"的通用判断法
   录入日期: '2026-07-26'
