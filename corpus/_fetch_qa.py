@@ -22,9 +22,53 @@ def secid_of(code):
         if d.get('stockCode')==code: return d.get('secid'),d.get('shortName')
     return None,None
 
+
+def fetch_sse(code,since):
+    """上证e互动: company.do?stockcode= 取uid; userfeeds.do(typeCode=company,type=11)分页HTML解析"""
+    r=requests.get('https://sns.sseinfo.com/company.do',params={'stockcode':code},
+                   headers={'User-Agent':H['User-Agent'],'Referer':'https://sns.sseinfo.com/'},timeout=15)
+    m=re.search(r'uid=(\d+)',r.text)
+    nm=re.search(r'companyName[^>]*>\s*([^<(（\s]+)',r.text) or re.search(r'<title>\s*([^<(（]+)',r.text)
+    if not m: print(f'[{code}] e互动uid未找到'); return None
+    uid=m.group(1); name=(nm.group(1).strip() if nm else code)
+    items=[];page=1
+    while True:
+        rr=requests.get('https://sns.sseinfo.com/ajax/userfeeds.do',
+            params={'typeCode':'company','type':11,'pageSize':20,'uid':uid,'page':page},
+            headers={'User-Agent':H['User-Agent'],'Referer':'https://sns.sseinfo.com/'},timeout=20)
+        chunk=re.split(r'id="item-\d+"',rr.text)[1:]
+        if not chunk: break
+        items+=chunk; page+=1; time.sleep(2)
+        if page>40: break
+    out=[];today=datetime.date.today().isoformat()
+    DATE=re.compile(r'(\d{4})年(\d{2})月(\d{2})日')
+    for it in items:
+        plain=re.sub(r'(§ *)+','§',re.sub(r'\s+',' ',re.sub(r'<[^>]+>','§',it)))
+        dates=DATE.findall(plain)
+        qm=re.search(r':[^§]*\('+code+r'\)§([^§]+)§',plain)
+        am=re.search(r'◆§◆§([^§]{2,10})§([^§]{2,})§\|§收藏',plain)
+        q=(qm.group(1).strip() if qm else '')
+        a=(am.group(2).strip() if am else '')
+        if am and name in ('上证e互动',code): name=am.group(1).strip()
+        ad='-'.join(dates[1]) if len(dates)>1 else ''
+        qd='-'.join(dates[0]) if dates else ''
+        if ad and ad<since: continue
+        out.append({'code':code,'secid':f'sse_uid{uid}','question':q,'answer':a,
+            'answer_date':ad,'ask_date':qd,'index_id':'',
+            'empty':bool(not a or EMPTY_PAT.match(re.sub(r'\s','',a)) or (len(a)<75 and ('披露为准' in a or '公告为准' in a))),
+            'fetch_date':today,'source':'sns.sseinfo.com userfeeds.do(type=11)'})
+    d=os.path.join(ROOT,'corpus','qa',code); os.makedirs(d,exist_ok=True)
+    fp=os.path.join(d,'qa.jsonl')
+    with open(fp,'w',encoding='utf-8') as f:
+        for o in out: f.write(json.dumps(o,ensure_ascii=False)+'\n')
+    print(f'[{code} {name}] {len(out)}条(空回答{sum(1 for o in out if o["empty"])}) → {fp}')
+    return len(out)
+
 def fetch(code,since):
+    if code.startswith('6'):
+        return fetch_sse(code,since)
     if not (code.startswith('0') or code.startswith('3')):
-        print(f'[{code}] 沪市/北交所未接入互动易抓取,跳过(如实记缺口)'); return None
+        print(f'[{code}] 北交所无互动平台,跳过(如实记缺口)'); return None
     secid,name=secid_of(code)
     if not secid:
         print(f'[{code}] secid未找到'); return None
