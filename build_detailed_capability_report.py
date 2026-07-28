@@ -551,41 +551,65 @@ def route_section() -> str:
 
 
 def macro_evidence_panel() -> str:
+    """全量宏观结论审计表(macro_evidence.csv 新schema):编号/等级/结论/出处描述/可点链接/口径备注。
+    模式源自codex 2026-07-28证据升级稿,内容以csv为唯一数据源(纪律6)。"""
     rows = read_csv(MACRO_EVIDENCE_CSV)
-    # claim_id 已改制为 MC###(防与材料格M1/M2撞名);MC001-005=降级/删除的宏观叙事数字
-    legacy = [row for row in rows if row["claim_id"] in {"MC001", "MC002", "MC003", "MC004", "MC005"}]
+    order = {"A": 0, "B": 1, "C": 2, "D": 3}
+    rows.sort(key=lambda r: (order.get(r.get("证据等级", "D"), 9), r.get("claim_id", "")))
     audit_rows = []
-    for row in legacy:
-        source = row["来源"]
-        source_html = (
-            f'<a href="{esc(source)}" target="_blank" rel="noreferrer">来源</a>'
-            if source.startswith(("http://", "https://"))
-            else '<span class="source-gap">未建立逐项原始锚点</span>'
-        )
+    for row in rows:
+        links = [u for u in (row.get("链接") or "").split() if u.startswith(("http://", "https://"))]
+        links_html = " ".join(
+            f'<a href="{esc(u)}" target="_blank" rel="noreferrer" class="srclnk">原文{i+1}</a>'
+            for i, u in enumerate(links)
+        ) or '<span class="source-gap">无一手链接</span>'
         audit_rows.append(
             "<tr>"
-            f"<td>{esc(row['claim_id'])}</td>"
-            f"<td>{esc(row['量化结论'])}</td>"
+            f'<td class="rid">{esc(row["claim_id"])}</td>'
             f"<td>{evidence_badge(row['证据等级'])}</td>"
-            f"<td>{esc(row['证据类型'])}</td>"
-            f"<td>{esc(row['处理方式'])} · {source_html}</td>"
+            f"<td>{esc(row['量化结论'])}</td>"
+            f"<td>{esc(row.get('来源描述',''))} {links_html}</td>"
+            f"<td>{esc(row.get('口径备注','') or row.get('处理方式',''))}</td>"
             "</tr>"
         )
     return f"""
   <div class="sec evidence-audit" id="evidence-audit">
-    <h2><span class="tag">审计</span>首页量化结论证据分级</h2>
-    <div class="desc">首页只把可重算的能力数据和标准原文作为 headline。历史版本中的市场规模、份额、跨型号 BOM 占比、国产化率和功耗比较不再伪装成同等确定的事实。</div>
-    <div class="evidence-legend">
-      <span>{evidence_badge('A')} 原始标准 / 公司原始披露 / 可重算账本</span>
-      <span>{evidence_badge('B')} 标准制定中或边界清楚的工程材料</span>
-      <span>{evidence_badge('C')} 机构 / 二手口径，待逐项补原始锚点</span>
-      <span>{evidence_badge('D')} 缺少同边界可比证据，不进入正文结论</span>
-    </div>
+    <h2><span class="tag">审计</span>量化结论证据分级（逐条出处可点）</h2>
+    <div class="desc">首页 headline 只用 A 级（可重算账本/已发布标准）。B=机构一手或厂商规格（附口径引用）；C=二手汇总仅方向性参考——多家二手互引是回声室不是一手，B5/B6/B7 类升级已按此标准压回 C；D 不采用。</div>
     <table class="evidence-table">
-      <tr><th>ID</th><th>历史量化结论</th><th>等级</th><th>证据类型</th><th>当前处理</th></tr>
+      <tr><th>ID</th><th>级</th><th>结论</th><th>出处</th><th>口径备注</th></tr>
       {''.join(audit_rows)}
     </table>
   </div>
+"""
+
+
+def errata_section() -> str:
+    """勘误与撤点区:从triage渲染否认性关案与撤点记录——账本敢撤回,是可信度而非缺陷。"""
+    rows = read_csv(ROOT / "triage.csv" if False else "triage.csv") if False else []
+    import csv as _csv
+    with open(ROOT / "triage.csv", encoding="utf-8-sig") as fh:
+        rows = list(_csv.DictReader(fh))
+    hits = [r for r in rows if re.search(r"撤点|撤销|关案", (r.get("理由") or "") + (r.get("引语或线索摘要") or ""))]
+    seen, items = set(), []
+    for r in hits:
+        key = r.get("公司")
+        if key in seen:
+            continue
+        seen.add(key)
+        items.append(
+            f'<div class="k-card"><div class="k-head"><b>{esc(r.get("公司",""))}</b>'
+            f'<span class="k-cells">{esc(r.get("处置",""))} · {esc(r.get("会话日期",""))}</span></div>'
+            f'<div class="k-plain">{esc((r.get("引语或线索摘要") or "").strip(chr(34))[:160])}\n→ {esc((r.get("理由") or "")[:200])}</div></div>'
+        )
+    if not items:
+        return ""
+    return f"""
+    <div class="sec" id="s9">
+      <h2><span class="tag">勘误</span>勘误与撤点：我们撤回过什么、为什么</h2>
+      <div class="desc">否认性证据（公司自己说"没做/未量产"）优先于暧昧文本。账本因此变小的每一次，都让剩下的每一行更硬。</div>
+      {''.join(items)}
+    </div>
 """
 
 
@@ -1234,7 +1258,7 @@ def build_html(template_path: Path, output_path: Path, rows: list[dict[str, str]
     source = source.replace("</style>", CAPABILITY_CSS + KNOWLEDGE_CSS + "\n</style>")
     source = source.replace(
         '<a href="#s7">⑦ 公司能力卡</a>',
-        '<a href="#s7">⑦ 公司能力卡</a>\n    <a href="#s8">⑧ 产业知识</a>',
+        '<a href="#s7">⑦ 公司能力卡</a>\n    <a href="#s8">⑧ 产业知识</a>\n    <a href="#s9">⑨ 勘误与撤点</a>',
     )
     source = source.replace(
         "  <footer>",
@@ -1244,6 +1268,11 @@ def build_html(template_path: Path, output_path: Path, rows: list[dict[str, str]
     source = source.replace(
         "  <footer>",
         knowledge_section() + "\n  <footer>",
+        1,
+    )
+    source = source.replace(
+        "  <footer>",
+        errata_section() + "\n  <footer>",
         1,
     )
     source = source.replace("</body>", CAPABILITY_JS + "\n</body>")
