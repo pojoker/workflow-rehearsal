@@ -23,6 +23,46 @@ def secid_of(code):
     return None,None
 
 
+
+def fetch_p5w(code,since):
+    """北交所: 全景网投资者关系互动平台 ir.p5w.net (interaction/getNewR.shtml, JSON直出)"""
+    HP={'User-Agent':H['User-Agent'],'Referer':'https://ir.p5w.net/'}
+    cp=requests.get(f'https://ir.p5w.net/c/{code}',headers=HP,timeout=20); cp.encoding='utf-8'
+    mp=re.search(r'id="pid"\s+value="([\w]+)"',cp.text)
+    pid=mp.group(1) if mp else None
+    if not pid:  # 兜底:公司建议接口按代码解析pid
+        rj=requests.post('https://ir.p5w.net/company/validCompanyJson.shtml',
+                         data={'keyword':code},headers=HP,timeout=15).json()
+        for o in (rj.get('obj') or []):
+            if o.get('companyCode')==code: pid=o.get('pid'); break
+    if not pid: print(f'[{code}] p5w pid未找到(页面+建议接口均无)'); return None
+    items=[];page=1;seen=set()
+    while page<=60:
+        r=requests.post('https://ir.p5w.net/interaction/getNewR.shtml',
+            data={'companyBaseinfoId':pid,'isPagination':'1','page':page,'rows':10},headers=HP,timeout=20)
+        rows=(r.json().get('rows') or [])
+        new=[x for x in rows if x.get('pid') not in seen]
+        if not new: break
+        for x in new: seen.add(x.get('pid'))
+        items+=new; page+=1; time.sleep(1.5)
+    out=[];today=datetime.date.today().isoformat();name=''
+    for a in items:
+        name=a.get('companyShortname') or name
+        ans=(a.get('replyContent') or '').strip()
+        ad=(a.get('replyerTimeStr') or '')[:10]
+        if ad and ad<since: continue
+        out.append({'code':code,'secid':f'p5w_{code}','question':(a.get('content') or '').strip(),
+            'answer':ans,'answer_date':ad,'ask_date':(a.get('questionerTimeStr') or '')[:10],
+            'index_id':str(a.get('pid') or ''),
+            'empty':bool(not ans or EMPTY_PAT.match(re.sub(r'\s','',ans)) or (len(ans)<75 and ('披露为准' in ans or '公告为准' in ans or '定期报告' in ans))),
+            'fetch_date':today,'source':'ir.p5w.net interaction/getNewR.shtml(全景网投关平台,北交所)'})
+    d=os.path.join(ROOT,'corpus','qa',code); os.makedirs(d,exist_ok=True)
+    fp=os.path.join(d,'qa.jsonl')
+    with open(fp,'w',encoding='utf-8') as f:
+        for o in out: f.write(json.dumps(o,ensure_ascii=False)+'\n')
+    print(f'[{code} {name}] {len(out)}条(空回答{sum(1 for o in out if o["empty"])})')
+    return len(out)
+
 def fetch_sse(code,since):
     """上证e互动: company.do?stockcode= 取uid; userfeeds.do(typeCode=company,type=11)分页HTML解析"""
     r=requests.get('https://sns.sseinfo.com/company.do',params={'stockcode':code},
@@ -67,8 +107,10 @@ def fetch_sse(code,since):
 def fetch(code,since):
     if code.startswith('6'):
         return fetch_sse(code,since)
+    if code.startswith('92') or code.startswith('8'):
+        return fetch_p5w(code,since)   # 勘误2026-07-28:北交所有平台=全景网ir.p5w.net(此前误记"无对应平台")
     if not (code.startswith('0') or code.startswith('3')):
-        print(f'[{code}] 北交所无互动平台,跳过(如实记缺口)'); return None
+        print(f'[{code}] 交易所归属未知,跳过'); return None
     secid,name=secid_of(code)
     if not secid:
         print(f'[{code}] secid未找到'); return None
