@@ -7,6 +7,7 @@
 - 沪市(sns.sseinfo.com)未接入,调用沪市代码时如实报错。
 jsonl 行: {code,secid,question,answer,answer_date,ask_date,index_id,empty,fetch_date,source}
 """
+import argparse
 import sys,os,json,time,re,datetime
 import requests
 
@@ -14,12 +15,25 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 H={'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
    'Referer':'https://irm.cninfo.com.cn/'}
 EMPTY_PAT=re.compile(r'^(尊敬的投资者[，,]?)?(您好[！!。]?)?(感谢您?的?(关注|提问)[和与及]?(支持)?[！!。，,]?)*(请|敬请)?(您)?(关注|参考|以)公司?(定期报告|公告|披露)(为准)?[。！!]?(谢谢[！!。]?)?$')
+MIN_INTERVAL=1.25
+_LAST_REQUEST=0.0
+
+def request(method,url,**kwargs):
+    """全站统一限速；HTTP/连接失败抛错，不能与“真实零结果”混淆。"""
+    global _LAST_REQUEST
+    wait=MIN_INTERVAL-(time.monotonic()-_LAST_REQUEST)
+    if wait>0: time.sleep(wait)
+    r=requests.request(method,url,timeout=kwargs.pop('timeout',20),**kwargs)
+    _LAST_REQUEST=time.monotonic()
+    r.raise_for_status()
+    return r
 
 def secid_of(code):
-    r=requests.post('https://irm.cninfo.com.cn/newircs/index/queryKeyboardInfo',
-                    data={'keyWord':code},headers=H,timeout=15)
+    r=request('POST','https://irm.cninfo.com.cn/newircs/index/queryKeyboardInfo',
+              data={'keyWord':code},headers=H,timeout=15)
     for d in (r.json().get('data') or []):
-        if d.get('stockCode')==code: return d.get('secid'),d.get('shortName')
+        if str(d.get('stockCode') or d.get('secCode') or '')==code:
+            return d.get('secid') or d.get('secId'),d.get('shortName') or d.get('secName')
     return None,None
 
 
@@ -27,18 +41,26 @@ def secid_of(code):
 def fetch_p5w(code,since):
     """北交所: 全景网投资者关系互动平台 ir.p5w.net (interaction/getNewR.shtml, JSON直出)"""
     HP={'User-Agent':H['User-Agent'],'Referer':'https://ir.p5w.net/'}
-    cp=requests.get(f'https://ir.p5w.net/c/{code}',headers=HP,timeout=20); cp.encoding='utf-8'
+    cp=request('GET',f'https://ir.p5w.net/c/{code}',headers=HP,timeout=20); cp.encoding='utf-8'
     mp=re.search(r'id="pid"\s+value="([\w]+)"',cp.text)
     pid=mp.group(1) if mp else None
     if not pid:  # 兜底:公司建议接口按代码解析pid
-        rj=requests.post('https://ir.p5w.net/company/validCompanyJson.shtml',
-                         data={'keyword':code},headers=HP,timeout=15).json()
-        for o in (rj.get('obj') or []):
-            if o.get('companyCode')==code: pid=o.get('pid'); break
+        rj=request('POST','https://ir.p5w.net/company/validCompanyJson.shtml',
+                   data={'keyword':code},headers=HP,timeout=15).json()
+        choices=rj.get('obj') or []
+        for o in choices:
+            shown=str(o.get('companyCode') or o.get('stockCode') or '')
+            if shown==code:
+                pid=o.get('pid') or o.get('companyBaseinfoId') or o.get('id')
+                break
+        # 北交所切换920代码后，建议接口可能仍返回旧代码；精确关键词只有一个候选时取其主键。
+        if not pid and len(choices)==1:
+            o=choices[0]
+            pid=o.get('pid') or o.get('companyBaseinfoId') or o.get('id')
     if not pid: print(f'[{code}] p5w pid未找到(页面+建议接口均无)'); return None
     items=[];page=1;seen=set()
     while page<=60:
-        r=requests.post('https://ir.p5w.net/interaction/getNewR.shtml',
+        r=request('POST','https://ir.p5w.net/interaction/getNewR.shtml',
             data={'companyBaseinfoId':pid,'isPagination':'1','page':page,'rows':10},headers=HP,timeout=20)
         rows=(r.json().get('rows') or [])
         new=[x for x in rows if x.get('pid') not in seen]
@@ -55,7 +77,7 @@ def fetch_p5w(code,since):
             'answer':ans,'answer_date':ad,'ask_date':(a.get('questionerTimeStr') or '')[:10],
             'index_id':str(a.get('pid') or ''),
             'empty':bool(not ans or EMPTY_PAT.match(re.sub(r'\s','',ans)) or (len(ans)<75 and ('披露为准' in ans or '公告为准' in ans or '定期报告' in ans))),
-            'fetch_date':today,'source':'ir.p5w.net interaction/getNewR.shtml(全景网投关平台,北交所)'})
+            'fetch_date':today,'source':'ir.p5w.net interaction/getNewR.shtml(全景网投关平台,全市场镜像)'})
     d=os.path.join(ROOT,'corpus','qa',code); os.makedirs(d,exist_ok=True)
     fp=os.path.join(d,'qa.jsonl')
     with open(fp,'w',encoding='utf-8') as f:
@@ -65,15 +87,15 @@ def fetch_p5w(code,since):
 
 def fetch_sse(code,since):
     """上证e互动: company.do?stockcode= 取uid; userfeeds.do(typeCode=company,type=11)分页HTML解析"""
-    r=requests.get('https://sns.sseinfo.com/company.do',params={'stockcode':code},
-                   headers={'User-Agent':H['User-Agent'],'Referer':'https://sns.sseinfo.com/'},timeout=15)
+    r=request('GET','https://sns.sseinfo.com/company.do',params={'stockcode':code},
+              headers={'User-Agent':H['User-Agent'],'Referer':'https://sns.sseinfo.com/'},timeout=15)
     m=re.search(r'uid=(\d+)',r.text)
     nm=re.search(r'companyName[^>]*>\s*([^<(（\s]+)',r.text) or re.search(r'<title>\s*([^<(（]+)',r.text)
     if not m: print(f'[{code}] e互动uid未找到'); return None
     uid=m.group(1); name=(nm.group(1).strip() if nm else code)
     items=[];page=1
     while True:
-        rr=requests.get('https://sns.sseinfo.com/ajax/userfeeds.do',
+        rr=request('GET','https://sns.sseinfo.com/ajax/userfeeds.do',
             params={'typeCode':'company','type':11,'pageSize':20,'uid':uid,'page':page},
             headers={'User-Agent':H['User-Agent'],'Referer':'https://sns.sseinfo.com/'},timeout=20)
         chunk=re.split(r'id="item-\d+"',rr.text)[1:]
@@ -104,11 +126,7 @@ def fetch_sse(code,since):
     print(f'[{code} {name}] {len(out)}条(空回答{sum(1 for o in out if o["empty"])}) → {fp}')
     return len(out)
 
-def fetch(code,since):
-    if code.startswith('6'):
-        return fetch_sse(code,since)
-    if code.startswith('92') or code.startswith('8'):
-        return fetch_p5w(code,since)   # 勘误2026-07-28:北交所有平台=全景网ir.p5w.net(此前误记"无对应平台")
+def fetch_irm(code,since):
     if not (code.startswith('0') or code.startswith('3')):
         print(f'[{code}] 交易所归属未知,跳过'); return None
     secid,name=secid_of(code)
@@ -116,7 +134,7 @@ def fetch(code,since):
         print(f'[{code}] secid未找到'); return None
     rows=[];page=1
     while True:
-        r=requests.get('https://irm.cninfo.com.cn/newircs/search/searchResult',params={
+        r=request('GET','https://irm.cninfo.com.cn/newircs/search/searchResult',params={
             'stockCodes':f'{secid}_{code}','keywords':'','infoTypes':'11',
             'startDate':f'{since} 00:00:00',
             'endDate':datetime.date.today().strftime('%Y-%m-%d')+' 23:59:59',
@@ -151,11 +169,26 @@ def fetch(code,since):
     print(f'[{code} {name}] {len(out)}条(空回答{n_empty}) → {fp}')
     return len(out)
 
+def fetch(code,since):
+    """主通道按市场分派；0条/失败时全景网兜底(全市场镜像,含沪深,纪律9双通道)。"""
+    if code.startswith('6'):
+        n=fetch_sse(code,since)
+    elif code.startswith('92') or code.startswith('8'):
+        return fetch_p5w(code,since)   # 勘误2026-07-28:北交所有平台=全景网ir.p5w.net(原生通道即此)
+    else:
+        n=fetch_irm(code,since)
+    if not n:
+        m=fetch_p5w(code,since)
+        if m: print(f'[{code}] 主通道{n},p5w兜底{m}条(前科:002792/600641/688079主通道假阴性)')
+        return m if m is not None else n
+    return n
+
 if __name__=='__main__':
-    args=[a for a in sys.argv[1:] if not a.startswith('--')]
-    since='2023-01-01'
-    if '--since' in sys.argv: since=sys.argv[sys.argv.index('--since')+1]
-    for c in args:
-        try: fetch(c,since)
+    parser=argparse.ArgumentParser()
+    parser.add_argument('codes',nargs='+')
+    parser.add_argument('--since',default='2023-01-01')
+    ns=parser.parse_args()
+    for c in ns.codes:
+        try: fetch(c,ns.since)
         except Exception as e: print(f'[{c}] 失败: {str(e)[:80]}')
         time.sleep(2.5)
