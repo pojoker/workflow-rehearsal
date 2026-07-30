@@ -206,25 +206,42 @@ def scan():
             words.append((w,cell,ex,ctx))
     done={t['hit_id'] for t in rows('triage.csv')}
     pts=rows('points.csv'); filled={p['cell_id'] for p in pts}; known_companies={p['公司'] for p in pts}
+    frozen={}
+    fz_path=os.path.join(ROOT,'corpus/_frozen.csv')
+    if os.path.exists(fz_path):
+        for r in rows('corpus/_frozen.csv'): frozen[r['代码']]=r['名称']
     q=[]
+    def recall_file(txt, co, fname):
+        """单个语料文本跑词表,命中入净队列(公司名/代码双轨:annual按_em_文件名,ir按_frozen代码映射)"""
+        try: t=re.sub(r'\s+','',open(txt,encoding='utf-8',errors='ignore').read())
+        except: return
+        for w,cell,ex,ctx in words:
+            if cell=='ANY' and co in known_companies: continue
+            for mm in list(re.finditer(re.escape(w),t))[:2]:
+                seg=t[max(0,mm.start()-40):mm.end()+40]
+                if ex and re.search(ex,seg): continue
+                if ctx and ctx not in seg: continue
+                hid=f'{co}+{cell}+{fname[:40]}'
+                if hid in done: continue
+                priority=1 if cell=='ANY' else (0 if cell not in filled else 2)
+                q.append((priority,hid,co,cell,w,seg))
+                break
     for d in sorted(glob.glob(os.path.join(ROOT,'corpus/annual/*/'))):
         for pdf in glob.glob(d+'**/*.pdf',recursive=True):
             txt=pdf+'.txt'
             if not os.path.exists(txt): subprocess.run(['pdftotext','-layout',pdf,txt],capture_output=True)
-            try: t=re.sub(r'\s+','',open(txt,encoding='utf-8',errors='ignore').read())
-            except: continue
             m=re.search(r'_([^_]+)_em_',os.path.basename(pdf)); co=m.group(1) if m else os.path.basename(d.rstrip('/'))
-            for w,cell,ex,ctx in words:
-                if cell=='ANY' and co in known_companies: continue
-                for mm in list(re.finditer(re.escape(w),t))[:2]:
-                    seg=t[max(0,mm.start()-40):mm.end()+40]
-                    if ex and re.search(ex,seg): continue
-                    if ctx and ctx not in seg: continue
-                    hid=f'{co}+{cell}+{os.path.basename(pdf)[:40]}'
-                    if hid in done: continue
-                    priority=1 if cell=='ANY' else (0 if cell not in filled else 2)
-                    q.append((priority,hid,co,cell,w,seg))
-                    break
+            recall_file(txt, co, os.path.basename(pdf))
+    # 投关表车道(2026-07-30接入): pdf现抽/docx读fetcher预解的.txt旁车
+    for d in sorted(glob.glob(os.path.join(ROOT,'corpus/ir/*/'))):
+        code=os.path.basename(d.rstrip('/')); co=frozen.get(code,code)
+        for f in sorted(glob.glob(d+'*')):
+            if f.endswith('.pdf'):
+                txt=f+'.txt'
+                if not os.path.exists(txt): subprocess.run(['pdftotext','-layout',f,txt],capture_output=True)
+                recall_file(txt, co, os.path.basename(f))
+            elif f.endswith('.docx') and os.path.exists(f+'.txt'):
+                recall_file(f+'.txt', co, os.path.basename(f))
     q.sort()
     print(f'净队列 {len(q)} 条(空叶格优先排序)')
     labels={0:'空格',1:'参与',2:'  '}
