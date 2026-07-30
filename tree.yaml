@@ -27,7 +27,7 @@ tree:
 - id: M
   名称: 材料层
   children:
-    - {cell_id: M1, 名称: 衬底(InP/GaAs), 路线: 共用}
+    - {cell_id: M1, 名称: 衬底(InP/GaAs/SOI), 路线: 共用}
     - id: M2
       名称: 外延层            # L8修复：独立产业环节，≥3叶
       children:
@@ -73,6 +73,7 @@ tree:
         - {cell_id: D9, 名称: 光纤阵列FAU/MPO连接, 路线: 共用}
         - {cell_id: D10, 名称: 陶瓷插芯/套管, 路线: 共用}
         - {cell_id: D11, 名称: 滤波片/薄膜, 路线: 共用}
+        - {cell_id: D13, 名称: 温控元件(TEC/制冷器), 路线: 共用}   # 2026-07-30闸主裁决:先导基电MicroTEC案开格
 - id: B
   名称: 电路与结构
   children:
@@ -125,6 +126,7 @@ flows:
   - {from: D10, to: [D9, MOD3]}
   - {from: D9, to: [MOD1]}
   - {from: D11, to: [D8, D2]}
+  - {from: D13, to: [D1, D12]}   # TEC温控入TOSA/光引擎(2026-07-30闸主裁决)
   - {from: D1, to: [MOD3]}
   - {from: D2, to: [MOD3]}
   - {from: D3, to: [MOD3]}
