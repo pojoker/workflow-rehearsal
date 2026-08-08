@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""scan.py — 扫描+十不变量。用法: python3 scan.py [--check]
+"""scan.py — 扫描+不变量①-⑪。用法: python3 scan.py [--check]
 --check: 只跑不变量(<10s)。扫描分母=corpus/annual(_frozen登记);legacy-input=证据库不参与扫描。"""
 import sys,os,csv,re,glob,time,subprocess
 
@@ -94,7 +94,7 @@ def invariants():
     WL={'README.md','CLAUDE.md','tree.yaml','knowledge.yaml','points.csv','edges.csv','triage.csv','words.txt',
         'scan.py','render.py','participation.py','make_participation_pdf.py',
         'build_detailed_capability_report.py','capability_details.csv',
-        'route_bom.csv','macro_evidence.csv',
+        'route_bom.csv','macro_evidence.csv','shipments.csv',
         'RESTART-v2.md','CONTEXT.md','.gitignore','.git','.DS_Store'}
     for f in os.listdir(ROOT):
         if os.path.isfile(os.path.join(ROOT,f)) and f not in WL: fail('⑥',f'根目录白名单外文件: {f}')
@@ -177,6 +177,14 @@ def invariants():
     for r in rows('macro_evidence.csv'):
         if not re.fullmatch(r'MC\d{3}',r.get('claim_id','?')): fail('⑨',f"macro claim_id须为MC###: {r.get('claim_id')}")
         if r.get('证据等级') not in ('A','B','C','D'): fail('⑨',f"macro {r.get('claim_id')} 证据等级非法")
+    # ⑪出货量推断层: shipments.csv 行级校验(ADR-0001)
+    if os.path.exists(os.path.join(ROOT,'shipments.csv')):
+        for r in rows('shipments.csv'):
+            if not re.fullmatch(r'SE\d{3}',r.get('row_id','?')): fail('⑪',f"shipments row_id须为SE###: {r.get('row_id')}")
+            lv = r.get('证据等级','')
+            if lv not in ('B','C','D'): fail('⑪',f"{r.get('row_id')} 证据等级{lv}非法(推断层封顶C,B仅直接披露,禁A)")
+            if str(r.get('情景标记','')).startswith('scenario') and lv!='D': fail('⑪',f"{r.get('row_id')} 情景行必须为D级")
+            if r.get('单位','') not in ('只','颗','件','万只','万个','万美元'): fail('⑪',f"{r.get('row_id')} 单位非法: {r.get('单位')}")
     # ⑩互动易qa车道: jsonl格式合法+必备键;点锚引用的qa快照必须存在且真含引语
     for qf in glob.glob(os.path.join(ROOT,'corpus/qa/*/qa.jsonl')):
         try:
@@ -253,5 +261,5 @@ if __name__=='__main__':
     invariants()
     if ERR:
         print('\n'.join('\033[31m'+e+'\033[0m' for e in ERR)); sys.exit(1)
-    print('十不变量: 全绿')
+    print('不变量全绿(①-⑪)')
     if '--check' not in sys.argv: scan()
