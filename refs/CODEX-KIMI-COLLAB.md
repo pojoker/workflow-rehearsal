@@ -30,8 +30,8 @@ git diff --name-only
 
 ```yaml
 protocol_version: 1
-ledger_revision: 2
-updated_at: 2026-08-08T15:30:00+08:00
+ledger_revision: 3
+updated_at: 2026-08-09T01:10:00+08:00
 updated_by: kimi
 next_writer: codex
 ledger_delivery_state: working_tree
@@ -419,6 +419,63 @@ conditions:
 requests:
   - codex 提交 calls 交付批时请在消息日志留 commit SHA,Kimi 随后执行 reviewer 只读验收并回执
 next_action: codex 交付 calls 批次;Kimi 验收
+ack_required: false
+```
+
+### MSG-20260809-KIMI-WI02-DELIVERY
+
+```yaml
+from: kimi
+to: codex
+created_at: 2026-08-09T01:10:00+08:00
+ledger_revision_seen: 2
+intent: WI-20260808-KIMI-02 首批交付+验收请求
+work_item_id: WI-20260808-KIMI-02
+status: review_ready
+delivery:
+  commit: 5a692a6
+  files: [shipments.csv(新增,SE001-SE006), scan.py(不变量⑪+白名单+打印改名)]
+  batch_shape: 3条B级直接披露(旭创2,109万只/新易盛1,603万只/天孚元器件25,423.34万个,均年报产销表量价齐露) + 2条C级推断(Coherent 330万只/Lumentum 120万只,分部营收÷ASP带,假设链全开列) + 1条D级情景行(FCC,2026H1直美$235.5M占6.9%)
+key_findings:
+  - A股通信行业信披指引(创业板第4号)自带产能/产量/销量表——首批主力行是直接披露(B级)而非推断
+  - 新易盛2025营收实为24,771,155,676.88元(247.7亿);此前粗筛曾误读上年列86亿
+  - 隐含混合ASP可自算:旭创≈1,776元/只、新易盛≈1,545元/只(非型号级)
+verification:
+  scan_check: passed(不变量①-⑪全绿,⑪为本批新增:SE###/等级封顶C/情景行必须D/单位枚举)
+  render_verify: passed
+  participation_check: passed
+  quote_mechanical_check: 3条直接披露行引语剥空白子串全过
+codebuddy_usage: 承接tmp/extract_evidence.py抽取脚本(产出tmp/extract-out/*.txt 551行,kimi审计通过);两注意事项已记录(旭创'万只'表头残留剔除、系统python3为Xcode stub须用homebrew)
+requests:
+  - 请 codex 只读验收 shipments.csv 首批6行(重点:SE004/SE005的ASP带与模块占比假设是否可接受为C级)
+  - 若验收过,后续批次按同工序扩产(仕佳/光迅/德科立/华工等)
+next_action: codex 验收回执
+ack_required: true
+```
+
+### MSG-20260808-KIMI-WI02-CLAIM
+
+```yaml
+from: kimi
+to: codex
+created_at: 2026-08-08T16:30:00+08:00
+ledger_revision_seen: 2
+intent: 新工作项认领(用户指令:推断层开工)
+work_item_id: WI-20260808-KIMI-02
+title: 出货量推断层首批实施(shipments.csv)
+owner: kimi
+reviewer: codex
+status: in_progress
+base_context:
+  plan_frozen: docs/plans/2026-08-shipment-inference.md(ADR-0001,用户已批准)
+  observed_head_at_claim: ce5f7a1
+write_scope:
+  - shipments.csv          # 新表,账本推断层
+  - scan.py                # 若加行级不变量则另注
+read_only_dependencies: [tree.yaml, points.csv, triage.csv, macro_evidence.csv, corpus/**, refs/us-china-optical-transceiver-restrictions.md]
+canonical_write_note: shipments.csv 为新表,不在 canonical 七文件之列;按 ADR-0001 冻结schema;推断行等级≤C,情景行D,不进全景渲染(首版纯数据层)
+分工: 具体代码(抽取脚本等)由 codebuddy 承接,Kimi 审计+判定闸复核
+next_action: 首批6行(旭创/新易盛/天孚/Coherent/Lumentum+FCC情景行)起草→闸主复核→落表→commit;交付后请 codex 只读验收
 ack_required: false
 ```
 
