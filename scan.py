@@ -99,10 +99,10 @@ def invariants():
     for f in os.listdir(ROOT):
         if os.path.isfile(os.path.join(ROOT,f)) and f not in WL: fail('⑥',f'根目录白名单外文件: {f}')
     refs=os.listdir(os.path.join(ROOT,'refs')) if os.path.isdir(os.path.join(ROOT,'refs')) else []
-    if len(refs)>6: fail('⑥',f'refs/文件数{len(refs)}>6(补丁P3)')
+    if len(refs)>8: fail('⑥',f'refs/文件数{len(refs)}>8(2026-08-04由6放宽,纪律4)')
     for m in glob.glob(os.path.join(ROOT,'**/*.md'),recursive=True):
         rel=os.path.relpath(m,ROOT)
-        if not rel.startswith(('archive/','refs/','out/','corpus/')) and rel not in ('README.md','CLAUDE.md','RESTART-v2.md'):
+        if not rel.startswith(('archive/','refs/','out/','corpus/','calls/')) and rel not in ('README.md','CLAUDE.md','RESTART-v2.md'):
             fail('⑥',f'越位md: {rel}')
     # ⑦triage一致性
     pnames={p['公司'] for p in pts}

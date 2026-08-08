@@ -2,7 +2,7 @@
 1. 点先行序：树(纯骨架,免锚,机制入知识库)→知识(KN,锚型机器核验)→点(自家披露件或互动易/e互动回答引语+锚;官网社媒不得为点锚)→边(四件套)。
 2. token 只花在判定闸；发现/校验/渲染一律脚本。
 3. 判定闸会话末必跑 `python3 scan.py --check`；驳回也是产出，写 triage.csv。
-4. archive/ 不读（settings 已 deny）；refs/ 只读参考,文件数≤6。
+4. archive/ 不读（settings 已 deny）；refs/ 只读参考,文件数≤8（2026-08-04由≤6放宽:us-china-restrictions研究笔记高价值,用户批准）。
 5. 单线程；禁 nohup 裸进程；禁并行迁移。
 6. 数据在 csv/yaml,md/html 只是渲染;手改 out/ 会被拒。
 7. 金额必带单位枚举;未上市≠未解析。
