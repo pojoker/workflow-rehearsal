@@ -32,6 +32,7 @@ from reportlab.platypus import (
 )
 
 import participation
+from calls.workbuddy import render_intelligence_section
 
 
 ROOT = Path(__file__).resolve().parent
@@ -39,6 +40,8 @@ DEFAULT_CSV = ROOT / "capability_details.csv"
 ROUTE_BOM_CSV = ROOT / "route_bom.csv"
 MACRO_EVIDENCE_CSV = ROOT / "macro_evidence.csv"
 EDGES_CSV = ROOT / "edges.csv"
+CALLS_INTELLIGENCE_CSV = ROOT / "calls" / "out" / "panorama-intelligence.csv"
+CALLS_POSITIONING_JSON = ROOT / "calls" / "out" / "positioning.json"
 DEFAULT_PDF = ROOT / "output" / "pdf" / "光模块产业链公司能力明细.pdf"
 DEFAULT_TEMPLATE = Path(
     "/Users/jowang/Workbuddy/2026-07-26-11-49-54/"
@@ -605,7 +608,7 @@ def errata_section() -> str:
     if not items:
         return ""
     return f"""
-    <div class="sec" id="s9">
+    <div class="sec" id="s10">
       <h2><span class="tag">勘误</span>勘误与撤点：我们撤回过什么、为什么</h2>
       <div class="desc">否认性证据（公司自己说"没做/未量产"）优先于暧昧文本。账本因此变小的每一次，都让剩下的每一行更硬。</div>
       {''.join(items)}
@@ -1191,12 +1194,16 @@ def knowledge_section() -> str:
         <details><summary>证据（{len(k.get('证据') or [])} 条，逐条带锚）</summary><ul class="k-ev">{''.join(ev_html)}</ul></details>
       </div>""")
     return f"""
-    <div class="sec" id="s8">
+    <div class="sec" id="s9">
       <h2><span class="tag">知识</span>产业知识层：这环节干嘛的、为什么难、怎么判断谁够格</h2>
       <div class="desc">来自 knowledge.yaml。每条为大白话结论 + 判定用法 + 逐条证据（谁说的 / 原话 / 锚）。无证据的"常识"被校验器机器拦截，进不了本层；负证据（"查过没有"）必须附检索协议（关键词 / 语料范围 / 日期 / 命中数）。</div>
       {''.join(cards)}
     </div>
 """
+
+
+def calls_intelligence_section(path: Path = CALLS_INTELLIGENCE_CSV) -> str:
+    return render_intelligence_section(path, positioning_path=CALLS_POSITIONING_JSON)
 
 
 KNOWLEDGE_CSS = """
@@ -1210,6 +1217,19 @@ KNOWLEDGE_CSS = """
   .k-ev{margin:6px 0 0 18px}
   .k-ev li{margin:6px 0}
   .k-anchor{color:var(--muted);font-size:11.5px}
+"""
+
+CALLS_CSS = """
+  .calls-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:12px}
+  .calls-card{border:1px solid #bfdbfe;border-radius:12px;padding:13px;background:#f8fbff}
+  .calls-head{display:flex;justify-content:space-between;gap:12px;font-size:13px}
+  .calls-head span{font-size:10.5px;color:#1d4ed8;background:#dbeafe;padding:3px 7px;border-radius:999px;white-space:nowrap}
+  .calls-meta{font-size:11.5px;color:var(--muted);margin:7px 0}
+  .calls-card ul{font-size:12px;margin:7px 0 7px 18px;padding:0}
+  .calls-gap{font-size:11px;line-height:1.5;background:#fff7ed;border-left:3px solid #fb923c;padding:7px 9px}
+  .calls-positioning{font-size:11px;line-height:1.5;background:#f0fdf4;border-left:3px solid #22c55e;padding:7px 9px;margin-top:7px}
+  .calls-positioning>ul{margin:5px 0 0 14px;padding:0}
+  .calls-positioning li{margin:4px 0}
 """
 
 
@@ -1255,14 +1275,24 @@ def build_html(template_path: Path, output_path: Path, rows: list[dict[str, str]
         "厂商名称、细分能力与少量已验证供货实边统一放在第 7 节能力卡；本节只解释产业分工。",
     )
     source = legacy_quantitative_badges(source)
-    source = source.replace("</style>", CAPABILITY_CSS + KNOWLEDGE_CSS + "\n</style>")
+    intelligence_html = calls_intelligence_section()
+    source = source.replace("</style>", CAPABILITY_CSS + KNOWLEDGE_CSS + CALLS_CSS + "\n</style>")
+    extra_nav = ""
+    if intelligence_html:
+        extra_nav += '\n    <a href="#s8">⑧ 海外电话会与官网技术情报</a>'
+    extra_nav += '\n    <a href="#s9">⑨ 产业知识</a>\n    <a href="#s10">⑩ 勘误与撤点</a>'
     source = source.replace(
         '<a href="#s7">⑦ 公司能力卡</a>',
-        '<a href="#s7">⑦ 公司能力卡</a>\n    <a href="#s8">⑧ 产业知识</a>\n    <a href="#s9">⑨ 勘误与撤点</a>',
+        '<a href="#s7">⑦ 公司能力卡</a>' + extra_nav,
     )
     source = source.replace(
         "  <footer>",
         capability_section(rows, edges_by_company) + "\n  <footer>",
+        1,
+    )
+    source = source.replace(
+        "  <footer>",
+        intelligence_html + "\n  <footer>",
         1,
     )
     source = source.replace(

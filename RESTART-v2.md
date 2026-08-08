@@ -65,7 +65,7 @@ cron 汇报规则：无实质增量→一句话收工**免开闸**；有增量�
 1. 点先行序：树→知识→点（披露件或互动易/e互动引语+锚；官网社媒不得为点锚）→边（四件套）。
 2. token 只花在判定闸；发现/校验/渲染一律脚本。
 3. 判定闸会话末必跑 `python3 scan.py --check`；驳回也是产出。
-4. archive/ 不读；refs/ 只读，≤6 件。
+4. archive/ 不读；refs/ 默认只读，≤8 件；仅 `refs/CODEX-KIMI-COLLAB.md` 可按单写者协议更新，且不作为事实源。
 5. 单线程；禁 nohup 裸进程；禁并行迁移。
 6. 数据在 csv/yaml；md/html 只是渲染；手改 out/ 会被拒。
 7. 金额必带单位枚举；未上市≠未解析。
@@ -98,6 +98,7 @@ cron 汇报规则：无实质增量→一句话收工**免开闸**；有增量�
 # 7. git commit（信息格式：产出: +N点 +M边 空格A/B 驳回K 摘要）
 ```
 
-关键参考：`README.md`（产品与流程）、`CLAUDE.md`（纪律 9 条）、`refs/`（参与识别-MVP、解匿判例库、
-信源分层总表、问题信源路由表、entity-registry）。
+关键参考：`README.md`（产品与流程）、`CLAUDE.md`（纪律 9 条）、`refs/CODEX-KIMI-COLLAB.md`
+（Codex/Kimi 协作账本）、`refs/`（参与识别-MVP、解匿判例库、信源分层总表、问题信源路由表、
+entity-registry）。
 本日全部判定史见 git log（`4281441`..`87470ec`，每条 commit 信息即案情摘要）。

@@ -1,0 +1,9 @@
+company_id,company_name,role,inclusion_reason,enabled
+COHR,Coherent,core_peer,光器件与高速光模块核心同业,yes
+LITE,Lumentum,core_peer,激光器与光通信器件核心同业,yes
+AAOI,Applied Optoelectronics,core_peer,800G与1.6T模块供给和产能信息密度高,yes
+FN,Fabrinet,core_peer,光通信制造交付与产能验证方,yes
+NVDA,NVIDIA,downstream,AI集群架构与互连需求方,yes
+ANET,Arista,downstream,数据中心交换网络需求验证方,yes
+CSCO,Cisco,downstream,交换系统及光学产品需求验证方,yes
+META,Meta,downstream,超大规模数据中心部署与资本开支验证方,yes

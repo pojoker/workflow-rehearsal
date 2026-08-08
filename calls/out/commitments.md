@@ -1,0 +1,6 @@
+# 承诺—兑现账本
+
+| 承诺 | 目标 | 截止 | 状态 | 兑现证据 | 判断 |
+|---|---|---|---|---|---|
+| CM001 / CL009 | 出货第100万颗Silicon One芯片 | 2026-01-24 | fulfilled | [S_CSCO_2026Q2_A](https://investor.cisco.com/files/doc_events/2026/02/Q2FY26-Prepared-Remarks-1.pdf) | 下一季官方prepared remarks明确使用已完成时态确认兑现 |
+| CM002 / CL003 | 800G产品从Q2开始明显放量 | 2026-06-30 | pending | 尚未观察到 | 尚未用后续季度正式材料核对；pending不代表未兑现 |

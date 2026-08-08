@@ -1,6 +1,6 @@
 # 光模块产业结构与公司能力地图（点先行 v2）
 
-一个账本，三个产品 + 一层知识。数据只有一份（tree.yaml / knowledge.yaml / points.csv / edges.csv / triage.csv / corpus/_frozen.csv），md/html 都是渲染。
+canonical 一个账本，四个读者产品 + 一层知识。前三个产品共用 tree.yaml / knowledge.yaml / points.csv / edges.csv / triage.csv / corpus/_frozen.csv；第四产品是只读引用 canonical 的独立情报层。md/html 都是渲染。
 
 架构 = 本体层 + 事实与解释层 + 关系层 + 产品投影（三层一投影）：
 
@@ -26,6 +26,10 @@
 以“公司 × 细分节点”为最小单元，把 `points.csv` 的已过闸证据标准化为具体产品、材料与技术、工艺能力、规格与应用、当前阶段和产业角色。PDF 与 HTML 使用同一份 `capability_details.csv`，未获披露支撑的字段显示“披露未细分”，不推断供货关系。
 
 HTML 保持单一读者页面：`route_bom.csv` 提供 800G DR8 / 1.6T DR8 / 400ZR 的正交轴与 BOM；`macro_evidence.csv` 管理首页量化结论的 A-D 证据等级；`edges.csv` 中少量已验证实边叠加到公司能力卡。后台可以扩 schema 和校验器，但不另造读者页面。
+
+**产品④ 海外电话会与官网技术情报**（`calls/*.csv` → `calls/out/`，由 `python3 -m calls all` 生成）
+
+独立管理海外同业/下游电话会、公司官网署名技术博客、技术演示、动态卡点、承诺兑现和国内能力潜在匹配。管理层商业陈述、分析师问题与公司技术作者陈述机械隔离；只生成候选验证链，不回写 canonical。`calls/out/panorama-intelligence.csv` 可选投影到 WorkBuddy HTML 的“海外电话会与官网技术情报”章节，缺失时安全跳过。
 
 **知识库**（`knowledge.yaml` → `out/知识库.md` / `.html`，由 `render.py` 生成）
 项目的"为什么"层。每条知识用不懂行的人能看懂的大白话写：一句话结论 + 说细点 + 怎么用它判断，
