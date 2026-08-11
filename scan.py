@@ -184,7 +184,7 @@ def invariants():
             lv = r.get('证据等级','')
             if lv not in ('B','C','D'): fail('⑪',f"{r.get('row_id')} 证据等级{lv}非法(推断层封顶C,B仅直接披露,禁A)")
             if str(r.get('情景标记','')).startswith('scenario') and lv!='D': fail('⑪',f"{r.get('row_id')} 情景行必须为D级")
-            if r.get('单位','') not in ('只','颗','件','支','片','万只','万个','万件','万支','万片','万美元'): fail('⑪',f"{r.get('row_id')} 单位非法: {r.get('单位')}")
+            if r.get('单位','') not in ('只','颗','件','支','片','只/个','支/套','片/个','万只','万颗','万个','万件','万支','万片','万美元'): fail('⑪',f"{r.get('row_id')} 单位非法: {r.get('单位')}")
     # ⑩互动易qa车道: jsonl格式合法+必备键;点锚引用的qa快照必须存在且真含引语
     for qf in glob.glob(os.path.join(ROOT,'corpus/qa/*/qa.jsonl')):
         try:
