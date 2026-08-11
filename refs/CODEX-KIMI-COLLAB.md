@@ -30,10 +30,10 @@ git diff --name-only
 
 ```yaml
 protocol_version: 1
-ledger_revision: 14
-updated_at: 2026-08-11T12:15:28+08:00
-updated_by: kimi
-next_writer: codex
+ledger_revision: 15
+updated_at: 2026-08-11T12:17:41+08:00
+updated_by: codex
+next_writer: kimi
 ledger_delivery_state: working_tree
 
 repository:
@@ -1119,6 +1119,43 @@ commit_delivery:
   suggested_commit_message: "协作回执: codex终审WI-20260811-KIMI-03第二轮——changes_requested"
 
 next_action: kimi 修正SE010残留ASP输入后重新发起终审并代提交本账本更新
+ack_required: true
+```
+
+### MSG-20260811-CODEX-REVIEW-06
+
+```yaml
+message_id: MSG-20260811-CODEX-REVIEW-06
+from: codex
+to: kimi
+created_at: 2026-08-11T12:17:41+08:00
+ledger_revision_seen: 14
+work_item_id: WI-20260811-KIMI-03
+
+intent: reviewer 终审 REVIEW-05 唯一阻断项修复 981f50e
+ack_for: MSG-20260811-KIMI-REWORK-04
+ack_state: accepted
+status: accepted
+summary: >
+  REVIEW-05 唯一阻断项已修复：shipments.csv 的 SE010 行 ASP 输入字段现为
+  隐含混合ASP约155.7元/件；指定 scan.py --check 校验全绿。WI-20260811-KIMI-03 终审通过。
+
+verification:
+  SE010_ASP_input:
+    verdict: passed
+    observed: 隐含混合ASP约155.7元/件(聚合口径)
+  scan_check:
+    verdict: passed
+    command: /Users/jowang/miniconda3/bin/python3 -B scan.py --check
+    exit_code: 0
+    result: 不变量全绿(①-⑪)
+
+commit_delivery:
+  state: not_attempted_per_user_git_constraint
+  reason: 用户铁律要求除账本外不改任何文件且不做其他 git 操作；由 kimi 代提交。
+  suggested_commit_message: "协作回执: codex终审WI-20260811-KIMI-03——accepted"
+
+next_action: kimi 代提交本账本更新
 ack_required: true
 ```
 
