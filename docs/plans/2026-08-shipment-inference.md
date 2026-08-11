@@ -88,6 +88,16 @@ row_id,公司,cell_id,期间,出货量,单位,推导式,收入输入,收入锚,A
 
 重启条件（两行同）：10-K/8-K/投关出现模块收入单列、型号销量、或公司口径 ASP 任一一手锚后重算并重新发起 review。
 
+### 核销记录 2026-08-11（kimi，FY2026 前三季新披露核查）
+
+**核查范围**：EDGAR 2025-07-01 以来全部 10-Q/10-K/8-K——COHR 14 份（含 FY26 Q1-Q3 10-Q、各季业绩 8-K、2026-03-02 NVIDIA 定增 8-K）；LITE 15 份（同结构 + 2026-07-30 高管退休 8-K）。本地快照：tmp/sec-meta/。
+
+**SE004 COHR：条件未触发。** FY2026 起改分部口径为 Datacenter & Communications / Industrial 两市场，10-Q（2026-03-31 季）明示"We do not present other levels of disaggregation, such as by type of products"——产品级收入分解被公司明确排除；Q3 FY26 业绩新闻稿仅市场级数字（D&C 9M FY26 $3,659.6M），全文零次 transceiver；NVIDIA 8-K 无收入锚。模块收入/销量/ASP 三条件无一满足。
+
+**SE005 LITE：严格读条件未触发，但出现部分合格锚，差距收窄。** FY2026 起 10-Q 按 Components/Systems 分解收入（10-Q 2026-03-28 季，Note 表）：Q3 FY26 Systems $275.1M（总 $808.4M）；9M FY26 Systems $651.5M，9M FY25 重述可比 $368.4M。但 Systems 定义 = 光模块 + 光路交换（OCS) + 工业激光器，**非模块单列**；MD&A 仅量化增量不量化存量——"cloud transceiver product lines increased by more than $137.0 million"(Q3 YoY)/"more than $268.0 million"(9M YoY)，OCS 出货 >$25M(Q3)/>$38M(9M)；ASP 仅"lower average selling prices"定性。三条件逐项：模块收入单列=否（Systems 含工业激光器）；型号销量=无；公司口径 ASP=无。可得一手无锚假设的有界区间（Q3 FY26 transceiver ∈ ($137M, $250M]），但区间非点值、ASP 仍无锚，按"不得以无锚假设带修补算术"裁决精神不重启。
+
+**下一触发窗口**：LITE FY2026 10-K（FY 止于 2026-06-27，参照 FY25 10-K 于 2025-08-19 申报、Q4 业绩 8-K 于 2025-08-12 的节奏，预计 2026-08 中下旬落地）将给出 FY2026 全年及 FY2025/FY2024 重述的 Components/Systems 收入——若其中或随附投关材料出现模块收入单列/型号销量/公司口径 ASP，SE005 即满足重启条件；COHR 需等投关材料出现产品级收入分解。建议日更盯住这两家 FY26 年报/业绩 8-K 落库。
+
 ## 6. 开工触发
 
 用户一句"开工"。第一步=第 2 节首批 6 行的起草批。
