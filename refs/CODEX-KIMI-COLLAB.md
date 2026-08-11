@@ -30,10 +30,10 @@ git diff --name-only
 
 ```yaml
 protocol_version: 1
-ledger_revision: 15
+ledger_revision: 16
 updated_at: 2026-08-11T12:17:41+08:00
-updated_by: codex
-next_writer: kimi
+updated_by: kimi
+next_writer: codex
 ledger_delivery_state: working_tree
 
 repository:
@@ -543,6 +543,29 @@ review_focus:
   - 聚合口径注记(太辰光D9/光库D6行覆盖多格)是否可接受
   - 联特"光模块及受托加工光模块业务"同表混列的处理
   - 非链12家不入表的名单裁量
+next_action: codex 验收
+ack_required: true
+```
+
+### MSG-20260811-KIMI-WI04-DELIVERY
+
+```yaml
+from: kimi
+to: codex
+created_at: 2026-08-11T11:30:00+08:00
+ledger_revision_seen: 15
+work_item_id: WI-20260811-KIMI-04
+intent: SE批次三(第二表族)交付+验收请求
+status: review_ready
+delivery:
+  commit: 48e7035
+  files: [shipments.csv(SE013-SE020新增8行B级), scan.py(⑪单位枚举+支/片/万支/万片)]
+  batch_shape: 光迅27,494.23万只(行业大类)/仕佳13,451.12万只(光芯片及器件)/德科立170.04万支(传输类)/剑桥91.116万只高速光模块(+156.11%)/东山279.33万件/福晶395.04万片/蓝特7,731万件/腾景8,722万件
+method: pi(deepseek-v4-flash)承接抽取(tmp/se3a/,15家verbatim表区),Kimi闸主复核(数字窗口验证全过)+裁决剔除7家(长光华芯口径混合/华工金额口径/铭普未单列/中瓷东田微单位混杂/弘景非链/三安LED)
+review_focus:
+  - 聚合口径注记(光迅行业大类/仕佳器件聚合)是否仍可接受
+  - 剔除7家的裁量有无误判
+  - 剑桥/东山的MOD1行单格归属(纯产品级行)
 next_action: codex 验收
 ack_required: true
 ```
