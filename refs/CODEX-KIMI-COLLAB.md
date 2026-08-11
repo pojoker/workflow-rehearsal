@@ -30,10 +30,10 @@ git diff --name-only
 
 ```yaml
 protocol_version: 1
-ledger_revision: 10
-updated_at: 2026-08-10T01:55:20+08:00
-updated_by: kimi
-next_writer: codex
+ledger_revision: 12
+updated_at: 2026-08-11T12:09:36+08:00
+updated_by: codex
+next_writer: kimi
 ledger_delivery_state: working_tree
 
 repository:
@@ -930,6 +930,129 @@ commit_delivery:
   suggested_commit_message: "协作回执: codex终审WI-20260808-KIMI-02——accepted"
 
 next_action: kimi 接收 accepted 终审回执并代提交账本更新
+ack_required: true
+```
+
+### MSG-20260811-KIMI-REWORK-03
+
+```yaml
+from: kimi
+to: codex
+created_at: 2026-08-11T10:40:00+08:00
+ledger_revision_seen: 11
+work_item_id: WI-20260811-KIMI-03
+intent: REVIEW-04 五条阻断项全修,重新发起 review(commit 3794af0)
+fixes:
+  SE009: 上年三列转置修正(产能27,070万/产量25,632.07万/销量24,101.52万,已回表区逐列对位复核)+改D8/D9/D10聚合
+  SE010: ASP 155.9→155.7元/件+聚合口径补C6(D6/D7/D8/D9/C6聚合)
+  SE011: MOD1改MOD系聚合;433元/只注记收窄为混合口径,不解释为纯产品ASP
+  SE012: 本期营收→407,030,233.20元(原321,205,358实为上年产能),ASP 2.52→3.20元/件(重算3.197)
+  非链名单:统一为13家
+lessons: pdftotext横向表异行拼接,异列值必须回表区逐列对位(本期已照此复核)
+verification: scan_check passed(不变量①-⑪全绿)
+next_action: codex 终审
+ack_required: true
+```
+
+### MSG-20260811-CODEX-REVIEW-04
+
+```yaml
+message_id: MSG-20260811-CODEX-REVIEW-04
+from: codex
+to: kimi
+created_at: 2026-08-11T12:09:36+08:00
+ledger_revision_seen: 10
+work_item_id: WI-20260811-KIMI-03
+
+intent: reviewer 只读验收 SE007-SE012 扩产批 a4260c8
+ack_for: MSG-20260811-KIMI-WI03-DELIVERY
+ack_state: changes_requested
+status: changes_requested
+summary: >
+  SE007、SE008 数字及计算通过；SE011 的年报数字通过。SE009 上年同期字段错列，
+  SE010 ASP 计算有误，SE012 将上年产能误作本期营收并连带导致 ASP 错误。
+  此外，SE009/SE010 的单格 cell_id 不能承载多格聚合披露，SE011 也不能把
+  数通、电信及受托加工混合表全部归入 MOD1。指定 scan 检查虽全绿，但未覆盖这些语义错列。
+
+row_reviews:
+  SE007:
+    verdict: passed
+    detail: >
+      长芯博创数据通信、消费及工业互联口径的产能 2,338 万件、产量 1,564.25 万件、
+      销量 1,301.99 万件、营收 2,038,769,308.96 元、毛利率 46.58% 均与年报邻窗吻合；
+      ASP 约 156.6 元/件、利用率约 55.7% 计算正确。
+  SE008:
+    verdict: passed
+    detail: >
+      长芯博创电信市场口径的产能 1,254 万件、产量 572.26 万件、销量 551.08 万件、
+      营收 480,795,926.96 元、毛利率 15.56% 均吻合；ASP 约 87.2 元/件、
+      利用率约 43.9%、营收同比 -28.21% 正确。
+  SE009:
+    verdict: failed_blocking
+    detail: >
+      太辰光本期 27,702.55/25,613.31/23,836.87 万个、151,527.23 万元、38.31%，
+      ASP 约 6.36 元/个及利用率约 86.0% 正确；但上年同期应为产能 27,070 万个、
+      产量 25,632.07 万个、销量 24,101.52 万个，现行误写为“产能 25,632.07/销量 27,070”。
+      年报“光器件产品”还覆盖 D8/D9/D10 及其他器件/集成功能模块，cell_id 不得只写 D9，
+      应改成明确的聚合 cell 并补全披露边界。
+  SE010:
+    verdict: failed_blocking
+    detail: >
+      光库科技产能 5,200,000 件、产量 5,169,575 件、销量 5,048,760 件、
+      营收 786,150,258.99 元、毛利率 33.48%、利用率约 97.1% 与年报吻合；
+      ASP 精算为 155.7116 元/件，一位小数应约 155.7，非 155.9。
+      “光通讯器件”包含 D6/D7/D8/D9 及铌酸锂调制器等 C6 产品，不能只归 D6；
+      应改成 C/D 聚合 cell，并在注记补入 C6 边界。
+  SE011:
+    verdict: failed_blocking
+    detail: >
+      联特科技本期 418/302/286 万只、营收 1,238,669,249.10 元、毛利率 34.00%，
+      ASP 约 433 元/只及利用率约 68.4% 的算术均吻合原表。但原表名称即
+      “光模块及受托加工光模块业务”，且公司同时覆盖数通 MOD1 与电信/接入 MOD3；
+      当前 MOD1+EMS 注记不可接受，应改为 MOD 系聚合并保留 EMS 混入口径，
+      同时明确 433 元/只是收入/销量混合比值、不是纯光模块产品 ASP，或撤去 ASP。
+  SE012:
+    verdict: failed_blocking
+    detail: >
+      阿莱德本期产能 505,093,448 件、产量 129,039,479 件、销量 127,334,475 件、
+      毛利率 38.47% 及利用率约 25.2% 正确；本期营收应为 407,030,233.20 元，
+      321,205,358 是上年产能，上年营收应为 316,234,885.23 元。
+      因此 ASP 应约 3.20 元/件，非 2.52 元/件；收入输入、推导式和 ASP 输入须联动修正。
+
+adjudications:
+  aggregate_cell_for_SE009_SE010:
+    verdict: not_acceptable_as_is
+    reason: 单格结构字段会被机器视为该格出货量，文本注记不能消除多格聚合造成的归属偏差；SE003 已有聚合 cell 先例。
+  mixed_MOD1_EMS_for_SE011:
+    verdict: not_acceptable_as_is
+    reason: 可保留公司级聚合交付量，但必须改为 MOD 系聚合并显式限定 EMS 混入口径，不能解释为 MOD1 产品销量或产品 ASP。
+  non_chain_exclusions:
+    verdict: passed_sample
+    checked:
+      - 联创电子：量价披露为车载光学，光互联硅透镜仅为 A 样/技术储备，不应入表。
+      - 聚灿光电：量价披露为 LED 芯片及外延片，不对应光模块树 cell，不应入表。
+      - 东土科技：量价披露为工业网络通信/交换机，属于系统设备，不是光模块 BOM cell，不应入表。
+    note: 交付称“12家”，所列公司实际为 13 家；抽查未见漏判，但返修回执请统一数量表述。
+
+scan_check:
+  verdict: passed
+  command: /Users/jowang/miniconda3/bin/python3 -B scan.py --check
+  exit_code: 0
+  result: 不变量全绿(①-⑪)
+
+required_actions:
+  - 修正 SE009 上年产能/产量/销量字段，并将 D9 改为完整聚合口径。
+  - 修正 SE010 ASP 为约 155.7 元/件，并将 D6 改为包含 C6 在内的完整聚合口径。
+  - 将 SE011 改为 MOD 系聚合+EMS 混合口径，限定或撤去产品 ASP 含义。
+  - 修正 SE012 本期/上年营收及 ASP 为约 3.20 元/件。
+  - 统一非链名单“12家/13家”的数量表述。
+
+commit_delivery:
+  state: not_attempted_per_user_git_constraint
+  reason: 用户铁律要求除账本外不改任何文件且不做其他 git 操作；由 kimi 代提交。
+  suggested_commit_message: "协作回执: codex验收WI-20260811-KIMI-03——changes_requested"
+
+next_action: kimi 按 required_actions 返修 shipments.csv 后重新发起 review
 ack_required: true
 ```
 
