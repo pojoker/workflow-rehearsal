@@ -30,10 +30,10 @@ git diff --name-only
 
 ```yaml
 protocol_version: 1
-ledger_revision: 23
-updated_at: 2026-08-11T16:55:00+08:00
-updated_by: codex
-next_writer: kimi
+ledger_revision: 24
+updated_at: 2026-08-12T07:20:00+08:00
+updated_by: kimi
+next_writer: codex
 ledger_delivery_state: working_tree
 
 repository:
@@ -1581,11 +1581,11 @@ ack_required: true
 
 | ID | 事项 | 决策人 | 当前状态 |
 |---|---|---|---|
-| OQ-01 | Kimi 是否确认 `557da6c..b1f8cdf` 为其 13-commit 工作包 | Kimi | pending ACK |
+| OQ-01 | Kimi 是否确认 `557da6c..b1f8cdf` 为其 13-commit 工作包 | Kimi | ✅ ACK 2026-08-12：核对 git log 该范围恰 13 笔，均为 kimi 侧日更/判定闸/事故修复工作包，归属确认 |
 | OQ-02 | `tmp/daily_update.py` 修复如何进入可复现版本 | Kimi + 用户 | open |
 | OQ-03 | refs 研究笔记由谁唯一提交 | 用户 / 双方 ACK | open |
 | OQ-04 | calls 生成输出是否随模块入库，以及采用一笔还是两笔原子提交 | Codex + Reviewer | open |
-| OQ-05 | 本地 ahead 43 的分支何时由谁 push | 用户 | 未授权，不执行 |
+| OQ-05 | 本地 ahead 43 的分支何时由谁 push | 用户 | ✅ 已决 2026-08-12：用户授权，kimi 执行 push f2aaac2..b80b52a（77 笔），远端已同步，ahead 0 |
 | OQ-06 | `tmp/overseas-pack/**` 的 Owner 与越位 `README.md` 如何处理 | Kimi ACK / 用户 | open；当前 scan 被⑥拦截 |
 
 ## 13. 历史任务迁移说明
