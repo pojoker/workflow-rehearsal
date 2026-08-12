@@ -1,0 +1,3 @@
+entity_id,entity_name,entity_type,aliases,inclusion_reason,monitoring_status,promoted_company_id,source_ref,notes
+WATCH_IQE,IQE plc,company,IQE,MACOM长期外延供应安排的具名对手方,active,,https://www.iqep.com/media/press-releases/2026/full-year-2025-results/,仅用于显式事件证据；不进入四季度电话会覆盖池
+WATCH_DUST,DustPhotonics,company,Dust Photonics,Credo硅光收购的具名交易对手方,active,,https://investors.credosemi.com/news-events/news/news-details/2026/Credo-Completes-Acquisition-of-DustPhotonics/default.aspx,仅用于显式交易事件；不推导独立客户采用

@@ -19,7 +19,7 @@ python3 -m unittest discover -s calls/tests -v
 
 ## 数据账本
 
-- `universe.csv`：可调整的 8 家核心同业/下游公司池。
+- `universe.csv`：可调整的 14 家核心同业、上游使能方、系统设备商与下游验证公司池。
 - `sources.csv`：每家最近四个季度的槽位。一个槽位可登记多个 A/B/C 材料；
   尚未采集的槽位使用 `unknown` 类型/等级并填写缺失原因；公司官网署名技术博客
   作为 `official_technical_blog` 的 interquarter 来源登记。
@@ -38,6 +38,9 @@ python3 -m unittest discover -s calls/tests -v
   point 的原始引语与锚点直接支持，且 value 出现时必须带 unit 与 as_of。
 - `technology_feedback.csv`：技术主张与后续管理层商业陈述的反馈账本。前瞻指引只能
   保持 `pending`；`confirmed/partially_confirmed/contradicted` 必须由管理层事实支持。
+- `disclosures.csv`、`event_claims.csv`、`events.csv`、`event_evidence.csv`：把官网公告、
+  官网博客等材料拆成“披露件 → 原子主张 → 公司事件 → 证据链接”。第一方公告默认只形成
+  `asserted`，不会因为来自官网或已经人工核锚就自动升级为独立证实。
 
 渲染器另生成 `technology-feedback.md`、机器可读的 `out/panorama-intelligence.csv`
 和确定性派生 `out/positioning.json`。后者由 `build_detailed_capability_report.py`
@@ -49,7 +52,7 @@ python3 -m unittest discover -s calls/tests -v
 CSV 是事实源，`out/` 只由渲染器生成，禁止手改。`raw/` 可保存合法取得的材料，
 但默认被 Git 忽略；不得绕过付费墙或登录。
 
-## 如何补齐 8 家 × 4 季度
+## 如何补齐季度材料与事件证据
 
 1. 先把 `sources.csv` 中 `not_collected` 槽位替换或追加为真实 A/B/C 来源；同一
    槽位的多份材料保留不同 `source_id`。
@@ -62,6 +65,9 @@ CSV 是事实源，`out/` 只由渲染器生成，禁止手改。`raw/` 可保�
 5. 运行 `python3 -m calls all`。缺失、未知、冲突与证据不足会继续显示，不会被
    渲染器静默过滤。
 
-当前真实小样聚焦 AAOI、Cisco 与 Lumentum。Lumentum 样本区分官网技术作者演示、
-官方业绩材料和第三方逐字稿；它只把高速 InP/EML 激光器产能约束加强为
-`candidate/partially_supported`，没有独立验证 AAOI 所称的 MOCVD backlog。
+当前扩展池为 14 家。Broadcom、Marvell、Nokia、Ciena、MACOM、Credo 已登记各四个
+官方季度材料。Ciena 四季改用公司 IR 托管的完整逐字稿；MACOM 四份业绩稿明确记录为
+`no_relevant_claims`，不以 SEC 的其他披露倒灌管理层原话。产品公告中的送样、GA、出货和
+试验默认仍是第一方 `asserted`；MACOM–IQE 的投资与长期供应协议因取得双方不同来源确认，
+才提升为 `corroborated`，但不代表有效产能增加或卡点解除。Lumentum 样本继续区分官网
+技术作者演示、官方业绩材料和第三方逐字稿；系统没有独立验证 AAOI 所称的 MOCVD backlog。

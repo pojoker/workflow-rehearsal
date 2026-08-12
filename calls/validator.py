@@ -8,6 +8,7 @@ import re
 from pathlib import Path
 from urllib.parse import urlparse
 
+from .event_intelligence import EventLedgerError, derive_event_projection, load_event_facts
 from .positioning import SUPPORTED_COMPARATORS, derive_positioning, load_positioning_facts, scan_forbidden_words
 from .schema import ENUMS, FILES
 from .workbuddy import render_all_positioning_blocks
@@ -344,10 +345,15 @@ def validate(project_root: Path) -> list[str]:
     if hits:
         raise ValidationError(f"workbuddy positioning block contains forbidden business words: {hits}")
 
+    try:
+        event_projection = derive_event_projection(load_event_facts(project_root))
+    except EventLedgerError as exc:
+        raise ValidationError(f"event ledger: {exc}") from exc
+
     return [
         f"validated {len(universe)} companies / {len(sources)} sources / {len(claims)} claims",
         f"validated {len(themes)} themes / {len(tables['validations.csv'])} cross-checks / {len(tables['commitments.csv'])} commitments / {len(tables['technology_feedback.csv'])} technology feedback rows",
-        "canonical references are closed; no canonical file was written",
+        f"event ledger validated / {len(event_projection['radar_events'])} reviewed radar events; canonical references are closed; no canonical file was written",
     ]
 
 

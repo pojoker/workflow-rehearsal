@@ -7,3 +7,9 @@ NVDA,NVIDIA,downstream,AI集群架构与互连需求方,yes
 ANET,Arista,downstream,数据中心交换网络需求验证方,yes
 CSCO,Cisco,downstream,交换系统及光学产品需求验证方,yes
 META,Meta,downstream,超大规模数据中心部署与资本开支验证方,yes
+AVGO,Broadcom,upstream_enabler,交换ASIC、SerDes、光DSP、EML与CPO上游平台,yes
+MRVL,Marvell,upstream_enabler,光DSP、硅光、交换芯片与定制互连平台,yes
+NOK,Nokia,system_vendor,光传输、相干可插拔与AI数据中心网络系统方,yes
+CIEN,Ciena,system_vendor,相干光系统、DCI与CPO光引擎观察方,yes
+MTSI,MACOM,upstream_enabler,高速驱动器、TIA、CW激光器与光电模拟器件方,yes
+CRDO,Credo,upstream_enabler,SerDes、AEC、光DSP与高速光收发器平台,yes

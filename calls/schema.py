@@ -47,10 +47,36 @@ FILES = {
         "feedback_id", "technology_claim_id", "commercial_claim_id", "theme_id",
         "feedback_status", "evidence_status", "stage_before", "stage_after", "rationale",
     ),
+    "watch_entities.csv": (
+        "entity_id", "entity_name", "entity_type", "aliases", "inclusion_reason",
+        "monitoring_status", "promoted_company_id", "source_ref", "notes",
+    ),
+    "disclosures.csv": (
+        "disclosure_id", "publisher_entity_id", "legacy_source_id", "title",
+        "disclosure_type", "content_class", "provenance_class", "canonical_url",
+        "local_path", "content_hash", "origin_group", "published_at", "updated_at",
+        "discovered_at", "retrieved_at", "reviewed_at", "retrieval_status",
+        "processing_status", "review_scope", "notes",
+    ),
+    "event_claims.csv": (
+        "event_claim_id", "legacy_claim_id", "disclosure_id", "claimant_entity_id",
+        "claimant_role", "statement_kind", "quote", "anchor", "summary",
+        "review_status", "reviewed_at", "notes",
+    ),
+    "events.csv": (
+        "event_id", "program_id", "event_category", "lifecycle_stage", "event_status",
+        "primary_subject_id", "counterparty_ids", "theme_ids", "occurred_start",
+        "occurred_end", "date_precision", "previous_event_id", "site_country",
+        "target_market", "policy_jurisdiction", "summary", "notes",
+    ),
+    "event_evidence.csv": (
+        "evidence_id", "event_id", "event_claim_id", "relationship",
+        "independence_class", "origin_group", "notes",
+    ),
 }
 
 ENUMS = {
-    "role": {"core_peer", "downstream"},
+    "role": {"core_peer", "upstream_enabler", "system_vendor", "downstream"},
     "enabled": {"yes", "no"},
     "source_scope": {"quarterly", "interquarter"},
     "material_type": {"unknown", "transcript", "prepared_remarks", "earnings_presentation", "webcast_transcript", "earnings_release", "official_release", "official_technical_blog"},
@@ -70,6 +96,22 @@ ENUMS = {
     "commitment_status": {"pending", "fulfilled", "partially_fulfilled", "delayed", "withdrawn", "not_observed"},
     "match_stage": {"node_overlap", "mechanism_match", "metric_match", "customer_validation", "volume_validation"},
     "feedback_status": {"confirmed", "partially_confirmed", "not_mentioned", "contradicted", "pending"},
+    "entity_type": {"company", "regulator", "government", "customer", "partner", "other"},
+    "monitoring_status": {"active", "paused", "promoted"},
+    "disclosure_type": {"official_release", "regulatory_filing", "technical_blog", "product_page", "datasheet", "customer_release", "government_record", "media", "other"},
+    "content_class": {"technical_disclosure", "demonstration_disclosure", "corporate_narrative", "commercial_disclosure", "regulatory_record"},
+    "provenance_class": {"first_party", "counterparty", "regulator", "government", "third_party", "unknown"},
+    "retrieval_status": {"discovered", "retrieved", "unavailable", "failed"},
+    "processing_status": {"unprocessed", "candidate_extracted", "anchor_reviewed", "no_relevant_claims", "rejected"},
+    "event_claimant_role": {"management", "corporate_author", "corporate_disclosure", "customer", "counterparty", "regulator", "other"},
+    "event_statement_kind": {"fact_assertion", "forward_looking", "technical_claim", "technical_demo", "corporate_narrative"},
+    "event_review_status": {"candidate", "anchor_reviewed", "rejected"},
+    "event_category": {"product_stage", "capacity_constraint", "commercial_adoption", "capital_relationship", "supply_chain_arrangement", "policy_market_access"},
+    "lifecycle_stage": {"announced", "demonstrated", "sampling", "qualifying", "volume_order", "first_shipment", "ramping", "scaled", "delayed", "withdrawn", "not_applicable"},
+    "event_status": {"asserted", "corroborated", "contradicted", "corrected", "withdrawn"},
+    "date_precision": {"exact", "month", "quarter", "window", "unknown"},
+    "event_relationship": {"reports", "supports", "contradicts", "corrects", "withdraws"},
+    "independence_class": {"same_origin", "first_party", "counterparty", "regulator", "observable_result", "third_party"},
 }
 
 PANORAMA_FIELDS = (

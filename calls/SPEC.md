@@ -18,8 +18,8 @@
 
 ### MVP 范围
 
-- 公司类型：核心同业与下游验证方；允许加入现有公司宇宙之外的高信息密度公司。
-- 目标公司池：Coherent、Lumentum、Applied Optoelectronics、Fabrinet、NVIDIA、Arista、Cisco、Meta。名单是 MVP 默认值，可由数据文件调整。
+- 公司类型：核心同业、上游使能方、系统设备商与下游验证方；允许加入现有公司宇宙之外的高信息密度公司。
+- 当前公司池：Coherent、Lumentum、Applied Optoelectronics、Fabrinet、NVIDIA、Arista、Cisco、Meta，以及扩展层的 Broadcom、Marvell、Nokia、Ciena、MACOM、Credo。名单由数据文件控制。
 - 时间：每家公司最近四个已披露季度；缺失必须显式登记原因。
 - 信源：
   - A：公司官网或监管披露的 transcript、prepared remarks、正式附件；
@@ -36,7 +36,7 @@
 - 不把电话会陈述直接升级为公司能力点、供货边或产业结构事实。
 - 不强制给整个行业一个统一阶段标签。
 - 不做投资评级、交易建议或综合技术评分。
-- MVP 不要求 32 个季度槽位全部完成深度人工判定；先证明流程与真实样例可用。
+- 季度槽位登记与深度人工判定分开：14 家均登记四个季度，但材料可用不等于已经完成全文提取或电话会逐字稿覆盖。
 
 ## 3. 角色与权限
 
@@ -91,6 +91,8 @@
 | `commitments.csv` | 前瞻承诺、期限、兑现证据与状态 |
 | `solution_links.csv` | 卡点所需能力与现有能力点的潜在匹配及缺证 |
 | `technology_feedback.csv` | 公司技术作者主张与管理层商业事实/前瞻之间的反馈状态 |
+| `disclosures.csv` / `event_claims.csv` | 官网公告、博客等披露件及其人工锚定的原子主张 |
+| `events.csv` / `event_evidence.csv` | 公司事件、成熟阶段、证据来源与独立性 |
 | `raw/` | 可合法保存的原始材料；第三方全文缓存默认 Git 忽略 |
 | `out/` | 派生报告，禁止作为事实源手改 |
 
@@ -121,6 +123,13 @@
 ### 差异比较
 
 仅在同代际、同应用、同形态之间比较；按架构、性能、可靠性/良率、成本、量产交付、商业适配六维记录。无共同基准的“领先/首创”只记公司主张。
+
+### 显式关系事件
+
+投资、收购与长期供应安排只能由明确披露建事件，主体、对手方、日期和证据 origin 分列。
+`supply_chain_arrangement` 只接受已披露的长期供应协议、产能预留或正式采购安排；它不自动
+生成 canonical 供货边，也不证明有效产能、实际采购或卡点解除。单方公告保持 `asserted`；
+只有不同 origin 的对手方、监管材料或可观察结果支持后，才可提升为 `corroborated`。
 
 ### 国内公司潜在匹配
 
@@ -158,7 +167,7 @@ MVP 模块：初始化/示例数据、CSV schema 校验器、报告渲染器、�
 4. 每条正式 claim 可追溯；分析师提问不能被渲染为管理层确认。
 5. validator 能拦截断裂引用、非法枚举、缺失来源锚、兑现状态无证据、错误现有 point 引用。
 6. `python3 scan.py --check` 仍通过，证明现有账本未被破坏。
-7. README 给出一条命令完成校验和渲染，并列出如何继续补齐 8 家 × 4 季度。
+7. README 给出一条命令完成校验和渲染，并说明如何继续补齐季度材料与事件证据。
 
 ## 10. 风险与开放问题
 
@@ -170,4 +179,4 @@ MVP 模块：初始化/示例数据、CSV schema 校验器、报告渲染器、�
 
 ## 11. 开发工包
 
-CodeBuddy 在 `calls/` 内实现 schema、validator、renderer、CLI、测试与真实小样；允许新增根 README 的简短入口，但不得修改现有 canonical 数据及 `out/`。Codex 负责审查契约符合性、运行测试、检查数据血缘与最终验收。
+实现方在 `calls/` 内维护 schema、validator、renderer、CLI、测试与真实样本；允许新增根 README 的简短入口，但不得修改现有 canonical 数据。Codex 负责审查契约符合性、运行测试、检查数据血缘与最终验收。

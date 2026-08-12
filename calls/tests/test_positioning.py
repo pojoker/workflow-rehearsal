@@ -560,9 +560,11 @@ class PositioningTest(unittest.TestCase):
 
     # ---- 16/17. canonical integrity, output count and legacy report ----
 
-    def test_rendered_output_is_exactly_15_files(self) -> None:
+    def test_rendered_output_count_tracks_enabled_company_pool(self) -> None:
         paths = render(self.root)
-        self.assertEqual(len(paths), 15)
+        with (self.root / "calls" / "universe.csv").open(encoding="utf-8-sig", newline="") as handle:
+            company_count = sum(1 for _ in csv.DictReader(handle))
+        self.assertEqual(len(paths), company_count + 8)
         self.assertIn(self.root / "calls" / "out" / "positioning.json", paths)
 
     def test_legacy_solution_link_report_still_exists(self) -> None:

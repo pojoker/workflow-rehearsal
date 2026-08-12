@@ -9,6 +9,7 @@ import shutil
 from collections import defaultdict
 from pathlib import Path
 
+from .event_intelligence import derive_event_projection, load_event_facts
 from .positioning import derive_positioning, load_positioning_facts
 from .schema import FILES, PANORAMA_FIELDS
 
@@ -178,7 +179,15 @@ def render(project_root: Path) -> list[Path]:
     )
     written.append(positioning_path)
 
-    index = ["# 海外电话会与官网技术情报层 MVP", "", "数据源仅为 `calls/*.csv`；本目录全部由渲染器重建。", "", "## 输出", "", "- [跨公司议题矩阵](theme-matrix.md)", "- [受限需求链](limited-demand-chains.md)", "- [承诺—兑现账本](commitments.md)", "- [技术陈述—商业反馈](technology-feedback.md)", "- [全景情报投影（CSV）](panorama-intelligence.csv)", "- [国内能力定位投影（JSON）](positioning.json)", "", "## 公司季度卡", ""]
+    event_path = out / "event-intelligence.json"
+    event_projection = derive_event_projection(load_event_facts(project_root))
+    event_path.write_text(
+        json.dumps(event_projection, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    written.append(event_path)
+
+    index = ["# 海外电话会与官网技术情报层 MVP", "", "数据源仅为 `calls/*.csv`；本目录全部由渲染器重建。", "", "## 输出", "", "- [公司事件雷达（JSON）](event-intelligence.json)", "- [跨公司议题矩阵](theme-matrix.md)", "- [受限需求链](limited-demand-chains.md)", "- [承诺—兑现账本](commitments.md)", "- [技术陈述—商业反馈](technology-feedback.md)", "- [全景情报投影（CSV）](panorama-intelligence.csv)", "- [国内能力定位投影（JSON）](positioning.json)", "", "## 公司季度卡", ""]
     for company in sorted(tables["universe.csv"], key=lambda row: row["company_name"]):
         index.append(f"- [{company['company_name']}](companies/{company['company_id'].lower()}-{_slug(company['company_name'])}.md)")
     index_path = out / "README.md"
@@ -247,6 +256,6 @@ def _write_panorama(
             "as_of": max((sources[source_id]["accessed_date"] for source_id in source_ids if sources[source_id]["accessed_date"]), default=""),
         })
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=PANORAMA_FIELDS)
+        writer = csv.DictWriter(handle, fieldnames=PANORAMA_FIELDS, lineterminator="\n")
         writer.writeheader()
         writer.writerows(output)
