@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import csv
 import html
+import json
 import re
 from collections import defaultdict
 from pathlib import Path
@@ -32,6 +33,8 @@ from reportlab.platypus import (
 )
 
 import participation
+from calls.renderer import render as render_calls
+from calls.validator import validate as validate_calls
 from calls.workbuddy import render_intelligence_section
 
 
@@ -42,6 +45,7 @@ MACRO_EVIDENCE_CSV = ROOT / "macro_evidence.csv"
 EDGES_CSV = ROOT / "edges.csv"
 CALLS_INTELLIGENCE_CSV = ROOT / "calls" / "out" / "panorama-intelligence.csv"
 CALLS_POSITIONING_JSON = ROOT / "calls" / "out" / "positioning.json"
+CALLS_EVENT_JSON = ROOT / "calls" / "out" / "event-intelligence.json"
 DEFAULT_PDF = ROOT / "output" / "pdf" / "光模块产业链公司能力明细.pdf"
 DEFAULT_TEMPLATE = Path(
     "/Users/jowang/Workbuddy/2026-07-26-11-49-54/"
@@ -1203,7 +1207,27 @@ def knowledge_section() -> str:
 
 
 def calls_intelligence_section(path: Path = CALLS_INTELLIGENCE_CSV) -> str:
-    return render_intelligence_section(path, positioning_path=CALLS_POSITIONING_JSON)
+    return render_intelligence_section(
+        path,
+        positioning_path=CALLS_POSITIONING_JSON,
+        event_path=CALLS_EVENT_JSON,
+    )
+
+
+def assert_event_intelligence_html(output_path: Path, event_path: Path = CALLS_EVENT_JSON) -> None:
+    """Fail the atomic build if reviewed event evidence silently disappears."""
+    source = output_path.read_text(encoding="utf-8")
+    required = ("本期公司事件", "数据版本：")
+    missing = [marker for marker in required if marker not in source]
+    with event_path.open(encoding="utf-8") as handle:
+        projection = json.load(handle)
+    for event in projection.get("radar_events", []):
+        for evidence in event.get("evidence", []):
+            url = evidence.get("url")
+            if url and f'href="{html.escape(url, quote=True)}"' not in source:
+                missing.append(f"source link for {event.get('event_id')}")
+    if missing:
+        raise RuntimeError(f"event intelligence HTML acceptance failed: {', '.join(missing)}")
 
 
 KNOWLEDGE_CSS = """
@@ -1230,6 +1254,17 @@ CALLS_CSS = """
   .calls-positioning{font-size:11px;line-height:1.5;background:#f0fdf4;border-left:3px solid #22c55e;padding:7px 9px;margin-top:7px}
   .calls-positioning>ul{margin:5px 0 0 14px;padding:0}
   .calls-positioning li{margin:4px 0}
+  .event-radar{margin:14px 0 20px}
+  .event-policy,.event-coverage{font-size:11.5px;color:var(--muted);margin:6px 0}
+  .event-list{display:grid;gap:10px;margin:10px 0}
+  .event-card{border:1px solid #c7d2fe;border-radius:12px;padding:12px;background:#fff}
+  .event-head{display:flex;align-items:center;gap:8px;font-size:13px;flex-wrap:wrap}
+  .event-kind,.event-status{font-size:10.5px;padding:3px 7px;border-radius:999px;background:#e0e7ff;color:#3730a3}
+  .event-status.asserted{background:#fff7ed;color:#9a3412}
+  .event-status.corroborated{background:#ecfdf5;color:#047857}
+  .event-meta{font-size:11.5px;color:var(--muted);margin:7px 0}
+  .event-card details{font-size:11.5px;margin-top:6px;background:#f8fafc;padding:7px 9px;border-radius:8px}
+  .event-card summary{cursor:pointer;color:#1d4ed8}
 """
 
 
@@ -1316,18 +1351,28 @@ def main() -> None:
     parser.add_argument("--pdf-output", type=Path, default=DEFAULT_PDF)
     parser.add_argument("--html-template", type=Path, default=DEFAULT_TEMPLATE)
     parser.add_argument("--html-output", type=Path, default=DEFAULT_HTML)
+    parser.add_argument(
+        "--html-only",
+        action="store_true",
+        help="validate and rebuild calls projections plus HTML without rewriting CSV/PDF",
+    )
     args = parser.parse_args()
 
+    validate_calls(ROOT)
+    render_calls(ROOT)
     rows = granular_rows()
-    write_capability_csv(args.csv_output, rows)
-    build_pdf(args.pdf_output, rows)
+    if not args.html_only:
+        write_capability_csv(args.csv_output, rows)
+        build_pdf(args.pdf_output, rows)
     build_html(args.html_template, args.html_output, rows)
+    assert_event_intelligence_html(args.html_output)
     print(
         f"companies={len({row['公司'] for row in rows})} "
         f"capabilities={len(rows)} nodes={len({row['cell_id'] for row in rows})}"
     )
-    print(args.csv_output)
-    print(args.pdf_output)
+    if not args.html_only:
+        print(args.csv_output)
+        print(args.pdf_output)
     print(args.html_output)
 
 
