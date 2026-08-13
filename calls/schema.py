@@ -57,6 +57,11 @@ FILES = {
         "source_ref", "verification_status", "promoted_entity_id",
         "reviewed_at", "notes",
     ),
+    "company_tier_reviews.csv": (
+        "review_id", "candidate_id", "period_label", "published_date",
+        "source_ref", "material_type", "signal_class", "signal_summary",
+        "reviewed_at", "notes",
+    ),
     "entity_relationships.csv": (
         "relationship_id", "subject_entity_id", "object_entity_id",
         "relationship_type", "effective_from", "effective_to", "source_ref",
@@ -113,6 +118,9 @@ ENUMS = {
     "candidate_priority": {"P1", "P2", "P3"},
     "candidate_verification_status": {
         "discovered", "source_verified", "promotion_ready", "promoted", "rejected",
+    },
+    "tier_review_signal_class": {
+        "direct_optical", "adjacent_segment", "no_relevant_signal",
     },
     "entity_relationship_type": {
         "parent_of", "subsidiary_of", "acquired_by", "brand_of",

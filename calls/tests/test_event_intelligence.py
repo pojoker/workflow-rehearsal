@@ -399,6 +399,57 @@ class EventIntelligenceTest(unittest.TestCase):
         with self.assertRaisesRegex(EventLedgerError, "known promoted_entity_id"):
             load_event_facts(self.root)
 
+    def test_candidate_promotion_requires_two_formal_period_reviews_with_signal(self) -> None:
+        self.append("company_candidates.csv", {
+            "candidate_id": "CAND_TEST",
+            "entity_name": "Test Photonics",
+            "entity_type": "company",
+            "suggested_role": "upstream_enabler",
+            "suggested_tier": "quarterly",
+            "priority": "P2",
+            "capability_scope": "C4",
+            "inclusion_reason": "test fixture",
+            "source_ref": "https://example.com/investors",
+            "verification_status": "promotion_ready",
+            "reviewed_at": "2026-08-13",
+        })
+        with self.assertRaisesRegex(EventLedgerError, "needs two formal tier reviews"):
+            load_event_facts(self.root)
+        review = {
+            "candidate_id": "CAND_TEST",
+            "published_date": "2026-08-01",
+            "source_ref": "https://example.com/results-q2",
+            "material_type": "regulatory_filing",
+            "signal_class": "no_relevant_signal",
+            "signal_summary": "reviewed full filing; no optical signal",
+            "reviewed_at": "2026-08-13",
+        }
+        self.append("company_tier_reviews.csv", {
+            **review, "review_id": "TR_TEST_Q2", "period_label": "2026Q2",
+        })
+        with self.assertRaisesRegex(EventLedgerError, "needs two formal tier reviews"):
+            load_event_facts(self.root)
+        self.append("company_tier_reviews.csv", {
+            **review,
+            "review_id": "TR_TEST_Q1",
+            "period_label": "2026Q1",
+            "published_date": "2026-05-01",
+            "source_ref": "https://example.com/results-q1",
+        })
+        with self.assertRaisesRegex(EventLedgerError, "lacks optical or adjacent signal"):
+            load_event_facts(self.root)
+        self.mutate("company_tier_reviews.csv", "TR_TEST_Q1", {
+            "signal_class": "direct_optical",
+            "signal_summary": "formal filing contains an optical product signal",
+        })
+        facts = load_event_facts(self.root)
+        self.assertEqual(len(facts["company_tier_reviews"]), 22)
+        self.mutate("company_tier_reviews.csv", "TR_TEST_Q1", {
+            "material_type": "official_technical_blog",
+        })
+        with self.assertRaisesRegex(EventLedgerError, "requires formal disclosure material"):
+            load_event_facts(self.root)
+
     def test_entity_relationships_are_time_aware_and_closed_over_entities(self) -> None:
         fixture = {
             "relationship_id": "REL_TEST",

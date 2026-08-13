@@ -23,6 +23,8 @@ python3 -m unittest discover -s calls/tests -v
 - `company_candidates.csv`：尚未晋级的发现候选。候选可以完成一手来源核验，但不进入
   公司时间线、主事件雷达或四季度覆盖率；只有人工批准后才迁移到 `universe.csv` 或
   `watch_entities.csv`。
+- `company_tier_reviews.csv`：候选逐期正式披露复核。至少两个不同披露期且存在直接光学或
+  邻近业务信号，才允许进入 `promotion_ready/promoted`；产品博客不能代替正式材料。
 - `watch_entities.csv`：按事件持续监控、但不承担四季度材料义务的实体。
 - `entity_relationships.csv`：带生效时间的一手来源实体关系，用于母子公司、品牌、并购、
   前身和业务承接去重；关系不生成 canonical 供货边，也不把品牌视为第二个经营主体。

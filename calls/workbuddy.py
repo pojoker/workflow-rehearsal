@@ -126,7 +126,9 @@ def render_event_radar(projection: dict) -> str:
         f"（四槽 {esc(coverage.get('four_slot_complete_count', 0))} / "
         f"四槽均可用 {esc(coverage.get('four_available_slot_complete_count', 0))}） · "
         f"事件监控 {esc(coverage.get('active_watch_entity_count', 0))} 家 · "
-        f"发现候选 {candidate_text}"
+        f"发现候选 {candidate_text} · "
+        f"晋级复核 {esc(coverage.get('tier_reviewed_candidate_count', 0))} 家/"
+        f"{esc(coverage.get('tier_review_count', 0))} 期"
     )
     return (
         '<div class="event-radar">'

@@ -961,6 +961,248 @@
       "verification_status": "source_verified"
     }
   ],
+  "company_tier_reviews": [
+    {
+      "candidate_id": "CAND_AIXA",
+      "material_type": "regulatory_filing",
+      "notes": "欧洲等价正式材料",
+      "period_label": "2026H1",
+      "published_date": "2026-07-30",
+      "review_id": "TR_AIXA_2026H1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "半年报覆盖AsP与datacom laser设备需求",
+      "source_ref": "https://www.aixtron.com/investoren/publikationen/2026/englisch/Half-Year%20Group%20Financial%20Report_2026.pdf"
+    },
+    {
+      "candidate_id": "CAND_AIXA",
+      "material_type": "regulatory_filing",
+      "notes": "不将全部设备订单归因InP",
+      "period_label": "2026Q1",
+      "published_date": "2026-04-30",
+      "review_id": "TR_AIXA_2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "三个月报告持续披露光电子设备订单与展望",
+      "source_ref": "https://www.aixtron.com/investoren/publikationen/2026/englisch/3-Months-Report-2026.pdf"
+    },
+    {
+      "candidate_id": "CAND_ASMPT",
+      "material_type": "regulatory_filing",
+      "notes": "AI订单不能自动归因光子封装",
+      "period_label": "2026H1",
+      "published_date": "2026-07-29",
+      "review_id": "TR_ASMPT_2026H1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "adjacent_segment",
+      "signal_summary": "正式半年结果提供先进封装与AI设备需求信号",
+      "source_ref": "https://www.asmpt.com/site/assets/files/85463/asmpt_2026_q2_press_release.pdf"
+    },
+    {
+      "candidate_id": "CAND_ASMPT",
+      "material_type": "regulatory_filing",
+      "notes": "CPO展示与量产收入分开",
+      "period_label": "2026Q1",
+      "published_date": "2026-04-22",
+      "review_id": "TR_ASMPT_2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "adjacent_segment",
+      "signal_summary": "正式季度结果持续覆盖先进封装设备业务",
+      "source_ref": "https://www.asmpt.com/site/assets/files/85243/e0522_results_announcement_2026_q1.pdf"
+    },
+    {
+      "candidate_id": "CAND_AXT",
+      "material_type": "earnings_release",
+      "notes": "2026Q2缺口不影响历史两期晋级复核",
+      "period_label": "2025Q4",
+      "published_date": "2026-02-19",
+      "review_id": "TR_AXTI_2025Q4",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "披露InP出口许可与当年扩产目标",
+      "source_ref": "https://investors.axt.com/Investors/news/news-details/2026/AXT-Inc--Announces-Fourth-Quarter-and-Fiscal-Year-2025-Financial-Results/default.aspx"
+    },
+    {
+      "candidate_id": "CAND_AXT",
+      "material_type": "earnings_release",
+      "notes": "第一方经营披露；出口许可与需求需分开",
+      "period_label": "2026Q1",
+      "published_date": "2026-04-30",
+      "review_id": "TR_AXTI_2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "披露InP对AI基础设施的需求与产能进展",
+      "source_ref": "https://investors.axt.com/Investors/news/news-details/2026/AXT-Inc--Announces-First-Quarter-2026-Financial-Results/default.aspx"
+    },
+    {
+      "candidate_id": "CAND_FORM",
+      "material_type": "regulatory_filing",
+      "notes": "具体采用需客户侧验证",
+      "period_label": "2026Q1",
+      "published_date": "2026-05-05",
+      "review_id": "TR_FORM_2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "季度材料可追踪硅光与CPO测试业务进展",
+      "source_ref": "https://www.sec.gov/Archives/edgar/data/1039399/000103939926000023/form-20260328.htm"
+    },
+    {
+      "candidate_id": "CAND_FORM",
+      "material_type": "regulatory_filing",
+      "notes": "需隔离存储探针卡主业",
+      "period_label": "2026Q2",
+      "published_date": "2026-08-04",
+      "review_id": "TR_FORM_2026Q2",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "adjacent_segment",
+      "signal_summary": "10-Q提供先进封装测试和客户资本开支信号",
+      "source_ref": "https://www.sec.gov/Archives/edgar/data/1039399/000103939926000033/form-20260627.htm"
+    },
+    {
+      "candidate_id": "CAND_GFS",
+      "material_type": "earnings_release",
+      "notes": "只记录材料中的明确光学表述",
+      "period_label": "2026Q1",
+      "published_date": "2026-05-05",
+      "review_id": "TR_GFS_2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "正式季度材料覆盖硅光平台商业进展",
+      "source_ref": "https://investors.gf.com/news-releases/news-release-details/globalfoundries-reports-first-quarter-2026-financial-results"
+    },
+    {
+      "candidate_id": "CAND_GFS",
+      "material_type": "earnings_release",
+      "notes": "集团口径宽；不将总收入归因硅光",
+      "period_label": "2026Q2",
+      "published_date": "2026-08-05",
+      "review_id": "TR_GFS_2026Q2",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "管理层明确点名AI数据中心光网络与硅光SiGe",
+      "source_ref": "https://investors.gf.com/news-releases/news-release-details/globalfoundries-reports-second-quarter-2026-financial-results"
+    },
+    {
+      "candidate_id": "CAND_JBL",
+      "material_type": "regulatory_filing",
+      "notes": "具体1.6T产品另用官方产品事件",
+      "period_label": "FY2026Q2",
+      "published_date": "2026-04-08",
+      "review_id": "TR_JBL_2026Q2",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "adjacent_segment",
+      "signal_summary": "连续季度可观察数据中心制造需求与供应链",
+      "source_ref": "https://www.sec.gov/Archives/edgar/data/898293/000162828026024148/jbl-20260228.htm"
+    },
+    {
+      "candidate_id": "CAND_JBL",
+      "material_type": "regulatory_filing",
+      "notes": "AI收入不能等同光模块收入",
+      "period_label": "FY2026Q3",
+      "published_date": "2026-06-30",
+      "review_id": "TR_JBL_2026Q3",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "adjacent_segment",
+      "signal_summary": "法定季度材料覆盖智能基础设施与制造交付",
+      "source_ref": "https://www.sec.gov/Archives/edgar/data/898293/000162828026046138/jbl-20260531.htm"
+    },
+    {
+      "candidate_id": "CAND_MXL",
+      "material_type": "regulatory_filing",
+      "notes": "需另行锚定具体光学主张",
+      "period_label": "2026Q1",
+      "published_date": "2026-04-23",
+      "review_id": "TR_MXL_2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "10-Q持续覆盖高速互连产品与风险",
+      "source_ref": "https://www.sec.gov/Archives/edgar/data/1288469/000128846926000029/mxl-20260331.htm"
+    },
+    {
+      "candidate_id": "CAND_MXL",
+      "material_type": "regulatory_filing",
+      "notes": "监管材料不等于电话会问答",
+      "period_label": "2026Q2",
+      "published_date": "2026-07-23",
+      "review_id": "TR_MXL_2026Q2",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "10-Q提供DSP与光学连接业务的法定披露入口",
+      "source_ref": "https://www.sec.gov/Archives/edgar/data/1288469/000128846926000051/mxl-20260630.htm"
+    },
+    {
+      "candidate_id": "CAND_SMTC",
+      "material_type": "earnings_release",
+      "notes": "不把公司总增长等同光学增长",
+      "period_label": "FY2026Q4",
+      "published_date": "2026-03-16",
+      "review_id": "TR_SMTC_2026Q4",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "正式业绩材料持续披露数据中心连接业务",
+      "source_ref": "https://investors.semtech.com/news/semtech-announces-fourth-quarter-and-fiscal-year-2026-results/21cc5cf3-f51f-4f27-88d7-4023516e7840"
+    },
+    {
+      "candidate_id": "CAND_SMTC",
+      "material_type": "earnings_release",
+      "notes": "非光业务需隔离",
+      "period_label": "FY2027Q1",
+      "published_date": "2026-05-26",
+      "review_id": "TR_SMTC_2027Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "季度材料含数据中心网络与200G每通道信号",
+      "source_ref": "https://investors.semtech.com/news/semtech-announces-first-quarter-of-fiscal-year-2027-results/0634b869-19f6-4e90-9a0b-110fecf1d2db"
+    },
+    {
+      "candidate_id": "CAND_TSEM",
+      "material_type": "earnings_release",
+      "notes": "产能投入不等于客户量产",
+      "period_label": "2025Q4",
+      "published_date": "2026-02-11",
+      "review_id": "TR_TSEM_2025Q4",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "季度材料披露SiPho增长与产能投资",
+      "source_ref": "https://ir.towersemi.com/news-releases/news-release-details/tower-semiconductor-reports-record-revenue-fourth-quarter-2025/"
+    },
+    {
+      "candidate_id": "CAND_TSEM",
+      "material_type": "earnings_release",
+      "notes": "客户通常未具名",
+      "period_label": "2026Q1",
+      "published_date": "2026-05-13",
+      "review_id": "TR_TSEM_2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "季度材料持续披露SiPho与SiGe业务",
+      "source_ref": "https://ir.towersemi.com/news-releases/news-release-details/tower-semiconductor-reports-first-quarter-2026-financial-results/"
+    },
+    {
+      "candidate_id": "CAND_VECO",
+      "material_type": "regulatory_filing",
+      "notes": "设备订单不是模块产量",
+      "period_label": "2026Q1",
+      "published_date": "2026-05-05",
+      "review_id": "TR_VECO_2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "季度材料含硅光与InP设备需求信号",
+      "source_ref": "https://www.sec.gov/Archives/edgar/data/103145/000110465926055672/veco-20260331x10q.htm"
+    },
+    {
+      "candidate_id": "CAND_VECO",
+      "material_type": "regulatory_filing",
+      "notes": "应用横跨光通信和其他市场",
+      "period_label": "2026Q2",
+      "published_date": "2026-08-05",
+      "review_id": "TR_VECO_2026Q2",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "10-Q可跟踪化合物半导体设备订单与风险",
+      "source_ref": "https://www.sec.gov/Archives/edgar/data/103145/000110465926091158/veco-20260630x10q.htm"
+    }
+  ],
   "company_timelines": [
     {
       "events": [
@@ -1886,7 +2128,9 @@
       "anchor_reviewed": 30,
       "no_relevant_claims": 8
     },
-    "quarterly_company_count": 24
+    "quarterly_company_count": 24,
+    "tier_review_count": 20,
+    "tier_reviewed_candidate_count": 10
   },
   "discovery_queue": [],
   "entity_relationships": [

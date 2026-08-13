@@ -23,6 +23,7 @@ class EventLedgerError(ValueError):
 EVENT_FILES = (
     "watch_entities.csv",
     "company_candidates.csv",
+    "company_tier_reviews.csv",
     "entity_relationships.csv",
     "disclosures.csv",
     "event_claims.csv",
@@ -99,6 +100,9 @@ def load_event_facts(root: Path) -> dict:
     candidates = _index(
         rows["company_candidates.csv"], "candidate_id", "company_candidates.csv"
     )
+    tier_reviews = _index(
+        rows["company_tier_reviews.csv"], "review_id", "company_tier_reviews.csv"
+    )
     relationships = _index(
         rows["entity_relationships.csv"],
         "relationship_id",
@@ -139,6 +143,33 @@ def load_event_facts(root: Path) -> dict:
             "company_candidates.csv: candidate_id collides with tracked entity: "
             f"{sorted(candidate_overlap)}"
         )
+    tier_reviews_by_candidate: dict[str, list[dict[str, str]]] = defaultdict(list)
+    seen_review_periods: set[tuple[str, str]] = set()
+    for review_id, row in tier_reviews.items():
+        where = f"company_tier_reviews:{review_id}"
+        candidate_id = row["candidate_id"]
+        if candidate_id not in candidates:
+            raise EventLedgerError(f"{where}: unknown candidate_id")
+        if not row["period_label"]:
+            raise EventLedgerError(f"{where}: period_label is required")
+        period_key = (candidate_id, row["period_label"])
+        if period_key in seen_review_periods:
+            raise EventLedgerError(f"{where}: duplicate candidate period review")
+        seen_review_periods.add(period_key)
+        for field in ("published_date", "reviewed_at"):
+            _date(row[field], field, where)
+        if not row["published_date"] or not row["reviewed_at"]:
+            raise EventLedgerError(f"{where}: published_date and reviewed_at are required")
+        if not _url_ok(row["source_ref"]):
+            raise EventLedgerError(f"{where}: invalid source_ref")
+        _enum(row, "material_type", "material_type", where)
+        if row["material_type"] in {"unknown", "official_technical_blog"}:
+            raise EventLedgerError(f"{where}: tier review requires formal disclosure material")
+        _enum(row, "signal_class", "tier_review_signal_class", where)
+        if not row["signal_summary"]:
+            raise EventLedgerError(f"{where}: signal_summary is required")
+        tier_reviews_by_candidate[candidate_id].append(row)
+
     for candidate_id, row in candidates.items():
         where = f"company_candidates:{candidate_id}"
         for field, enum_name in (
@@ -167,6 +198,12 @@ def load_event_facts(root: Path) -> dict:
             raise EventLedgerError(
                 f"{where}: only promoted candidate may set promoted_entity_id"
             )
+        if row["verification_status"] in {"promotion_ready", "promoted"}:
+            reviews = tier_reviews_by_candidate.get(candidate_id, [])
+            if len(reviews) < 2:
+                raise EventLedgerError(f"{where}: promotion needs two formal tier reviews")
+            if all(item["signal_class"] == "no_relevant_signal" for item in reviews):
+                raise EventLedgerError(f"{where}: promotion lacks optical or adjacent signal")
 
     for relationship_id, row in relationships.items():
         where = f"entity_relationships:{relationship_id}"
@@ -365,6 +402,7 @@ def load_event_facts(root: Path) -> dict:
         "universe": universe,
         "watch_entities": watch,
         "company_candidates": candidates,
+        "company_tier_reviews": tier_reviews,
         "entity_relationships": relationships,
         "sources": sources,
         "disclosures": disclosures,
@@ -384,6 +422,7 @@ def derive_event_projection(facts: dict) -> dict:
     universe = facts["universe"]
     watch = facts["watch_entities"]
     candidates = facts["company_candidates"]
+    tier_reviews = facts["company_tier_reviews"]
     relationships = facts["entity_relationships"]
     sources = facts["sources"]
 
@@ -526,6 +565,10 @@ def derive_event_projection(facts: dict) -> dict:
             row["monitoring_status"] == "active" for row in watch.values()
         ),
         "candidate_status_counts": dict(sorted(candidate_status_counts.items())),
+        "tier_review_count": len(tier_reviews),
+        "tier_reviewed_candidate_count": len({
+            row["candidate_id"] for row in tier_reviews.values()
+        }),
     })
     return {
         "radar_events": radar,
@@ -534,5 +577,6 @@ def derive_event_projection(facts: dict) -> dict:
         "discovery_queue": sorted(queue, key=lambda item: (item["queue_type"], item.get("event_id", ""), item.get("disclosure_id", ""))),
         "coverage_summary": coverage,
         "company_candidates": [candidates[key] for key in sorted(candidates)],
+        "company_tier_reviews": [tier_reviews[key] for key in sorted(tier_reviews)],
         "entity_relationships": [relationships[key] for key in sorted(relationships)],
     }

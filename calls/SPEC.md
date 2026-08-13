@@ -96,6 +96,7 @@
 | `disclosures.csv` / `event_claims.csv` | 官网公告、博客等披露件及其人工锚定的原子主张 |
 | `events.csv` / `event_evidence.csv` | 公司事件、成熟阶段、证据来源与独立性 |
 | `company_candidates.csv` | 一手来源待核或已核、但尚未晋级季度/事件监控层的发现候选 |
+| `company_tier_reviews.csv` | 候选最近正式披露的逐期晋级复核、信号强度与边界 |
 | `watch_entities.csv` | 不承担四季度完整性、只按事件持续监控的组织 |
 | `entity_relationships.csv` | 母子公司、品牌、并购、前身与业务承接的时态去重关系 |
 | `raw/` | 可合法保存的原始材料；第三方全文缓存默认 Git 忽略 |
@@ -110,7 +111,8 @@
 公司分层采用 `discovery candidate → watch entity / quarterly coverage company`。发现候选
 不进入事件雷达或覆盖率；事件监控实体不承担四季度完整性；只有启用的季度覆盖公司才必须
 恰好登记四个季度槽。品牌或被收购实体通过带生效时间的关系保存历史身份，不与母公司重复
-计算公司数或来源独立性。
+计算公司数或来源独立性。候选进入 `promotion_ready/promoted` 前必须有两个不同正式披露期的
+`company_tier_reviews`，且不能两期均为 `no_relevant_signal`。
 
 ## 6. 分析纪律
 
