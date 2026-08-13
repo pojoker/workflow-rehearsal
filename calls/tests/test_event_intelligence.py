@@ -400,6 +400,9 @@ class EventIntelligenceTest(unittest.TestCase):
             load_event_facts(self.root)
 
     def test_candidate_promotion_requires_two_formal_period_reviews_with_signal(self) -> None:
+        baseline_review_count = len(
+            load_event_facts(self.root)["company_tier_reviews"]
+        )
         self.append("company_candidates.csv", {
             "candidate_id": "CAND_TEST",
             "entity_name": "Test Photonics",
@@ -443,7 +446,9 @@ class EventIntelligenceTest(unittest.TestCase):
             "signal_summary": "formal filing contains an optical product signal",
         })
         facts = load_event_facts(self.root)
-        self.assertEqual(len(facts["company_tier_reviews"]), 22)
+        self.assertEqual(
+            len(facts["company_tier_reviews"]), baseline_review_count + 2
+        )
         self.mutate("company_tier_reviews.csv", "TR_TEST_Q1", {
             "material_type": "official_technical_blog",
         })

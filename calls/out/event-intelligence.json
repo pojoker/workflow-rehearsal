@@ -963,6 +963,54 @@
   ],
   "company_tier_reviews": [
     {
+      "candidate_id": "CAND_ACCTON",
+      "material_type": "regulatory_filing",
+      "notes": "未拆LPO与光交换收入",
+      "period_label": "FY2025",
+      "published_date": "2026-07-08",
+      "review_id": "TR_ACCTON_2025",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "adjacent_segment",
+      "signal_summary": "股东报告提供网络交换设备经营结构与AI基础设施投入",
+      "source_ref": "https://www.accton.com/shareholder/"
+    },
+    {
+      "candidate_id": "CAND_ACCTON",
+      "material_type": "regulatory_filing",
+      "notes": "适合展示与新品事件监控",
+      "period_label": "2025H1",
+      "published_date": "2025-09-04",
+      "review_id": "TR_ACCTON_2025H1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "no_relevant_signal",
+      "signal_summary": "法定半年材料未给出光学产品采用或规模",
+      "source_ref": "https://www.accton.com/wp-content/uploads/2025/09/20250904014725.pdf"
+    },
+    {
+      "candidate_id": "CAND_ADTN",
+      "material_type": "earnings_release",
+      "notes": "产品采用仍需客户或出货证据",
+      "period_label": "2025Q4",
+      "published_date": "2026-02-25",
+      "review_id": "TR_ADTN_2025Q4",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "全年结果提供光网络业务与需求基线",
+      "source_ref": "https://investors.adtran.com/news/news-details/2026/ADTRAN-Holdings-Inc--reports-fourth-quarter-and-full-year-2025-financial-results/default.aspx"
+    },
+    {
+      "candidate_id": "CAND_ADTN",
+      "material_type": "earnings_release",
+      "notes": "运营商光传输与AI集群内互联分开",
+      "period_label": "2026Q1",
+      "published_date": "2026-05-04",
+      "review_id": "TR_ADTN_2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "季度材料明确LiteWave800面向AI数据中心内部互联",
+      "source_ref": "https://investors.adtran.com/news/news-details/2026/ADTRAN-Holdings-Inc--reports-first-quarter-2026-financial-results/default.aspx"
+    },
+    {
       "candidate_id": "CAND_AIXA",
       "material_type": "regulatory_filing",
       "notes": "欧洲等价正式材料",
@@ -985,6 +1033,30 @@
       "signal_class": "direct_optical",
       "signal_summary": "三个月报告持续披露光电子设备订单与展望",
       "source_ref": "https://www.aixtron.com/investoren/publikationen/2026/englisch/3-Months-Report-2026.pdf"
+    },
+    {
+      "candidate_id": "CAND_ASE",
+      "material_type": "regulatory_filing",
+      "notes": "不得把先进封装总额当硅光收入",
+      "period_label": "2025Q4",
+      "published_date": "2026-02-05",
+      "review_id": "TR_ASE_2025Q4",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "no_relevant_signal",
+      "signal_summary": "连续正式材料仍以集团OSAT口径为主",
+      "source_ref": "https://ir.aseglobal.com/html/ir_financial.php"
+    },
+    {
+      "candidate_id": "CAND_ASE",
+      "material_type": "regulatory_filing",
+      "notes": "技术能力保留在事件监控层",
+      "period_label": "2026Q1",
+      "published_date": "2026-04-30",
+      "review_id": "TR_ASE_2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "no_relevant_signal",
+      "signal_summary": "正式季度入口未提供可独立归因的硅光封装经营数据",
+      "source_ref": "https://ir.aseglobal.com/html/ir_financial.php"
     },
     {
       "candidate_id": "CAND_ASMPT",
@@ -1035,6 +1107,30 @@
       "source_ref": "https://investors.axt.com/Investors/news/news-details/2026/AXT-Inc--Announces-First-Quarter-2026-Financial-Results/default.aspx"
     },
     {
+      "candidate_id": "CAND_CLS",
+      "material_type": "earnings_release",
+      "notes": "系统收入与光学BOM分开",
+      "period_label": "2026Q1",
+      "published_date": "2026-04-27",
+      "review_id": "TR_CLS_2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "adjacent_segment",
+      "signal_summary": "季度材料持续提供Connectivity与Cloud Solutions交付信号",
+      "source_ref": "https://corporate.celestica.com/node/17386/pdf"
+    },
+    {
+      "candidate_id": "CAND_CLS",
+      "material_type": "earnings_release",
+      "notes": "兼容光模块不等于自产模块",
+      "period_label": "2026Q2",
+      "published_date": "2026-07-27",
+      "review_id": "TR_CLS_2026Q2",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "结果材料包含高速网络项目与800G至1.6T需求假设",
+      "source_ref": "https://corporate.celestica.com/news-releases/news-release-details/celestica-announces-second-quarter-2026-financial-results"
+    },
+    {
       "candidate_id": "CAND_FORM",
       "material_type": "regulatory_filing",
       "notes": "具体采用需客户侧验证",
@@ -1057,6 +1153,54 @@
       "signal_class": "adjacent_segment",
       "signal_summary": "10-Q提供先进封装测试和客户资本开支信号",
       "source_ref": "https://www.sec.gov/Archives/edgar/data/1039399/000103939926000033/form-20260627.htm"
+    },
+    {
+      "candidate_id": "CAND_FUJIKURA",
+      "material_type": "earnings_presentation",
+      "notes": "材料超过十二个月仅证明可跟踪性不证明当前状态",
+      "period_label": "FY2024Q1",
+      "published_date": "2024-08-08",
+      "review_id": "TR_FUJIKURA_FY2024Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "历史同季结果提供通信系统连续口径",
+      "source_ref": "https://www.fujikura.co.jp/eng/resource/pdf/presentation20240808.pdf"
+    },
+    {
+      "candidate_id": "CAND_FUJIKURA",
+      "material_type": "earnings_presentation",
+      "notes": "公开英文直链滞后故暂不晋级季度层",
+      "period_label": "FY2024Q3",
+      "published_date": "2025-02-10",
+      "review_id": "TR_FUJIKURA_FY2024Q3",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "业绩材料明确拆分通信系统并讨论数据中心需求",
+      "source_ref": "https://www.fujikura.co.jp/eng/resource/pdf/presentation250210.pdf"
+    },
+    {
+      "candidate_id": "CAND_FURUKAWA",
+      "material_type": "earnings_presentation",
+      "notes": "英文历史材料可追溯但不替代最新电话会",
+      "period_label": "FY2025Q1",
+      "published_date": "2025-08-07",
+      "review_id": "TR_FURUKAWA_FY2025Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "上一年度同季材料持续披露通信解决方案变化",
+      "source_ref": "https://www.furukawa.co.jp/en/ir/library/finalreport/pdf/2026/20250807_pre.pdf"
+    },
+    {
+      "candidate_id": "CAND_FURUKAWA",
+      "material_type": "regulatory_filing",
+      "notes": "需按通信段而非集团总额解读",
+      "period_label": "FY2026Q1",
+      "published_date": "2026-08-06",
+      "review_id": "TR_FURUKAWA_FY2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "季度结果可跟踪通信解决方案与光纤器件业务",
+      "source_ref": "https://www.furukawaelectric.com/en/ir/library/finalreport/pdf/2027/20260806.pdf"
     },
     {
       "candidate_id": "CAND_GFS",
@@ -1083,6 +1227,30 @@
       "source_ref": "https://investors.gf.com/news-releases/news-release-details/globalfoundries-reports-second-quarter-2026-financial-results"
     },
     {
+      "candidate_id": "CAND_GLW",
+      "material_type": "earnings_release",
+      "notes": "光纤连接不等同主动光模块",
+      "period_label": "2026Q1",
+      "published_date": "2026-04-28",
+      "review_id": "TR_GLW_2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "季度材料明确光通信销售增长及超大规模客户协议",
+      "source_ref": "https://investor.corning.com/investor-relations/financials/quarterly-results/default.aspx?source=news_body_link"
+    },
+    {
+      "candidate_id": "CAND_GLW",
+      "material_type": "earnings_release",
+      "notes": "具名长期协议需独立事件去重",
+      "period_label": "2026Q2",
+      "published_date": "2026-07-28",
+      "review_id": "TR_GLW_2026Q2",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "季度结果拆分Optical Communications并披露AI数据中心项目",
+      "source_ref": "https://investor.corning.com/news-and-events/news/news-details/2026/Cornings-Strong-Second-Quarter-2026-Financial-Results1-Demonstrate-Progress-on-Recently-Upgraded-Springboard-Plan/default.aspx"
+    },
+    {
       "candidate_id": "CAND_JBL",
       "material_type": "regulatory_filing",
       "notes": "具体1.6T产品另用官方产品事件",
@@ -1105,6 +1273,54 @@
       "signal_class": "adjacent_segment",
       "signal_summary": "法定季度材料覆盖智能基础设施与制造交付",
       "source_ref": "https://www.sec.gov/Archives/edgar/data/898293/000162828026046138/jbl-20260531.htm"
+    },
+    {
+      "candidate_id": "CAND_KEYS",
+      "material_type": "earnings_release",
+      "notes": "1.6T具体进度另由产品事件承载",
+      "period_label": "FY2026Q1",
+      "published_date": "2026-02-23",
+      "review_id": "TR_KEYS_FY2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "adjacent_segment",
+      "signal_summary": "连续季度可观察通信测试景气与订单",
+      "source_ref": "https://investor.keysight.com/investor-news-and-events/financial-press-releases/press-release-details/2026/Keysight-Technologies-Reports-First-Quarter-2026-Results/default.aspx"
+    },
+    {
+      "candidate_id": "CAND_KEYS",
+      "material_type": "earnings_release",
+      "notes": "商业通信增长不能等同光模块验证收入",
+      "period_label": "FY2026Q2",
+      "published_date": "2026-05-19",
+      "review_id": "TR_KEYS_FY2026Q2",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "adjacent_segment",
+      "signal_summary": "季度材料提供商业通信测试需求的上层信号",
+      "source_ref": "https://investor.keysight.com/investor-news-and-events/financial-press-releases/press-release-details/2026/Keysight-Technologies-Reports-Second-Quarter-2026-Results/default.aspx"
+    },
+    {
+      "candidate_id": "CAND_MELCO",
+      "material_type": "regulatory_filing",
+      "notes": "适合事件监控而非季度趋势层",
+      "period_label": "FY2026",
+      "published_date": "2026-04-28",
+      "review_id": "TR_MELCO_FY2026",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "no_relevant_signal",
+      "signal_summary": "全年结果仍无法分离数据中心光器件进展",
+      "source_ref": "https://www.mitsubishielectric.com/en/pr/2026/pdf/0428_co1.pdf"
+    },
+    {
+      "candidate_id": "CAND_MELCO",
+      "material_type": "regulatory_filing",
+      "notes": "EML产品存在但集团财务披露稀释",
+      "period_label": "FY2027Q1",
+      "published_date": "2026-07-31",
+      "review_id": "TR_MELCO_FY2027Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "no_relevant_signal",
+      "signal_summary": "完整结果材料未提供可独立归因的光器件经营信号",
+      "source_ref": "https://www.mitsubishielectric.com/en/pr/2026/pdf/0731_co1.pdf"
     },
     {
       "candidate_id": "CAND_MXL",
@@ -1131,6 +1347,150 @@
       "source_ref": "https://www.sec.gov/Archives/edgar/data/1288469/000128846926000051/mxl-20260630.htm"
     },
     {
+      "candidate_id": "CAND_MYCRONIC",
+      "material_type": "regulatory_filing",
+      "notes": "中国光模块需求与海外需求分区观察",
+      "period_label": "2026Q1",
+      "published_date": "2026-04-24",
+      "review_id": "TR_MYCRONIC_2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "季度材料明确由AI数据中心扩建驱动光通信封装设备需求",
+      "source_ref": "https://www.mycronic.com/news-events/our-press-releases/interim-report-january-march-2026/"
+    },
+    {
+      "candidate_id": "CAND_MYCRONIC",
+      "material_type": "regulatory_filing",
+      "notes": "设备订单领先模块产出但不是模块产量",
+      "period_label": "2026Q2",
+      "published_date": "2026-07-14",
+      "review_id": "TR_MYCRONIC_2026Q2",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "季度材料明确披露光通信die bonder需求持续强劲",
+      "source_ref": "https://www.mycronic.com/news-events/our-press-releases/interim-report-january-june-2026/"
+    },
+    {
+      "candidate_id": "CAND_OXIG",
+      "material_type": "regulatory_filing",
+      "notes": "应用横跨功率射频和光电子",
+      "period_label": "FY2026",
+      "published_date": "2026-06-09",
+      "review_id": "TR_OXIG_FY2026",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "adjacent_segment",
+      "signal_summary": "全年结果披露化合物半导体设备订单与长交期",
+      "source_ref": "https://www.oxinst.com/assets/uploads/Oxford_Instruments_plc_preliminary_FY26_results_9_June_2026.pdf"
+    },
+    {
+      "candidate_id": "CAND_OXIG",
+      "material_type": "earnings_presentation",
+      "notes": "不把全部化合物半导体订单归因InP激光",
+      "period_label": "FY2026H1",
+      "published_date": "2025-11-11",
+      "review_id": "TR_OXIG_FY2026H1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "adjacent_segment",
+      "signal_summary": "半年结果持续提供Advanced Technologies设备需求",
+      "source_ref": "https://www.oxinst.com/assets/uploads/Oxford_Instruments_plc_FY26_half_year_results_investor_presentation_111125.pdf"
+    },
+    {
+      "candidate_id": "CAND_POET",
+      "material_type": "earnings_release",
+      "notes": "公司自述商业验证仍需客户侧证据",
+      "period_label": "2025Q4",
+      "published_date": "2026-03-31",
+      "review_id": "TR_POET_2025Q4",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "全年结果直接讨论从研发向商业执行迁移",
+      "source_ref": "https://www.poet-technologies.com/news/poet-technologies-reports-fourth-quarter-2025-financial-results"
+    },
+    {
+      "candidate_id": "CAND_POET",
+      "material_type": "earnings_release",
+      "notes": "前瞻产能与已实现收入严格分开",
+      "period_label": "2026Q1",
+      "published_date": "2026-05-14",
+      "review_id": "TR_POET_2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "季度材料直接覆盖光引擎光模块与马来西亚产能迁移",
+      "source_ref": "https://www.poet-technologies.com/news/poet-technologies-reports-first-quarter-2026-financial-results"
+    },
+    {
+      "candidate_id": "CAND_SAMCO",
+      "material_type": "regulatory_filing",
+      "notes": "适合产品事件监控",
+      "period_label": "FY2026H1",
+      "published_date": "2026-03-12",
+      "review_id": "TR_SAMCO_FY2026H1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "no_relevant_signal",
+      "signal_summary": "半年结果仍无法识别数据中心客户或收入",
+      "source_ref": "https://www.samco.co.jp/en/disclosure/"
+    },
+    {
+      "candidate_id": "CAND_SAMCO",
+      "material_type": "regulatory_filing",
+      "notes": "产品事件有价值但财务口径不足",
+      "period_label": "FY2026Q3",
+      "published_date": "2026-06-12",
+      "review_id": "TR_SAMCO_FY2026Q3",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "no_relevant_signal",
+      "signal_summary": "正式九个月结果未独立披露InP光通信设备贡献",
+      "source_ref": "https://www.samco.co.jp/en/disclosure/"
+    },
+    {
+      "candidate_id": "CAND_SANM",
+      "material_type": "earnings_release",
+      "notes": "光子设计能力另由产品事件验证",
+      "period_label": "FY2026Q2",
+      "published_date": "2026-04-27",
+      "review_id": "TR_SANM_FY2026Q2",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "adjacent_segment",
+      "signal_summary": "连续季度可观察通信网络与云AI制造景气",
+      "source_ref": "https://ir.sanmina.com/news/news-details/2026/Sanmina-Reports-Second-Quarter-Fiscal-2026-Financial-Results/default.aspx"
+    },
+    {
+      "candidate_id": "CAND_SANM",
+      "material_type": "earnings_release",
+      "notes": "集团订单不能归因光学制造",
+      "period_label": "FY2026Q3",
+      "published_date": "2026-07-27",
+      "review_id": "TR_SANM_FY2026Q3",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "adjacent_segment",
+      "signal_summary": "季度材料提供云与AI基础设施制造需求和产能信号",
+      "source_ref": "https://ir.sanmina.com/news/news-details/2026/Sanmina-Reports-Third-Quarter-Fiscal-2026-Financial-Results/default.aspx"
+    },
+    {
+      "candidate_id": "CAND_SIVERS",
+      "material_type": "regulatory_filing",
+      "notes": "年报曾调整跨期收入需保留更正边界",
+      "period_label": "FY2025",
+      "published_date": "2026-05-13",
+      "review_id": "TR_SIVERS_2025",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "年报持续披露DFB与CW激光器商业化路径",
+      "source_ref": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf"
+    },
+    {
+      "candidate_id": "CAND_SIVERS",
+      "material_type": "regulatory_filing",
+      "notes": "规模与融资条件单列",
+      "period_label": "2026Q1",
+      "published_date": "2026-05-29",
+      "review_id": "TR_SIVERS_2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "季度报告提供光子业务设计赢单与量产窗口",
+      "source_ref": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers-Interim-report-Q126_FINAL_ENG.pdf"
+    },
+    {
       "candidate_id": "CAND_SMTC",
       "material_type": "earnings_release",
       "notes": "不把公司总增长等同光学增长",
@@ -1153,6 +1513,78 @@
       "signal_class": "direct_optical",
       "signal_summary": "季度材料含数据中心网络与200G每通道信号",
       "source_ref": "https://investors.semtech.com/news/semtech-announces-first-quarter-of-fiscal-year-2027-results/0634b869-19f6-4e90-9a0b-110fecf1d2db"
+    },
+    {
+      "candidate_id": "CAND_SOI",
+      "material_type": "regulatory_filing",
+      "notes": "材料收入与终端模块需求不可一一对应",
+      "period_label": "FY2026",
+      "published_date": "2026-05-25",
+      "review_id": "TR_SOI_FY2026",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "全年结果提供Photonics-SOI需求与库存节奏",
+      "source_ref": "https://www.soitec.com/docs/default-source/financial-documents/2025-2026/en/soitec-fy%2726-pr---en.pdf?Status=Master&sfvrsn=a4e6d7e6_1"
+    },
+    {
+      "candidate_id": "CAND_SOI",
+      "material_type": "regulatory_filing",
+      "notes": "只采用明确光子口径不分摊集团收入",
+      "period_label": "FY2027Q1",
+      "published_date": "2026-07-22",
+      "review_id": "TR_SOI_FY2027Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "正式季度收入材料持续披露Photonics-SOI所在连接业务",
+      "source_ref": "https://www.soitec.com/home/group/resource-library/content/docs/default-source/financial-documents/2026-2027/en/soitec---cp-q1%2727---en"
+    },
+    {
+      "candidate_id": "CAND_SUMITOMO",
+      "material_type": "regulatory_filing",
+      "notes": "不把信息通信总额等同光模块收入",
+      "period_label": "FY2025",
+      "published_date": "2026-05-12",
+      "review_id": "TR_SUMITOMO_FY2025",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "全年结果持续提供光器件与光纤需求信号",
+      "source_ref": "https://sumitomoelectric.com/sites/default/files/2026-05/download_documents/2025_allv.pdf"
+    },
+    {
+      "candidate_id": "CAND_SUMITOMO",
+      "material_type": "regulatory_filing",
+      "notes": "集团多业务口径需锁定光通信段",
+      "period_label": "FY2026Q1",
+      "published_date": "2026-07-31",
+      "review_id": "TR_SUMITOMO_FY2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "季度结果覆盖信息通信与数据中心相关业务",
+      "source_ref": "https://sumitomoelectric.com/sites/default/files/2026-07/download_documents/2026_1g.pdf"
+    },
+    {
+      "candidate_id": "CAND_SUSS",
+      "material_type": "regulatory_filing",
+      "notes": "未拆硅光收入故不进入季度主层",
+      "period_label": "2026H1",
+      "published_date": "2026-08-06",
+      "review_id": "TR_SUSS_2026H1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "adjacent_segment",
+      "signal_summary": "半年正式披露提供键合设备订单与交付节奏",
+      "source_ref": "https://www.suss.com/de/events/financial-calendar/2026/veroeffentlichung-halbjahresfinanzbericht"
+    },
+    {
+      "candidate_id": "CAND_SUSS",
+      "material_type": "regulatory_filing",
+      "notes": "半导体总需求不能归因光子异质集成",
+      "period_label": "2026Q1",
+      "published_date": "2026-05-07",
+      "review_id": "TR_SUSS_2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "adjacent_segment",
+      "signal_summary": "季度报告可观察永久键合设备需求",
+      "source_ref": "https://www.suss.com/jp/content/download/3330/53284?version=3"
     },
     {
       "candidate_id": "CAND_TSEM",
@@ -1201,6 +1633,54 @@
       "signal_class": "direct_optical",
       "signal_summary": "10-Q可跟踪化合物半导体设备订单与风险",
       "source_ref": "https://www.sec.gov/Archives/edgar/data/103145/000110465926091158/veco-20260630x10q.htm"
+    },
+    {
+      "candidate_id": "CAND_VIAV",
+      "material_type": "earnings_release",
+      "notes": "并购带来的收入变化需单列",
+      "period_label": "FY2026Q2",
+      "published_date": "2026-01-28",
+      "review_id": "TR_VIAV_FY2026Q2",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "连续季度确认数据中心测试需求动能",
+      "source_ref": "https://investor.viavisolutions.com/news-events/news-releases/news-details/2026/VIAVI-Announces-Second-Quarter-Fiscal-2026-Results/"
+    },
+    {
+      "candidate_id": "CAND_VIAV",
+      "material_type": "earnings_release",
+      "notes": "测试收入与模块出货量不可等量",
+      "period_label": "FY2026Q3",
+      "published_date": "2026-04-29",
+      "review_id": "TR_VIAV_FY2026Q3",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "季度结果明确数据中心生态需求是增长来源",
+      "source_ref": "https://investor.viavisolutions.com/news-events/news-releases/news-details/2026/VIAVI-Announces-Third-Quarter-Fiscal-2026-Results/default.aspx"
+    },
+    {
+      "candidate_id": "CAND_WIWYNN",
+      "material_type": "earnings_presentation",
+      "notes": "一般服务器增长不能映射光模块消耗",
+      "period_label": "2025Q4",
+      "published_date": "2026-02-26",
+      "review_id": "TR_WIWYNN_2025Q4",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "adjacent_segment",
+      "signal_summary": "全年材料持续提供AI服务器与高速互连需求背景",
+      "source_ref": "https://www.wiwynn.com/hubfs/Investors/Shareholders_Services/Investor_Conference/25Q4_ENG_20260226.pdf"
+    },
+    {
+      "candidate_id": "CAND_WIWYNN",
+      "material_type": "earnings_presentation",
+      "notes": "投资关系不等同采购或供货",
+      "period_label": "2026Q1",
+      "published_date": "2026-05-07",
+      "review_id": "TR_WIWYNN_2026Q1",
+      "reviewed_at": "2026-08-13",
+      "signal_class": "direct_optical",
+      "signal_summary": "季度材料明确投资Ayar Labs并布局机架级CPO",
+      "source_ref": "https://www.wiwynn.com/hubfs/Investors/Shareholders_Services/Investor_Conference/26Q1_ENG_20260507.pdf"
     }
   ],
   "company_timelines": [
@@ -2129,8 +2609,8 @@
       "no_relevant_claims": 8
     },
     "quarterly_company_count": 24,
-    "tier_review_count": 20,
-    "tier_reviewed_candidate_count": 10
+    "tier_review_count": 60,
+    "tier_reviewed_candidate_count": 30
   },
   "discovery_queue": [],
   "entity_relationships": [
