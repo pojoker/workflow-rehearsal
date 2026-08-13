@@ -2612,7 +2612,98 @@
     "tier_review_count": 60,
     "tier_reviewed_candidate_count": 30
   },
-  "discovery_queue": [],
+  "discovery_queue": [
+    {
+      "candidate_id": "CAND_AMKR",
+      "entity_name": "Amkor",
+      "priority": "P3",
+      "queue_type": "company_candidate_review",
+      "source_ref": "https://amkor.com/technology/",
+      "suggested_tier": "quarterly",
+      "verification_status": "source_verified"
+    },
+    {
+      "candidate_id": "CAND_DELTA",
+      "entity_name": "Delta Electronics",
+      "priority": "P3",
+      "queue_type": "company_candidate_review",
+      "source_ref": "https://landing.deltaww.com/en-US/news/12998",
+      "suggested_tier": "quarterly",
+      "verification_status": "source_verified"
+    },
+    {
+      "candidate_id": "CAND_EKI",
+      "entity_name": "Ekinops",
+      "priority": "P3",
+      "queue_type": "company_candidate_review",
+      "source_ref": "https://www.ekinops.com/images/press-releases/24.01.2023-PM400FR05-C2A_PR_ENG.pdf",
+      "suggested_tier": "quarterly",
+      "verification_status": "source_verified"
+    },
+    {
+      "candidate_id": "CAND_HAMAMATSU",
+      "entity_name": "Hamamatsu Photonics",
+      "priority": "P3",
+      "queue_type": "company_candidate_review",
+      "source_ref": "https://www.hamamatsu.com/eu/en/news/featured-products_and_technologies/2024/meeting-optical-communication-demands.html",
+      "suggested_tier": "quarterly",
+      "verification_status": "source_verified"
+    },
+    {
+      "candidate_id": "CAND_HPE",
+      "entity_name": "HPE",
+      "priority": "P3",
+      "queue_type": "company_candidate_review",
+      "source_ref": "https://www.hpe.com/us/en/juniper-data-center-interconnect.html",
+      "suggested_tier": "quarterly",
+      "verification_status": "source_verified"
+    },
+    {
+      "candidate_id": "CAND_LWLG",
+      "entity_name": "Lightwave Logic",
+      "priority": "P3",
+      "queue_type": "company_candidate_review",
+      "source_ref": "https://www.lightwavelogic.com/",
+      "suggested_tier": "quarterly",
+      "verification_status": "source_verified"
+    },
+    {
+      "candidate_id": "CAND_MCHP",
+      "entity_name": "Microchip",
+      "priority": "P3",
+      "queue_type": "company_candidate_review",
+      "source_ref": "https://www.microchip.com/en-us/products/high-speed-networking-and-video/ethernet/ethernet-phys/meta-dx-family",
+      "suggested_tier": "quarterly",
+      "verification_status": "source_verified"
+    },
+    {
+      "candidate_id": "CAND_RBBN",
+      "entity_name": "Ribbon Communications",
+      "priority": "P3",
+      "queue_type": "company_candidate_review",
+      "source_ref": "https://ribboncommunications.com/solutions/service-provider-solutions/ip-optical/ribbons-automated-ip-routing-and-optical-networking",
+      "suggested_tier": "quarterly",
+      "verification_status": "source_verified"
+    },
+    {
+      "candidate_id": "CAND_SMARTOPTICS",
+      "entity_name": "Smartoptics",
+      "priority": "P3",
+      "queue_type": "company_candidate_review",
+      "source_ref": "https://smartoptics.com/products/optical-transceivers/osfp/",
+      "suggested_tier": "quarterly",
+      "verification_status": "source_verified"
+    },
+    {
+      "candidate_id": "CAND_TEL",
+      "entity_name": "TE Connectivity",
+      "priority": "P3",
+      "queue_type": "company_candidate_review",
+      "source_ref": "https://www.te.com/en/about-te/news-center/te-ofc-2026.html",
+      "suggested_tier": "quarterly",
+      "verification_status": "source_verified"
+    }
+  ],
   "entity_relationships": [
     {
       "effective_from": "2021-03-01",

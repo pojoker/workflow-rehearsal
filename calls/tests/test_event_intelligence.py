@@ -111,7 +111,14 @@ class EventIntelligenceTest(unittest.TestCase):
             projection["coverage_summary"]["processing_status_counts"],
             {"anchor_reviewed": 30, "no_relevant_claims": 8},
         )
-        self.assertEqual(projection["discovery_queue"], [])
+        self.assertEqual(
+            {row["candidate_id"] for row in projection["discovery_queue"]},
+            {
+                "CAND_HAMAMATSU", "CAND_MCHP", "CAND_LWLG",
+                "CAND_SMARTOPTICS", "CAND_AMKR", "CAND_DELTA", "CAND_TEL",
+                "CAND_RBBN", "CAND_EKI", "CAND_HPE",
+            },
+        )
 
     def test_expanded_event_regressions_preserve_stages_evidence_and_watch_boundary(self) -> None:
         facts = load_event_facts(self.root)
@@ -399,6 +406,8 @@ class EventIntelligenceTest(unittest.TestCase):
         self.assertIn("Narrative", section)
         self.assertIn("原文短引", section)
         self.assertIn("数据版本：", section)
+        self.assertIn("发现队列：10 家待进一步复核", section)
+        self.assertIn("Hamamatsu Photonics", section)
         self.assertIn("official blog lines 24-30", section)
         self.assertIn('href="https://investors.ao-inc.com/node/16751"', section)
 
@@ -446,6 +455,10 @@ class EventIntelligenceTest(unittest.TestCase):
         self.assertNotIn(
             "CAND_TEST",
             {row["primary_subject_id"] for row in projection["radar_events"]},
+        )
+        self.assertIn(
+            "CAND_TEST",
+            {row.get("candidate_id") for row in projection["discovery_queue"]},
         )
 
     def test_candidate_promotion_and_review_require_traceable_state(self) -> None:

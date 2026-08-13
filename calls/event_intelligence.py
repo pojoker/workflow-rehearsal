@@ -513,6 +513,19 @@ def derive_event_projection(facts: dict) -> dict:
                 "title": disclosure["title"],
             })
 
+    for candidate_id in sorted(candidates):
+        candidate = candidates[candidate_id]
+        if candidate["verification_status"] != "promoted":
+            queue.append({
+                "queue_type": "company_candidate_review",
+                "candidate_id": candidate_id,
+                "entity_name": candidate["entity_name"],
+                "verification_status": candidate["verification_status"],
+                "suggested_tier": candidate["suggested_tier"],
+                "priority": candidate["priority"],
+                "source_ref": candidate["source_ref"],
+            })
+
     timelines: dict[str, list[dict]] = defaultdict(list)
     theme_impacts: dict[str, list[dict]] = defaultdict(list)
     for row in radar:
@@ -581,7 +594,10 @@ def derive_event_projection(facts: dict) -> dict:
         "radar_events": radar,
         "company_timelines": timeline_rows,
         "theme_impacts": theme_rows,
-        "discovery_queue": sorted(queue, key=lambda item: (item["queue_type"], item.get("event_id", ""), item.get("disclosure_id", ""))),
+        "discovery_queue": sorted(queue, key=lambda item: (
+            item["queue_type"], item.get("candidate_id", ""),
+            item.get("event_id", ""), item.get("disclosure_id", ""),
+        )),
         "coverage_summary": coverage,
         "company_candidates": [candidates[key] for key in sorted(candidates)],
         "company_tier_reviews": [tier_reviews[key] for key in sorted(tier_reviews)],

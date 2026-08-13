@@ -68,6 +68,10 @@ def render_event_radar(projection: dict) -> str:
     """Render traceable reviewed events without recomputing evidence policy."""
     events = projection.get("radar_events", [])
     coverage = projection.get("coverage_summary", {})
+    candidate_queue = [
+        row for row in projection.get("discovery_queue", [])
+        if row.get("queue_type") == "company_candidate_review"
+    ]
 
     def esc(value: object) -> str:
         return html.escape(str(value or ""), quote=True)
@@ -130,6 +134,17 @@ def render_event_radar(projection: dict) -> str:
         f"晋级复核 {esc(coverage.get('tier_reviewed_candidate_count', 0))} 家/"
         f"{esc(coverage.get('tier_review_count', 0))} 期"
     )
+    queue_rows = "".join(
+        f'<li><a href="{esc(row.get("source_ref"))}" target="_blank" rel="noopener noreferrer">'
+        f'{esc(row.get("entity_name") or row.get("candidate_id"))}</a> · '
+        f'{esc(row.get("suggested_tier"))} / {esc(row.get("verification_status"))}</li>'
+        for row in candidate_queue
+    )
+    queue_html = (
+        '<details class="event-queue"><summary>发现队列：'
+        f'{len(candidate_queue)} 家待进一步复核</summary><ul>{queue_rows}</ul></details>'
+        if candidate_queue else ""
+    )
     return (
         '<div class="event-radar">'
         '<h3>本期公司事件</h3>'
@@ -138,6 +153,7 @@ def render_event_radar(projection: dict) -> str:
         f'<div class="event-coverage"><b>海外覆盖范围：</b>{tracking_scope}</div>'
         f'<div class="event-coverage">处理覆盖：{coverage_text} · 最新披露 {esc(coverage.get("latest_disclosure_at") or "unknown")} · 最新复核 {esc(coverage.get("latest_reviewed_at") or "unknown")}</div>'
         f'<div class="event-version" data-event-version="{data_version}">数据版本：{data_version}</div>'
+        f'{queue_html}'
         f'<div class="event-list">{"".join(cards) or "尚无已完成锚点复核的事件。"}</div>'
         '</div>'
     )
