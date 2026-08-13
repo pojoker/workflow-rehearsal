@@ -338,6 +338,116 @@ class EventIntelligenceTest(unittest.TestCase):
         self.assertIn("本期公司事件", section)
         self.assertIn("数据版本：", section)
 
+    def test_tracking_tiers_are_counted_without_promoting_candidates_to_radar(self) -> None:
+        baseline = derive_event_projection(load_event_facts(self.root))["coverage_summary"]
+        self.append("company_candidates.csv", {
+            "candidate_id": "CAND_TEST",
+            "entity_name": "Test Photonics",
+            "entity_type": "company",
+            "suggested_role": "upstream_enabler",
+            "suggested_tier": "quarterly",
+            "priority": "P1",
+            "capability_scope": "M1/C1",
+            "inclusion_reason": "test fixture",
+            "source_ref": "https://example.com/investors",
+            "verification_status": "source_verified",
+            "reviewed_at": "2026-08-13",
+        })
+        projection = derive_event_projection(load_event_facts(self.root))
+        coverage = projection["coverage_summary"]
+        self.assertEqual(coverage["quarterly_company_count"], baseline["quarterly_company_count"])
+        self.assertEqual(coverage["four_slot_complete_count"], baseline["four_slot_complete_count"])
+        self.assertEqual(
+            coverage["four_available_slot_complete_count"],
+            baseline["four_available_slot_complete_count"],
+        )
+        self.assertEqual(coverage["active_watch_entity_count"], baseline["active_watch_entity_count"])
+        self.assertEqual(
+            coverage["candidate_status_counts"]["source_verified"],
+            baseline["candidate_status_counts"]["source_verified"] + 1,
+        )
+        self.assertIn(
+            "CAND_TEST",
+            {row["candidate_id"] for row in projection["company_candidates"]},
+        )
+        self.assertNotIn(
+            "CAND_TEST",
+            {row["primary_subject_id"] for row in projection["radar_events"]},
+        )
+
+    def test_candidate_promotion_and_review_require_traceable_state(self) -> None:
+        fixture = {
+            "candidate_id": "CAND_TEST",
+            "entity_name": "Test Photonics",
+            "entity_type": "company",
+            "suggested_role": "upstream_enabler",
+            "suggested_tier": "watch",
+            "priority": "P2",
+            "capability_scope": "C4",
+            "inclusion_reason": "test fixture",
+            "verification_status": "source_verified",
+        }
+        self.append("company_candidates.csv", fixture)
+        with self.assertRaisesRegex(EventLedgerError, "needs source_ref and reviewed_at"):
+            load_event_facts(self.root)
+        self.mutate("company_candidates.csv", "CAND_TEST", {
+            "verification_status": "promoted",
+            "source_ref": "https://example.com/source",
+            "reviewed_at": "2026-08-13",
+            "promoted_entity_id": "UNKNOWN",
+        })
+        with self.assertRaisesRegex(EventLedgerError, "known promoted_entity_id"):
+            load_event_facts(self.root)
+
+    def test_entity_relationships_are_time_aware_and_closed_over_entities(self) -> None:
+        fixture = {
+            "relationship_id": "REL_TEST",
+            "subject_entity_id": "WATCH_DUST",
+            "object_entity_id": "CRDO",
+            "relationship_type": "acquired_by",
+            "effective_from": "2026-05-28",
+            "source_ref": "https://example.com/acquisition",
+            "review_status": "reviewed",
+        }
+        self.append("entity_relationships.csv", fixture)
+        projection = derive_event_projection(load_event_facts(self.root))
+        self.assertEqual(
+            next(
+                row for row in projection["entity_relationships"]
+                if row["relationship_id"] == "REL_TEST"
+            )["relationship_id"],
+            "REL_TEST",
+        )
+        self.mutate("entity_relationships.csv", "REL_TEST", {
+            "object_entity_id": "WATCH_DUST",
+        })
+        with self.assertRaisesRegex(EventLedgerError, "self relationship"):
+            load_event_facts(self.root)
+        self.mutate("entity_relationships.csv", "REL_TEST", {
+            "object_entity_id": "UNKNOWN",
+        })
+        with self.assertRaisesRegex(EventLedgerError, "unknown relationship endpoint"):
+            load_event_facts(self.root)
+
+    def test_entity_relationship_date_range_and_review_source_are_validated(self) -> None:
+        self.append("entity_relationships.csv", {
+            "relationship_id": "REL_TEST",
+            "subject_entity_id": "WATCH_DUST",
+            "object_entity_id": "CRDO",
+            "relationship_type": "acquired_by",
+            "effective_from": "2026-06-01",
+            "effective_to": "2026-05-01",
+            "review_status": "candidate",
+        })
+        with self.assertRaisesRegex(EventLedgerError, "effective_from is after effective_to"):
+            load_event_facts(self.root)
+        self.mutate("entity_relationships.csv", "REL_TEST", {
+            "effective_to": "",
+            "review_status": "reviewed",
+        })
+        with self.assertRaisesRegex(EventLedgerError, "reviewed relationship needs source_ref"):
+            load_event_facts(self.root)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -117,11 +117,23 @@ def render_event_radar(projection: dict) -> str:
         f"disclosures={esc(coverage.get('disclosure_count', 0))} · "
         f"latest_reviewed={esc(coverage.get('latest_reviewed_at') or 'unknown')}"
     )
+    candidate_counts = coverage.get("candidate_status_counts", {})
+    candidate_text = " / ".join(
+        f"{esc(key)}={esc(value)}" for key, value in sorted(candidate_counts.items())
+    ) or "0"
+    tracking_scope = (
+        f"季度公司 {esc(coverage.get('quarterly_company_count', 0))} 家"
+        f"（四槽 {esc(coverage.get('four_slot_complete_count', 0))} / "
+        f"四槽均可用 {esc(coverage.get('four_available_slot_complete_count', 0))}） · "
+        f"事件监控 {esc(coverage.get('active_watch_entity_count', 0))} 家 · "
+        f"发现候选 {candidate_text}"
+    )
     return (
         '<div class="event-radar">'
         '<h3>本期公司事件</h3>'
         '<div class="event-policy">新闻只是证据入口：<code>asserted</code> 表示第一方已披露，'
         '<code>corroborated</code> 才表示已有独立来源支持。</div>'
+        f'<div class="event-coverage"><b>海外覆盖范围：</b>{tracking_scope}</div>'
         f'<div class="event-coverage">处理覆盖：{coverage_text} · 最新披露 {esc(coverage.get("latest_disclosure_at") or "unknown")} · 最新复核 {esc(coverage.get("latest_reviewed_at") or "unknown")}</div>'
         f'<div class="event-version" data-event-version="{data_version}">数据版本：{data_version}</div>'
         f'<div class="event-list">{"".join(cards) or "尚无已完成锚点复核的事件。"}</div>'

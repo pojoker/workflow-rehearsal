@@ -93,6 +93,9 @@
 | `technology_feedback.csv` | 公司技术作者主张与管理层商业事实/前瞻之间的反馈状态 |
 | `disclosures.csv` / `event_claims.csv` | 官网公告、博客等披露件及其人工锚定的原子主张 |
 | `events.csv` / `event_evidence.csv` | 公司事件、成熟阶段、证据来源与独立性 |
+| `company_candidates.csv` | 一手来源待核或已核、但尚未晋级季度/事件监控层的发现候选 |
+| `watch_entities.csv` | 不承担四季度完整性、只按事件持续监控的组织 |
+| `entity_relationships.csv` | 母子公司、品牌、并购、前身与业务承接的时态去重关系 |
 | `raw/` | 可合法保存的原始材料；第三方全文缓存默认 Git 忽略 |
 | `out/` | 派生报告，禁止作为事实源手改 |
 
@@ -101,6 +104,11 @@
 技术反馈采用同一 `theme_id` 的保守连接规则，不做隐式跨主题匹配。`pending` 可链接
 管理层前瞻信号；`confirmed/partially_confirmed/contradicted` 必须链接已审核管理层事实。
 `not_mentioned` 不得携带商业 claim，避免把沉默渲染成确认。
+
+公司分层采用 `discovery candidate → watch entity / quarterly coverage company`。发现候选
+不进入事件雷达或覆盖率；事件监控实体不承担四季度完整性；只有启用的季度覆盖公司才必须
+恰好登记四个季度槽。品牌或被收购实体通过带生效时间的关系保存历史身份，不与母公司重复
+计算公司数或来源独立性。
 
 ## 6. 分析纪律
 

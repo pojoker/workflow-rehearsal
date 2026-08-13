@@ -20,6 +20,12 @@ python3 -m unittest discover -s calls/tests -v
 ## 数据账本
 
 - `universe.csv`：可调整的 14 家核心同业、上游使能方、系统设备商与下游验证公司池。
+- `company_candidates.csv`：尚未晋级的发现候选。候选可以完成一手来源核验，但不进入
+  公司时间线、主事件雷达或四季度覆盖率；只有人工批准后才迁移到 `universe.csv` 或
+  `watch_entities.csv`。
+- `watch_entities.csv`：按事件持续监控、但不承担四季度材料义务的实体。
+- `entity_relationships.csv`：带生效时间的一手来源实体关系，用于母子公司、品牌、并购、
+  前身和业务承接去重；关系不生成 canonical 供货边，也不把品牌视为第二个经营主体。
 - `sources.csv`：每家最近四个季度的槽位。一个槽位可登记多个 A/B/C 材料；
   尚未采集的槽位使用 `unknown` 类型/等级并填写缺失原因；公司官网署名技术博客
   作为 `official_technical_blog` 的 interquarter 来源登记。
@@ -64,6 +70,16 @@ CSV 是事实源，`out/` 只由渲染器生成，禁止手改。`raw/` 可保�
    管理层确认或兑现证据。
 5. 运行 `python3 -m calls all`。缺失、未知、冲突与证据不足会继续显示，不会被
    渲染器静默过滤。
+
+## 公司升级闸门
+
+1. 新名称先进入 `company_candidates.csv`；取得一手来源并人工复核后可标
+   `source_verified`，但仍不算正式覆盖。
+2. 只有持续产生高价值事件、且不需要连续季度经营材料时，晋级 `watch_entities.csv`。
+3. 只有上市主体、最近四个可得正式期间均能逐槽登记，并能持续回答产品阶段、供给卡点、
+   技术路线或需求兑现问题时，才晋级 `universe.csv`；晋级必须同一批补齐四个季度槽。
+4. 被收购公司、子公司和品牌先登记 `entity_relationships.csv`；历史事件可以保留原主体，
+   但公司数与独立证据不重复计算。
 
 当前扩展池为 14 家。Broadcom、Marvell、Nokia、Ciena、MACOM、Credo 已登记各四个
 官方季度材料。Ciena 四季改用公司 IR 托管的完整逐字稿；MACOM 四份业绩稿明确记录为
