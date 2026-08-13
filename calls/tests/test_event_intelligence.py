@@ -210,6 +210,41 @@ class EventIntelligenceTest(unittest.TestCase):
             self.assertTrue(all(row["availability"] == "available" for row in quarterly))
             self.assertTrue(all(row["source_grade"] == "A" for row in quarterly))
 
+    def test_second_batch_is_partitioned_by_disclosure_signal(self) -> None:
+        _, universe = self._rows("universe.csv")
+        _, sources = self._rows("sources.csv")
+        _, watch_rows = self._rows("watch_entities.csv")
+        _, candidates = self._rows("company_candidates.csv")
+        quarterly_ids = {
+            "SOI", "SUMITOMO", "FURUKAWA", "POET", "SIVERS", "SANM",
+            "CLS", "MYCRONIC", "OXIG", "VIAV", "ADTN", "WIWYNN", "GLW",
+        }
+        watch_ids = {
+            "WATCH_FUJIKURA", "WATCH_MELCO", "WATCH_ASE", "WATCH_SUSS",
+            "WATCH_SAMCO", "WATCH_KEYS", "WATCH_ACCTON",
+        }
+        enabled = {row["company_id"] for row in universe if row["enabled"] == "yes"}
+        active_watch = {
+            row["entity_id"] for row in watch_rows
+            if row["monitoring_status"] == "active"
+        }
+        self.assertTrue(quarterly_ids <= enabled)
+        self.assertTrue(watch_ids <= active_watch)
+        self.assertFalse(watch_ids & enabled)
+        for company_id in quarterly_ids:
+            quarterly = [
+                row for row in sources
+                if row["company_id"] == company_id and row["source_scope"] == "quarterly"
+            ]
+            self.assertEqual(len(quarterly), 4, company_id)
+            self.assertTrue(all(row["availability"] == "available" for row in quarterly))
+            self.assertTrue(all(row["source_grade"] == "A" for row in quarterly))
+        promoted = {
+            row["promoted_entity_id"] for row in candidates
+            if row["priority"] == "P2" and row["verification_status"] == "promoted"
+        }
+        self.assertEqual(promoted, quarterly_ids | watch_ids)
+
     def test_first_party_cannot_self_corroborate(self) -> None:
         self.mutate("events.csv", "EV001", {"event_status": "corroborated"})
         with self.assertRaisesRegex(EventLedgerError, "lacks independent supporting origin"):

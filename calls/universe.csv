@@ -23,3 +23,16 @@ TSEM,Tower Semiconductor,upstream_enabler,SiPho与模拟混合信号代工及产
 SMTC,Semtech,upstream_enabler,200G每通道PMD、TIA与驱动器平台观察方,yes
 AIXA,AIXTRON,upstream_enabler,InP与GaAs MOCVD设备和扩产交期观察方,yes
 ASMPT,ASMPT,upstream_enabler,光子芯片贴装、耦合、键合与CPO装配设备观察方,yes
+SOI,Soitec,upstream_enabler,Photonics-SOI材料平台与硅光底座需求观察方,yes
+SUMITOMO,Sumitomo Electric,upstream_enabler,InP激光器、FAU与光纤连接的综合上游观察方,yes
+FURUKAWA,Furukawa Electric,upstream_enabler,光纤、激光器与数据中心光连接需求观察方,yes
+POET,POET Technologies,upstream_enabler,晶圆级光引擎与1.6T商业化进度观察方,yes
+SIVERS,Sivers Semiconductors,upstream_enabler,DFB与CW激光器新进入者及商业化观察方,yes
+SANM,Sanmina,core_peer,光子设计封装制造与云AI基础设施交付观察方,yes
+CLS,Celestica,system_vendor,AI网络硬件制造与高速交换系统交付观察方,yes
+MYCRONIC,Mycronic,upstream_enabler,光通信die bonder订单与封装节拍领先指标,yes
+OXIG,Oxford Instruments,upstream_enabler,化合物半导体等离子设备订单与交期观察方,yes
+VIAV,VIAVI,upstream_enabler,1.6T测试验证需求与量产测试卡点观察方,yes
+ADTN,ADTRAN,system_vendor,800G低功耗模块及开放光传输观察方,yes
+WIWYNN,Wiwynn,system_vendor,机架级AI系统与CPO互连需求观察方,yes
+GLW,Corning,upstream_enabler,AI数据中心光纤与无源连接需求观察方,yes

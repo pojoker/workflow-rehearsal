@@ -6,14 +6,14 @@
       "entity_name": "Accton",
       "entity_type": "company",
       "inclusion_reason": "800G LPO与光波长交换连接ODM端",
-      "notes": "展示与规模出货需分开",
+      "notes": "正式披露未拆光学产品规模",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_ACCTON",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.accton.com/optics/",
       "suggested_role": "system_vendor",
-      "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "suggested_tier": "watch",
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_ADTN",
@@ -21,14 +21,14 @@
       "entity_name": "ADTRAN",
       "entity_type": "company",
       "inclusion_reason": "800G与相干可插拔补齐运营商和边缘DCI",
-      "notes": "与AI内部网络不同",
+      "notes": "AI集群内互联与运营商光传输分开",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "ADTN",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.adtran.com/de-de/innovation/optical-networking/800g-optical-transport",
       "suggested_role": "system_vendor",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_AIXA",
@@ -96,14 +96,14 @@
       "entity_name": "ASE Technology",
       "entity_type": "company",
       "inclusion_reason": "硅光FOPOP与光学实验室验证OSAT量产能力",
-      "notes": "技术展示不等于客户量产",
+      "notes": "集团季度材料无法分离硅光经营信号",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_ASE",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://ase.aseglobal.com/silicon-photonics/",
       "suggested_role": "upstream_enabler",
-      "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "suggested_tier": "watch",
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_ASMPT",
@@ -171,14 +171,14 @@
       "entity_name": "Celestica",
       "entity_type": "company",
       "inclusion_reason": "AI网络硬件制造可观察系统交付",
-      "notes": "不得把兼容光模块当自产",
+      "notes": "兼容光模块不视作自产模块",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "CLS",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.celestica.com/our-expertise/markets/communications",
       "suggested_role": "system_vendor",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_DELTA",
@@ -291,14 +291,14 @@
       "entity_name": "Fujikura",
       "entity_type": "company",
       "inclusion_reason": "光纤与高密度连接补足无源互联约束",
-      "notes": "高速模块收入归因有限",
+      "notes": "直接信号存在但最新英文季度直链覆盖不足",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_FUJIKURA",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.fujikura.co.jp/eng/ir/library/briefing/doc01.pdf",
       "suggested_role": "upstream_enabler",
-      "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "suggested_tier": "watch",
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_FUJITSUOC",
@@ -321,14 +321,14 @@
       "entity_name": "Furukawa Electric",
       "entity_type": "company",
       "inclusion_reason": "DFB EML ITLA与数据中心光连接链条完整",
-      "notes": "规划与订单需分离",
+      "notes": "正式材料持续提供通信解决方案信号",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "FURUKAWA",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.furukawa.co.jp/en/solution/datacenter/index.html",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_GFS",
@@ -351,14 +351,14 @@
       "entity_name": "Corning",
       "entity_type": "company",
       "inclusion_reason": "AI数据中心光纤连接和CPO补足被动互联",
-      "notes": "AI产品组合口径宽",
+      "notes": "季度光通信分部口径可持续验证",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "GLW",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.corning.com/optical-communications/worldwide/en/home/solutions/glassworks-ai.html",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_GOOGL",
@@ -426,14 +426,14 @@
       "entity_name": "Keysight",
       "entity_type": "company",
       "inclusion_reason": "224G与1.6T验证进度领先于量产",
-      "notes": "测试新品不等于需求规模",
+      "notes": "季度通信测试口径过宽只做事件监控",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_KEYS",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.keysight.com/au/en/about/newsroom/news-releases/2026/0313-pr26-049-keysight-introduces-new-224g-test-solutions-to-enable-1-6t-optical-network-validation.html",
       "suggested_role": "upstream_enabler",
-      "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "suggested_tier": "watch",
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_LIGHTMATTER",
@@ -486,14 +486,14 @@
       "entity_name": "Mitsubishi Electric",
       "entity_type": "company",
       "inclusion_reason": "EML覆盖800G至3.2T并可观察光源扩产",
-      "notes": "集团披露稀释",
+      "notes": "两期集团材料均无可分离光学经营信号",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_MELCO",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.mitsubishielectric.com/en/pr/2026/pdf/0529_co5.pdf",
       "suggested_role": "upstream_enabler",
-      "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "suggested_tier": "watch",
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_MOLEX",
@@ -546,14 +546,14 @@
       "entity_name": "Mycronic",
       "entity_type": "company",
       "inclusion_reason": "高精度die bonding可观察封装节拍",
-      "notes": "光子收入未必拆分",
+      "notes": "两期正式材料均明确光通信设备需求",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "MYCRONIC",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.mycronic.com/product-areas/die-bonding/",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_NTTID",
@@ -606,14 +606,14 @@
       "entity_name": "Oxford Instruments",
       "entity_type": "company",
       "inclusion_reason": "InP激光与探测器等离子工艺交叉验证制造卡点",
-      "notes": "研究与量产场景混合",
+      "notes": "用正式半年及全年材料观察设备订单",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "OXIG",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://plasma.oxinst.com/media-centre/wp/plasma-solutions-for-inp-lasers-and-photodiodes",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_PI",
@@ -636,14 +636,14 @@
       "entity_name": "POET Technologies",
       "entity_type": "company",
       "inclusion_reason": "晶圆级1.6T光引擎信号纯度高",
-      "notes": "商业化和收入兑现风险高",
+      "notes": "商业化与实际收入需分层跟踪",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "POET",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.poet-technologies.com/products/poet-teralight",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_RANOVUS",
@@ -681,14 +681,14 @@
       "entity_name": "Samco",
       "entity_type": "company",
       "inclusion_reason": "InP设备补充日本制造设备样本",
-      "notes": "数据中心客户证据待核",
+      "notes": "两期正式材料未拆光通信客户或收入",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_SAMCO",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.samco.co.jp/whatsnew/products/2026/03/ExpandingLineupInPEquipment.php",
       "suggested_role": "upstream_enabler",
-      "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "suggested_tier": "watch",
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_SANM",
@@ -696,14 +696,14 @@
       "entity_name": "Sanmina",
       "entity_type": "company",
       "inclusion_reason": "光子设计封装制造可验证制造端",
-      "notes": "光学收入通常不拆",
+      "notes": "按云AI制造信号跟踪而不归因光学收入",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "SANM",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.sanmina.com/solutions-contract-manufacturing-design/optical/",
       "suggested_role": "core_peer",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_SCINTIL",
@@ -756,14 +756,14 @@
       "entity_name": "Sivers Semiconductors",
       "entity_type": "company",
       "inclusion_reason": "DFB与CW laser提供新进入者样本",
-      "notes": "规模与融资风险",
+      "notes": "规模融资和跨期更正单列",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "SIVERS",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers_annualreport_2025_2.pdf",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_SMARTOPTICS",
@@ -801,14 +801,14 @@
       "entity_name": "Soitec",
       "entity_type": "company",
       "inclusion_reason": "Photonics-SOI是硅光底座并已形成AI增长信号",
-      "notes": "光子业务口径可能不独立",
+      "notes": "两期正式材料持续出现直接光子信号",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "SOI",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.soitec.com/home/products/product-platforms/photonics-soi",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_SOURCEPHOTONICS",
@@ -831,14 +831,14 @@
       "entity_name": "Sumitomo Electric",
       "entity_type": "company",
       "inclusion_reason": "InP EML CW laser和FAU同时覆盖光源与光耦",
-      "notes": "集团口径较宽",
+      "notes": "按信息通信分部而非集团总额跟踪",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "SUMITOMO",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://sumitomoelectric.com/products/FlexBeamGuidE-SC",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_SUSS",
@@ -846,14 +846,14 @@
       "entity_name": "SUSS MicroTec",
       "entity_type": "company",
       "inclusion_reason": "永久键合覆盖异质集成",
-      "notes": "缺少光互联独立口径",
+      "notes": "正式材料只支持半导体设备相邻信号",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_SUSS",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.suss.com/en/products-solutions/bonding-solutions/permanent-bonding?languageChanged=en",
       "suggested_role": "upstream_enabler",
-      "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "suggested_tier": "watch",
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_TEL",
@@ -921,14 +921,14 @@
       "entity_name": "VIAVI",
       "entity_type": "company",
       "inclusion_reason": "1.6T OSFP测试观察验证瓶颈",
-      "notes": "电信与无线业务稀释",
+      "notes": "正式季度材料持续确认数据中心测试需求",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "VIAV",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.viavisolutions.com/en-us/products/one-1600er-osfp-1600gb-s-test-module",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_WIWYNN",
@@ -936,14 +936,14 @@
       "entity_name": "Wiwynn",
       "entity_type": "company",
       "inclusion_reason": "机柜级CPO生态与高速互联集成",
-      "notes": "客户和供应商归因有限",
+      "notes": "CPO投资关系不自动解释为采购关系",
       "priority": "P2",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WIWYNN",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.wiwynn.com/technology/high-speed-interconnect",
       "suggested_role": "system_vendor",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_XSCAPE",
@@ -2593,14 +2593,14 @@
     }
   ],
   "coverage_summary": {
-    "active_watch_entity_count": 3,
+    "active_watch_entity_count": 10,
     "candidate_status_counts": {
-      "promoted": 10,
-      "source_verified": 54
+      "promoted": 30,
+      "source_verified": 34
     },
     "disclosure_count": 38,
-    "four_available_slot_complete_count": 21,
-    "four_slot_complete_count": 24,
+    "four_available_slot_complete_count": 34,
+    "four_slot_complete_count": 37,
     "latest_disclosure_at": "2026-08-06",
     "latest_retrieved_at": "2026-08-11",
     "latest_reviewed_at": "2026-08-11",
@@ -2608,7 +2608,7 @@
       "anchor_reviewed": 30,
       "no_relevant_claims": 8
     },
-    "quarterly_company_count": 24,
+    "quarterly_company_count": 37,
     "tier_review_count": 60,
     "tier_reviewed_candidate_count": 30
   },

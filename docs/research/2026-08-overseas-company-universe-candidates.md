@@ -52,7 +52,13 @@
 | AIXTRON（Xetra: AIXA） | 未核 | InP/GaAs MOCVD；`EQ1`，T007/T008 | 可观察 6 英寸 InP 扩产和设备交期；季度订单不等于数据中心实际装机 | [FY2025 官方发言稿](https://www.aixtron.com/investoren/events/telefonkonferenz/2025/AIXTRON_SE_FY_2025_speech.pdf) |
 | ASMPT（HKEX: 0522） | 未核 | 光子芯片贴装、耦合、混合键合/CPO 装配；`EQ3/EQ4/EQ5`，T015/T017 | 覆盖封装自动化关键节点；集团业务宽、样机展示与量产收入需分开 | [OFC 2026 CPO](https://www.asmpt.com/en/news-center/press-releases/asmpt-at-ofc-2026-los-angeles-enabling-scalable-co-packaged-optics-and-photonic-integration/) |
 
-## 第二批：20 家（完成一手材料可得性抽样后再晋级）
+## 第二批：20 家（已完成两期正式材料复核与分层）
+
+本批没有按最初建议机械地全部纳入季度层。两期正式材料复核后，13 家有可重复出现的直接或相邻光学经营信号，已进入 `quarterly universe` 并各补四期正式材料；7 家的集团口径不足以支持季度光学趋势判断，改进入事件监控层。后者仍持续收录官网产品、博客、合作、订单、产能和监管事件，但不制造低质量季度空槽。
+
+- **季度层（13）**：Soitec、Sumitomo Electric、Furukawa Electric、POET、Sivers、Sanmina、Celestica、Mycronic、Oxford Instruments、VIAVI、ADTRAN、Wiwynn、Corning。
+- **事件监控层（7）**：Mitsubishi Electric、Fujikura、ASE Technology、SUSS MicroTec、Samco、Keysight、Accton。
+- **审计留痕**：20 家共保存 40 条两期 tier review；13 家共新增 52 个正式季度材料槽。分层只影响海外情报采集方式，不写入 canonical 点、边或供应关系。
 
 | 角色 | 公司（属性） | 能力；cell/theme | 建议 | 理由与风险 | 官方来源 |
 |---|---|---|---|---|---|
@@ -127,7 +133,7 @@
 | 批次 | 数量 | 动作 |
 |---|---:|---|
 | 第一批 | 10 | 先建立四期正式材料；逐条抽取产品、产能、验证和限制声明 |
-| 第二批 | 20 | 每家抽样最近两期，只有光学信号密度足够者晋级 quarterly universe |
+| 第二批 | 20 | 已完成两期复核：13 家进入季度层，7 家进入事件监控层 |
 | 长尾 | 34 | 事件驱动 watch/discovery；不承诺四季度完整性 |
 | 合计 | **64** | 不含当前 14 家与既有 IQE、DustPhotonics |
 
@@ -195,7 +201,7 @@
 
 ## 证据限制与落库闸门
 
-- 64 家候选均至少有一个第一方技术/IR入口，但这不代表所有 ticker、总部/制造地、季度发布日期已完成交易所级复核；表中“未核/待核”不得原样进入结构化账本。
+- 64 家候选均至少有一个第一方技术/IR入口，但这不代表所有 ticker、总部/制造地、季度发布日期已完成交易所级复核；表中“未核/待核”不得原样进入结构化账本。当前正式季度层共 37 家（原 14 家 + 首批 10 家 + 第二批 13 家）；第二批其余 7 家只进入事件监控。
 - 第一批 40 个季度槽中，**39 个达到 period/period_end/published_date/官方直接材料 URL 可用的完整口径，1 个仍不可用**：AXT 2026Q2。截至核验只找到发布预告，未找到结果正文、监管附件或可确认的财报回放直链。GlobalFoundries 与 Veeco 的 Q2 文件已在 8 月 5 日发布，前者有公司 IR 正文与 SEC 6-K，后者可用 SEC 10-Q；FormFactor 2026Q2 只有官方 earnings webcast 事件页，按项目既定的 equivalent-material 口径计完整，但不得标成 earnings release 或 transcript。
 - 公司官网的产品页和博客属于公司自述。对“量产、客户采用、订单规模、性能领先”等主张，仍需用财报/监管披露、客户材料或设备/供应链另一端交叉验证。
 - 对日本/欧洲公司，半年报、九个月报告、年度报告可能是最稳定的正式材料；应标 `equivalent_material`，不能伪造成美式季度电话会 transcript。

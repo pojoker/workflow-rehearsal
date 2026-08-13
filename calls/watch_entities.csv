@@ -12,3 +12,10 @@ WATCH_POLARITON,Polariton Technologies,company,Polariton,Marvell已公告收购�
 WATCH_INFINERA,Infinera Corporation,company,Infinera,Nokia光网络与光子半导体能力的并购来源,promoted,NOK,https://www.nokia.com/newsroom/nokia-completes-acquisition-of-infinera-to-create-innovation-powerhouse-in-optical-networks-with-the-scale-to-power-the-data-center-revolution/,只作历史身份与能力来源
 WATCH_NUBIS,Nubis Communications Inc.,company,Nubis,Ciena低功耗光电互连能力的并购来源,promoted,CIEN,https://investor.ciena.com/static-files/11dd73c3-c17b-44d3-8018-844fe6979976,只作历史身份与能力来源
 WATCH_HYPERLUME,Hyperlume Inc.,company,Hyperlume,Credo microLED光互连能力的并购来源,promoted,CRDO,https://investors.credosemi.com/news-events/news/news-details/2025/Credo-to-Acquire-Hyperlume-Inc-/default.aspx,标题写to acquire但正文明确closing；按正文完成事实登记
+WATCH_FUJIKURA,Fujikura,company,Fujikura Ltd.,光纤与高密度连接事件监控；最新英文季度直链覆盖不足,active,,https://www.fujikura.co.jp/eng/ir/,不承担四季度完整性；待最新正式材料可稳定复核后再晋级
+WATCH_MELCO,Mitsubishi Electric,company,Mitsubishi Electric Corporation,EML产品与扩产事件监控；集团业绩无法分离光器件,active,,https://www.mitsubishielectric.com/investors/library/results/,不把集团电子器件收入当作数据中心光学收入
+WATCH_ASE,ASE Technology,company,ASE Technology Holding;Advanced Semiconductor Engineering,硅光封装与OSAT能力事件监控；集团口径稀释,active,,https://ase.aseglobal.com/about-ase/financials/,技术展示与客户量产分开
+WATCH_SUSS,SUSS MicroTec,company,SUSS,永久键合与异质集成设备事件监控；未拆硅光经营口径,active,,https://www.suss.com/de/investor-relations/finanzberichte,半导体设备总订单不归因光子
+WATCH_SAMCO,Samco,company,Samco Inc.,InP刻蚀沉积设备产品与订单事件监控,active,,https://www.samco.co.jp/en/disclosure/,正式财务材料未给出光通信客户或收入
+WATCH_KEYS,Keysight,company,Keysight Technologies,224G与1.6T验证产品及客户采用事件监控,active,,https://investor.keysight.com/financial-information/quarterly-reports/default.aspx,通信测试总收入不等同光模块测试收入
+WATCH_ACCTON,Accton,company,Accton Technology,800G LPO与光交换系统展示和出货事件监控,active,,https://www.accton.com/shareholder/,网络设备总收入不等同光学产品收入
