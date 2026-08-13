@@ -133,71 +133,70 @@
 
 ## 第一批 10 家：最近四个可得季度正式材料清单
 
-说明：`official earnings release/webcast` 是允许的 equivalent material；只有官网明确提供 transcript 才标 transcript。对于官网档案存在但本轮未逐项打开确认的 `period_end` 或发布日期，明确写“待核”，不能猜填。URL 指向官方季度归档页时，落库执行者须再解析该季度的直接链接。
+说明：`official earnings release/webcast` 是允许的 equivalent material；只有官网明确提供 transcript 才标 transcript。下表已逐项改为公司 IR、SEC、交易所披露或公司正式报告的直接 URL。`unavailable` 表示截至本轮核验只找到结果发布预告、未找到已发布的结果/回放/监管文件，预告不能冒充季度材料。
 
 | 公司 | period | period_end | published_date | material_type | 官方/监管 URL | 完整性 |
 |---|---|---|---|---|---|---|
-| AXT | 2026Q2 | 2026-06-30 | 2026-07-30 | earnings release + webcast | [官方季度归档](https://investors.axt.com/Investors/financials/quarterly-results/default.aspx) | 归档项可得；直接链接待解析 |
+| AXT | 2026Q2 | unavailable（预告未披露 period_end） | unavailable | unavailable | [仅有 2026-07-02 的结果发布预告](https://investors.axt.com/Investors/news/news-details/2026/AXT-Inc--Schedules-Second-Quarter-2026-Earnings-Release-for-July-30-2026/default.aspx) | **缺口**：官方季度页仍显示 Q2 material not available；预定 7 月 30 日发布不等于实际发布 |
 | AXT | 2026Q1 | 2026-03-31 | 2026-04-30 | earnings release + call/webcast | [直接材料](https://investors.axt.com/Investors/news/news-details/2026/AXT-Inc--Announces-First-Quarter-2026-Financial-Results/default.aspx) | 已核 |
-| AXT | 2025Q4 | 2025-12-31 | 2026-02-19 | earnings release + webcast | [官方季度归档](https://investors.axt.com/Investors/financials/quarterly-results/default.aspx) | 已见归档；直接链接待解析 |
-| AXT | 2025Q3 | 2025-09-30 | 待核 | earnings release + webcast | [官方季度归档](https://investors.axt.com/Investors/financials/quarterly-results/default.aspx) | 日期缺口 |
-| GlobalFoundries | 2026Q2 | 2026-06-30 | 待核 | earnings release + webcast/presentation + 6-K | [官方季度归档](https://investors.gf.com/investor-relations/quarterly-results) | Q2 条目发布时间待核 |
+| AXT | 2025Q4 | 2025-12-31 | 2026-02-19 | earnings release + webcast | [直接材料](https://investors.axt.com/Investors/news/news-details/2026/AXT-Inc--Announces-Fourth-Quarter-and-Fiscal-Year-2025-Financial-Results/default.aspx) | 已核 |
+| AXT | 2025Q3 | 2025-09-30 | 2025-10-30 | earnings release + webcast | [直接材料](https://investors.axt.com/Investors/news/news-details/2025/AXT-Inc--Announces-Third-Quarter-2025-Financial-Results/default.aspx) | 已核 |
+| GlobalFoundries | 2026Q2 | 2026-06-30 | 2026-08-05 | earnings release + webcast/presentation + 6-K | [直接材料](https://investors.gf.com/news-releases/news-release-details/globalfoundries-reports-second-quarter-2026-financial-results) | 已核；同日 6-K 亦已进入 SEC |
 | GlobalFoundries | 2026Q1 | 2026-03-31 | 2026-05-05 | earnings release + webcast/presentation + 6-K | [直接材料](https://investors.gf.com/news-releases/news-release-details/globalfoundries-reports-first-quarter-2026-financial-results) | 已核 |
 | GlobalFoundries | 2025Q4 | 2025-12-31 | 2026-02-11 | earnings release + webcast/presentation + 20-F | [直接材料](https://investors.gf.com/news-releases/news-release-details/globalfoundries-reports-fourth-quarter-2025-and-fiscal-year-2025) | 已核 |
-| GlobalFoundries | 2025Q3 | 2025-09-30 | 待核 | earnings release + webcast/presentation + 6-K | [官方季度归档](https://investors.gf.com/investor-relations/quarterly-results) | 日期缺口 |
+| GlobalFoundries | 2025Q3 | 2025-09-30 | 2025-11-12 | earnings release + webcast/presentation + 6-K | [直接材料](https://investors.gf.com/news-releases/news-release-details/globalfoundries-reports-third-quarter-2025-financial-results) | 已核 |
 | Tower | 2026Q1 | 2026-03-31 | 2026-05-13 | release + webcast + slides + official transcript | [直接材料](https://ir.towersemi.com/news-releases/news-release-details/tower-semiconductor-reports-first-quarter-2026-financial-results/) | 已核 |
 | Tower | 2025Q4 | 2025-12-31 | 2026-02-11 | release + webcast + slides + official transcript | [直接材料](https://ir.towersemi.com/news-releases/news-release-details/tower-semiconductor-reports-record-revenue-fourth-quarter-2025) | 已核 |
-| Tower | 2025Q3 | 2025-09-30 | 待核 | release + webcast + slides + official transcript | [官方季度归档](https://ir.towersemi.com/financial-information/quarterly-results/) | 日期缺口 |
+| Tower | 2025Q3 | 2025-09-30 | 2025-11-10 | release + webcast + slides + official transcript | [直接材料](https://ir.towersemi.com/news-releases/news-release-details/tower-semiconductor-reports-third-quarter-2025-financial-results/) | 已核 |
 | Tower | 2025Q2 | 2025-06-30 | 2025-08-04 | release + webcast + slides + official transcript | [直接材料](https://ir.towersemi.com/news-releases/news-release-details/tower-semiconductor-reports-2025-second-quarter-financial) | 已核 |
 | Semtech | FY2027Q1 | 2026-04-26 | 2026-05-26 | earnings release + audio webcast/supplement | [直接材料](https://investors.semtech.com/news/semtech-announces-first-quarter-of-fiscal-year-2027-results/0634b869-19f6-4e90-9a0b-110fecf1d2db) | 已核 |
 | Semtech | FY2026Q4 | 2026-01-25 | 2026-03-16 | earnings release + audio webcast/supplement | [直接材料](https://investors.semtech.com/news/semtech-announces-fourth-quarter-and-fiscal-year-2026-results/21cc5cf3-f51f-4f27-88d7-4023516e7840) | 已核 |
-| Semtech | FY2026Q3 | 待核 | 待核 | earnings release + webcast/supplement | [官方新闻归档](https://investors.semtech.com/news-events/press-announcements) | period_end/日期缺口 |
-| Semtech | FY2026Q2 | 待核 | 待核 | earnings release + webcast/supplement | [官方新闻归档](https://investors.semtech.com/news-events/press-announcements) | period_end/日期缺口 |
-| MaxLinear | 2026Q2 | 2026-06-30（待文件确认） | 待核 | earnings release/call equivalent | [官方 IR](https://investor.maxlinear.com/) | 直接季度链接和日期缺口 |
-| MaxLinear | 2026Q1 | 2026-03-31（待文件确认） | 待核 | earnings release/call equivalent | [官方 IR](https://investor.maxlinear.com/) | 直接季度链接和日期缺口 |
-| MaxLinear | 2025Q4 | 2025-12-31（待文件确认） | 待核 | earnings release/call equivalent | [官方 IR](https://investor.maxlinear.com/) | 直接季度链接和日期缺口 |
-| MaxLinear | 2025Q3 | 2025-09-30（待文件确认） | 待核 | earnings release/call equivalent | [官方 IR](https://investor.maxlinear.com/) | 直接季度链接和日期缺口；落库前必须补齐 |
-| Jabil | FY2026Q3 | 2026-05-31 | 2026-06-17 | release + presentation + webcast + official transcript | [官方事件页](https://investors.jabil.com/events-and-presentations/default.aspx) | 已核；页内直接链接待解析 |
-| Jabil | FY2026Q2 | 2026-02-28（待文件确认） | 2026-03-18 | release + presentation + webcast + official transcript | [官方事件页](https://investors.jabil.com/events-and-presentations/default.aspx) | 发布日已核 |
-| Jabil | FY2026Q1 | 2025-11-30（待文件确认） | 待核 | release + presentation + webcast + official transcript | [官方事件归档](https://investors.jabil.com/events-and-presentations/default.aspx?ShowEvents=PAST) | 日期缺口 |
-| Jabil | FY2025Q4 | 2025-08-31 | 待核 | release + presentation + webcast + official transcript | [官方事件归档](https://investors.jabil.com/events-and-presentations/default.aspx?ShowEvents=PAST) | 日期缺口 |
-| Veeco | 2026Q2 | 2026-06-30（待文件确认） | 2026-08-05 | earnings release + conference call/webcast | [官方新闻归档](https://ir.veeco.com/news-and-events/press-releases/default.aspx) | 发布日由官方预告核；结果直接链接待解析 |
-| Veeco | 2026Q1 | 2026-03-31（待文件确认） | 2026-05-05 | earnings release + conference call/webcast | [官方新闻归档](https://ir.veeco.com/news-and-events/press-releases/default.aspx) | 发布日已核 |
+| Semtech | FY2026Q3 | 2025-10-26 | 2025-11-24 | earnings release + webcast/supplement | [直接材料](https://investors.semtech.com/news/semtech-announces-third-quarter-of-fiscal-year-2026-results/a5b07929-dc1c-49f7-863e-86ffe4ca3353) | 已核 |
+| Semtech | FY2026Q2 | 2025-07-27 | 2025-08-25 | earnings release + webcast/supplement | [直接材料](https://investors.semtech.com/news/semtech-announces-second-quarter-of-fiscal-year-2026-results/9b5409e6-9a96-4810-a932-6b86fd42b9c5) | 已核 |
+| MaxLinear | 2026Q2 | 2026-06-30 | 2026-07-23 | earnings release + earnings webcast/presentation + 10-Q | [直接材料](https://investors.maxlinear.com/press-releases/detail/617/maxlinear-inc-announces-second-quarter-2026-financial) | 已核 |
+| MaxLinear | 2026Q1 | 2026-03-31 | 2026-04-23 | earnings release + earnings webcast/presentation + 10-Q | [直接材料](https://investors.maxlinear.com/press-releases/detail/607/maxlinear-inc-announces-first-quarter-2026-financial) | 已核 |
+| MaxLinear | 2025Q4 | 2025-12-31 | 2026-01-29 | earnings release + webcast/presentation + 10-K | [SEC/公司 IR 直接附件](https://investors.maxlinear.com/all-sec-filings/content/0001288469-26-000009/a12312025exhibit991.htm) | 已核 |
+| MaxLinear | 2025Q3 | 2025-09-30 | 2025-10-23 | earnings release + earnings webcast | [直接材料](https://investors.maxlinear.com/press-releases/detail/588/maxlinear-inc-announces-third-quarter-2025-financial) | 已核 |
+| Jabil | FY2026Q3 | 2026-05-31 | 2026-06-17 | release + presentation + webcast + official transcript | [直接材料](https://investors.jabil.com/news/news-details/2026/Jabil-Posts-Third-Quarter-Results/default.aspx) | 已核 |
+| Jabil | FY2026Q2 | 2026-02-28 | 2026-03-18 | release + presentation + webcast + official transcript | [直接材料](https://investors.jabil.com/news/news-details/2026/Jabil-Posts-Second-Quarter-Results/default.aspx) | 已核 |
+| Jabil | FY2026Q1 | 2025-11-30 | 2025-12-17 | release + presentation + webcast + official transcript | [直接材料](https://investors.jabil.com/news/news-details/2025/Jabil-Posts-First-Quarter-Results/default.aspx) | 已核 |
+| Jabil | FY2025Q4 | 2025-08-31 | 2025-09-25 | release + presentation + webcast + official transcript | [直接材料](https://investors.jabil.com/news/news-details/2025/Jabil-Posts-Fourth-Quarter-and-Fiscal-Year-2025-Results/default.aspx) | 已核 |
+| Veeco | 2026Q2 | 2026-06-30 | 2026-08-05 | SEC 10-Q regulatory filing | [SEC 直接文件](https://www.sec.gov/Archives/edgar/data/103145/000110465926091158/veco-20260630x10q.htm) | 已核；官网仍只展示发布预告，因此不伪装成 earnings release/transcript |
+| Veeco | 2026Q1 | 2026-03-31 | 2026-05-05 | earnings release + conference call/webcast | [直接材料](https://ir.veeco.com/news-and-events/news-details/2026/Veeco-Reports-First-Quarter-2026-Financial-Results/default.aspx) | 已核 |
 | Veeco | 2025Q4 | 2025-12-31 | 2026-02-25 | earnings release + conference call/webcast | [直接材料](https://ir.veeco.com/news-and-events/news-details/2026/Veeco-Reports-Fourth-Quarter-and-Fiscal-Year-2025-Financial-Results/default.aspx) | 已核 |
-| Veeco | 2025Q3 | 2025-09-30（待文件确认） | 待核 | earnings release + conference call/webcast | [官方新闻归档](https://ir.veeco.com/news-and-events/press-releases/default.aspx) | 日期缺口 |
-| FormFactor | 2026Q2 | 待核 | 2026-07-29 | earnings release + webcast/supporting materials | [官方 IR 首页事件](https://investors.formfactor.com/) | period_end 待核 |
+| Veeco | 2025Q3 | 2025-09-30 | 2025-11-05 | earnings release + conference call/webcast | [直接材料](https://ir.veeco.com/news-and-events/news-details/2025/Veeco-Reports-Third-Quarter-2025-Financial-Results/default.aspx) | 已核 |
+| FormFactor | 2026Q2 | 2026-06-27（由 Q1 正式材料确认） | 2026-07-29 | official earnings webcast/event equivalent | [官方财报 webcast 事件页](https://investors.formfactor.com/events/event-details/formfactor-inc-second-quarter-2026-financial-results/) | 已核为 equivalent；未见 earnings release，不得标 transcript |
 | FormFactor | 2026Q1 | 2026-03-28 | 2026-04-29 | earnings release + webcast/supporting materials | [直接材料](https://investors.formfactor.com/news-releases/news-release-details/formfactor-inc-reports-2026-first-quarter-results/) | 已核 |
 | FormFactor | 2025Q4 | 2025-12-27 | 2026-02-04 | earnings release + webcast/supporting materials | [直接材料](https://investors.formfactor.com/news-releases/news-release-details/formfactor-inc-reports-2025-fourth-quarter-results) | 已核 |
-| FormFactor | 2025Q3 | 待核 | 2025-10-29 | earnings release + webcast/supporting materials | [官方 8-K 附件](https://investors.formfactor.com/static-files/fd61fc18-71a3-43c3-800e-cf86f4472ec4) | period_end 待核 |
-| AIXTRON | 2026Q2/H1 | 2026-06-30 | 待核 | official quarterly report/call equivalent | [官方 Investors](https://www.aixtron.com/en/investors) | 直接材料 URL/发布日期缺口 |
-| AIXTRON | 2026Q1 | 2026-03-31 | 待核 | official quarterly report/call equivalent | [官方 Investors](https://www.aixtron.com/en/investors) | 直接材料 URL/发布日期缺口 |
-| AIXTRON | FY2025 | 2025-12-31 | 待核 | annual results + official call speech | [官方发言稿](https://www.aixtron.com/investoren/events/telefonkonferenz/2025/AIXTRON_SE_FY_2025_speech.pdf) | period 可用；发布日期待核 |
-| AIXTRON | 2025Q3/9M | 2025-09-30 | 待核 | official quarterly report/call equivalent | [官方 Investors](https://www.aixtron.com/en/investors) | 直接材料 URL/发布日期缺口 |
-| ASMPT | 2026Q2/H1 | 2026-06-30 | 待核 | exchange/official results announcement | [官方 IR](https://www.asmpt.com/en/investors/) | 直接季度文件/发布日期缺口 |
-| ASMPT | 2026Q1 | 2026-03-31 | 待核 | official results announcement | [Q1 官方结果 PDF](https://www.asmpt.com/site/assets/files/85243/e0522_results_announcement_2026_q1.pdf) | period 可用；发布日期待核 |
-| ASMPT | FY2025 | 2025-12-31 | 待核 | annual results announcement | [官方 IR](https://www.asmpt.com/en/investors/) | 直接季度文件/发布日期缺口 |
-| ASMPT | 2025Q3/9M | 2025-09-30 | 待核 | official results announcement | [官方 IR](https://www.asmpt.com/en/investors/) | 直接季度文件/发布日期缺口 |
+| FormFactor | 2025Q3 | 2025-09-27 | 2025-10-29 | earnings release + webcast/supporting materials | [直接材料](https://investors.formfactor.com/news-releases/news-release-details/formfactor-inc-reports-2025-third-quarter-results) | 已核 |
+| AIXTRON | 2026Q2/H1 | 2026-06-30 | 2026-07-30 | official half-year report/call equivalent | [正式报告 PDF](https://www.aixtron.com/investoren/publikationen/2026/englisch/Half-Year%20Group%20Financial%20Report_2026.pdf) | 已核 |
+| AIXTRON | 2026Q1 | 2026-03-31 | 2026-04-30 | official quarterly group statement/call equivalent | [正式报告 PDF](https://www.aixtron.com/investoren/publikationen/2026/englisch/3-Months-Report-2026.pdf) | 已核 |
+| AIXTRON | FY2025 | 2025-12-31 | 2026-02-26 | annual report + official analyst call | [正式年报 PDF](https://www.aixtron.com/investoren/publikationen/2025/en/Annual%20Report%202025.pdf) | 已核 |
+| AIXTRON | 2025Q3/9M | 2025-09-30 | 2025-10-30 | official nine-month statement + analyst call | [正式报告 PDF](https://www.aixtron.com/investoren/publikationen/2025/en/9-Months-Report-2025.pdf) | 已核 |
+| ASMPT | 2026Q2/H1 | 2026-06-30 | 2026-07-29 | official results press release | [正式结果 PDF](https://www.asmpt.com/site/assets/files/85463/asmpt_2026_q2_press_release.pdf) | 已核；本轮只确认 press release 直链，不标 transcript |
+| ASMPT | 2026Q1 | 2026-03-31 | 2026-04-22 | HKEX/company official results announcement | [正式结果 PDF](https://www.asmpt.com/site/assets/files/85243/e0522_results_announcement_2026_q1.pdf) | 已核 |
+| ASMPT | FY2025 | 2025-12-31 | 2026-03-04 | audited annual results announcement | [正式结果 PDF](https://www.asmpt.com/site/assets/files/84503/e0522_results_announcement_2025_q4.pdf) | 已核 |
+| ASMPT | 2025Q3/9M | 2025-09-30 | 2025-10-28 | HKEX/company official results announcement | [正式结果 PDF](https://www.asmpt.com/site/assets/files/84017/e0522_results_announcement_2025_q3.pdf) | 已核 |
 
 ### 第一批：最近 90 天官网新闻/博客候选（2026-05-15 至 2026-08-13）
 
 | 公司 | 日期 | 事件候选 | 映射/价值 | 官方来源 |
 |---|---|---|---|---|
-| AXT | 2026-07-30 | Q2 正式结果（重点抽取 InP 产能、许可、客户/需求） | `M1`；T006/T007/T008 | [季度归档](https://investors.axt.com/Investors/financials/quarterly-results/default.aspx) |
-| GlobalFoundries | — | 本轮未确认区间内的独立高价值光子事件 | 不以普通企业新闻填充；保留缺口 | [公司新闻](https://investors.gf.com/news-releases) |
-| Tower | 2026-07（具体日待核） | 与 Xscape 的片上多波长激光平台 | `C1/C4/P1`；T013/T017；合作方官方来源 | [Xscape 官方公告](https://www.xscapephotonics.com/blog-post/xscape-photonics-and-tower-semiconductor-unveil-the-industrys-first-optically-pumped-on-chip-multi-wavelength-laser-platform-for-ai-datacenter-fabrics) |
+| AXT | 2026-07-29 | 与 Lumentum 签长期供应协议并锁定产能 | `M1`；T006/T007/T008；比未发布的 Q2 结果更直接 | [公司 IR 直接公告](https://investors.axt.com/Investors/news/news-details/2026/AXT-Inc--Announces-Long-Term-Supplier-Agreement-with-Lumentum/default.aspx) |
+| GlobalFoundries | 2026-07-29 | 与美国商务部签署 3 亿美元硅光研发拟议资助 LOI | `C4/P1`；T013/T015/T017；LOI 不是最终拨款 | [公司 IR 直接公告](https://investors.gf.com/news-releases/news-release-details/globalfoundries-signs-letter-intent-us-department-commerce-300) |
+| Tower | 2026-07-14 | 日本 300mm SiPho/SiGe/先进封装双轨扩产 | `C4/P1`；T013/T015/T017 | [公司 IR 直接公告](https://ir.towersemi.com/news-releases/news-release-details/tower-semiconductor-meti-support-announces-strategic-capacity) |
 | Semtech | 2026-05-26 | FY27Q1，抽取 data-center design wins 与 200G/lane 进展 | `C5`；T010/T019 | [官方结果](https://investors.semtech.com/news/semtech-announces-first-quarter-of-fiscal-year-2027-results/0634b869-19f6-4e90-9a0b-110fecf1d2db) |
-| MaxLinear | 2026（具体日待核） | Washington 200G TIA availability | `C5`；T010/T019；发布日期需入库前复核 | [官方公告](https://www.maxlinear.com/news/press-releases/2026/maxlinear-announces-availability-of-washington-200g-tia-for-next-generation-ai-data-center-connectiv) |
+| MaxLinear | 2026-07-23 | Q2 结果与电话会，重点抽取 optical products / DSP / TIA 的量产和收入陈述 | `C5`；T010/T019；避免使用 4 月 30 日、已超 90 天窗口的 Washington 新闻 | [公司 IR 直接公告](https://investors.maxlinear.com/press-releases/detail/617/maxlinear-inc-announces-second-quarter-2026-financial) |
 | Jabil | 2026-06-17 | FY26Q3：AI 基建收入上调，但只采明确光学/制造陈述 | `EMS1/MOD1`；防止把 AI 收入全算光模块 | [官方结果](https://investors.jabil.com/news/news-details/2026/Jabil-Posts-Third-Quarter-Results/default.aspx) |
-| Veeco | 2026-06-11 | LUMINA+ MOCVD 获 Ennostar qualification | `EQ1`；T007/T008 | [官方新闻归档](https://ir.veeco.com/news-and-events/press-releases/default.aspx) |
-| Veeco | 2026-05-05 | 超过 2.5 亿美元 InP 激光设备订单 | `EQ1`；产能领先信号，应用归因仍需核 | [官方新闻归档](https://ir.veeco.com/news-and-events/press-releases/default.aspx) |
-| FormFactor | 2026-05-11 | Investor Day 中 CPO 测试与规模化路线 | `EQ7`；T015/T017 | [官方 Investor Day](https://investors.formfactor.com/static-files/29f1154b-e1e4-4b57-afbd-f296b3f36504) |
-| AIXTRON | — | 本轮未确认区间内独立高价值光子事件 | 不能用一般设备订单补空 | [官方 Investors](https://www.aixtron.com/en/investors) |
-| ASMPT | — | 本轮未确认区间内独立高价值光子事件 | OFC 2026 公告早于 90 天窗口 | [官方新闻](https://www.asmpt.com/en/news-center/press-releases/) |
+| Veeco | 2026-06-11 | LUMINA+ MOCVD 获 Ennostar 量产资格 | `EQ1`；T007/T008；官方材料同时说明应用横跨显示、光通信等，不能全归因 AI 光互联 | [公司 IR 直接公告](https://ir.veeco.com/news-and-events/news-details/2026/Ennostar-Qualifies-Veecos-New-LUMINA-MOCVD-System-for-Advanced-Product-Applications/default.aspx) |
+| FormFactor | unavailable | 90 天内未找到明确指向 SiPh/CPO 的独立产品/订单新闻 | 7 月 28 日 Keystone Microtech 合作未明确指向光子，不强行纳入；5 月 11 日 Investor Day 已超窗口 4 天 | [公司新闻归档](https://investors.formfactor.com/press-releases) |
+| AIXTRON | 2026-07-30 | H1 2026 正式报告，抽取 AsP/InP、datacom laser 和设备订单表述 | `EQ1`；T007/T008；正式报告比泛设备新闻更高价值 | [正式报告 PDF](https://www.aixtron.com/investoren/publikationen/2026/englisch/Half-Year%20Group%20Financial%20Report_2026.pdf) |
+| ASMPT | 2026-07-29 | H1/Q2 2026 正式结果，抽取 photonics/CPO 封装与订单信号 | `EQ3/EQ4/EQ5`；T015/T017；财报中的 AI 订单不能自动全部归因光子 | [正式结果 PDF](https://www.asmpt.com/site/assets/files/85463/asmpt_2026_q2_press_release.pdf) |
 
 ## 证据限制与落库闸门
 
 - 64 家候选均至少有一个第一方技术/IR入口，但这不代表所有 ticker、总部/制造地、季度发布日期已完成交易所级复核；表中“未核/待核”不得原样进入结构化账本。
-- 第一批 40 个季度槽中，按本表的严格口径，**23 个槽仍至少存在发布日期、period_end 或季度直接材料 URL 之一的缺口**；其中 MaxLinear、AIXTRON、ASMPT 的四期均未达到可原子落库状态，其余缺口散布在历史季度或归档直链。缺口补齐前，不应声称“四季度完整”。
+- 第一批 40 个季度槽中，**39 个达到 period/period_end/published_date/官方直接材料 URL 可用的完整口径，1 个仍不可用**：AXT 2026Q2。截至核验只找到发布预告，未找到结果正文、监管附件或可确认的财报回放直链。GlobalFoundries 与 Veeco 的 Q2 文件已在 8 月 5 日发布，前者有公司 IR 正文与 SEC 6-K，后者可用 SEC 10-Q；FormFactor 2026Q2 只有官方 earnings webcast 事件页，按项目既定的 equivalent-material 口径计完整，但不得标成 earnings release 或 transcript。
 - 公司官网的产品页和博客属于公司自述。对“量产、客户采用、订单规模、性能领先”等主张，仍需用财报/监管披露、客户材料或设备/供应链另一端交叉验证。
 - 对日本/欧洲公司，半年报、九个月报告、年度报告可能是最稳定的正式材料；应标 `equivalent_material`，不能伪造成美式季度电话会 transcript。
 - watch/discovery 的存在是为了提高信息召回，不降低 canonical 的证据门槛，也不自动生成行业结论。

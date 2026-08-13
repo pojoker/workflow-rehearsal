@@ -90,7 +90,7 @@ ENUMS = {
     "role": {"core_peer", "upstream_enabler", "system_vendor", "downstream"},
     "enabled": {"yes", "no"},
     "source_scope": {"quarterly", "interquarter"},
-    "material_type": {"unknown", "transcript", "prepared_remarks", "earnings_presentation", "webcast_transcript", "earnings_release", "official_release", "official_technical_blog"},
+    "material_type": {"unknown", "transcript", "prepared_remarks", "earnings_presentation", "webcast_transcript", "earnings_release", "regulatory_filing", "official_release", "official_technical_blog"},
     "source_grade": {"unknown", "A", "B", "C"},
     "availability": {"available", "not_collected", "unavailable"},
     "speaker_role": {"management", "analyst", "operator", "corporate_author"},

@@ -14,6 +14,9 @@
 
 ## 公司季度卡
 
+- [AIXTRON](companies/aixa-aixtron.md)
+- [ASMPT](companies/asmpt-asmpt.md)
+- [AXT](companies/axti-axt.md)
 - [Applied Optoelectronics](companies/aaoi-applied-optoelectronics.md)
 - [Arista](companies/anet-arista.md)
 - [Broadcom](companies/avgo-broadcom.md)
@@ -22,9 +25,16 @@
 - [Coherent](companies/cohr-coherent.md)
 - [Credo](companies/crdo-credo.md)
 - [Fabrinet](companies/fn-fabrinet.md)
+- [FormFactor](companies/form-formfactor.md)
+- [GlobalFoundries](companies/gfs-globalfoundries.md)
+- [Jabil](companies/jbl-jabil.md)
 - [Lumentum](companies/lite-lumentum.md)
 - [MACOM](companies/mtsi-macom.md)
 - [Marvell](companies/mrvl-marvell.md)
+- [MaxLinear](companies/mxl-maxlinear.md)
 - [Meta](companies/meta-meta.md)
 - [NVIDIA](companies/nvda-nvidia.md)
 - [Nokia](companies/nok-nokia.md)
+- [Semtech](companies/smtc-semtech.md)
+- [Tower Semiconductor](companies/tsem-tower-semiconductor.md)
+- [Veeco](companies/veco-veeco.md)

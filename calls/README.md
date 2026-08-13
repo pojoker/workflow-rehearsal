@@ -28,7 +28,8 @@ python3 -m unittest discover -s calls/tests -v
   前身和业务承接去重；关系不生成 canonical 供货边，也不把品牌视为第二个经营主体。
 - `sources.csv`：每家最近四个季度的槽位。一个槽位可登记多个 A/B/C 材料；
   尚未采集的槽位使用 `unknown` 类型/等级并填写缺失原因；公司官网署名技术博客
-  作为 `official_technical_blog` 的 interquarter 来源登记。
+  作为 `official_technical_blog` 的 interquarter 来源登记；SEC/交易所等法定披露平台的
+  季度或年度报告以 `regulatory_filing` 登记，与 transcript、earnings release 分开。
 - `claims.csv`：原子陈述。`analyst_question` 与管理层事实/前瞻机械隔离；
   `corporate_author` 的 `technical_claim/technical_demo` 也与管理层商业确认机械隔离。
 - `themes.csv`：受限需求、卡点、候选解法与双轨节点映射；可行性、稀缺性、

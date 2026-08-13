@@ -13,3 +13,13 @@ NOK,Nokia,system_vendor,光传输、相干可插拔与AI数据中心网络系统
 CIEN,Ciena,system_vendor,相干光系统、DCI与CPO光引擎观察方,yes
 MTSI,MACOM,upstream_enabler,高速驱动器、TIA、CW激光器与光电模拟器件方,yes
 CRDO,Credo,upstream_enabler,SerDes、AEC、光DSP与高速光收发器平台,yes
+MXL,MaxLinear,upstream_enabler,200G TIA与PAM4 DSP补足LPO和DSP路线,yes
+JBL,Jabil,core_peer,光模块设计制造与1.6T可插拔产品的制造交付观察方,yes
+VECO,Veeco,upstream_enabler,InP MOCVD与离子束设备订单观察激光产能约束,yes
+FORM,FormFactor,upstream_enabler,硅光与CPO晶圆级测试及自动对准平台,yes
+AXTI,AXT,upstream_enabler,InP、GaAs与Ge衬底供给及出口许可观察方,yes
+GFS,GlobalFoundries,upstream_enabler,硅光代工、SiGe与CPO平台的设计到量产观察方,yes
+TSEM,Tower Semiconductor,upstream_enabler,SiPho与模拟混合信号代工及产能扩张观察方,yes
+SMTC,Semtech,upstream_enabler,200G每通道PMD、TIA与驱动器平台观察方,yes
+AIXA,AIXTRON,upstream_enabler,InP与GaAs MOCVD设备和扩产交期观察方,yes
+ASMPT,ASMPT,upstream_enabler,光子芯片贴装、耦合、键合与CPO装配设备观察方,yes

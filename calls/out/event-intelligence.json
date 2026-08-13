@@ -36,14 +36,14 @@
       "entity_name": "AIXTRON",
       "entity_type": "company",
       "inclusion_reason": "InP/GaAs MOCVD观察六英寸InP扩产与设备交期",
-      "notes": "季度直链元数据待补",
+      "notes": "半年报与九个月报告按正式等价材料登记",
       "priority": "P1",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "AIXA",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.aixtron.com/investoren/events/telefonkonferenz/2025/AIXTRON_SE_FY_2025_speech.pdf",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_AMD",
@@ -113,12 +113,12 @@
       "inclusion_reason": "CPO与SiPh贴装耦合键合覆盖封装自动化",
       "notes": "展示与量产收入需分开",
       "priority": "P1",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "ASMPT",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.asmpt.com/en/news-center/press-releases/asmpt-at-ofc-2026-los-angeles-enabling-scalable-co-packaged-optics-and-photonic-integration/",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_AVICENA",
@@ -141,14 +141,14 @@
       "entity_name": "AXT",
       "entity_type": "company",
       "inclusion_reason": "InP/GaAs/Ge衬底直接观察InP供给扩产与出口许可",
-      "notes": "四季度元数据仍有缺口",
+      "notes": "四槽已建；2026Q2只有发布预告并显式unavailable",
       "priority": "P1",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "AXTI",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://investors.axt.com/Investors/news/news-details/2026/AXT-Inc--Announces-First-Quarter-2026-Financial-Results/default.aspx",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_AYAR",
@@ -263,12 +263,12 @@
       "inclusion_reason": "硅光与CPO晶圆级测试覆盖量产测试缺口",
       "notes": "公司主业还包括存储探针卡",
       "priority": "P1",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "FORM",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.formfactor.com/product/probe-systems/autonomous-assistants/autonomous-silicon-photonics/",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_FREIBERGER",
@@ -338,12 +338,12 @@
       "inclusion_reason": "硅光代工与CPO平台可验证设计到量产节奏",
       "notes": "业务宽需隔离硅光口径",
       "priority": "P1",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "GFS",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://gf.com/technologies/silicon-photonics/",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_GLW",
@@ -413,12 +413,12 @@
       "inclusion_reason": "承接硅光模块业务并推出1.6T可观察制造交付",
       "notes": "AI收入不能等同光模块收入",
       "priority": "P1",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "JBL",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.jabil.com/news/jabil-launches-1.6t-pluggable-transceiver.html",
       "suggested_role": "core_peer",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_KEYS",
@@ -531,14 +531,14 @@
       "entity_name": "MaxLinear",
       "entity_type": "company",
       "inclusion_reason": "200G TIA与PAM4 DSP补足LPO和DSP路线",
-      "notes": "四季度直接材料待补",
+      "notes": "四季度采用SEC法定披露连续覆盖；不等同电话会",
       "priority": "P1",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "MXL",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.maxlinear.com/dcc",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_MYCRONIC",
@@ -788,12 +788,12 @@
       "inclusion_reason": "200G每通道PMD与TIA/driver补足高速模拟前端",
       "notes": "非光业务稀释口径",
       "priority": "P1",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "SMTC",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.semtech.com/technology/fiberedge-directedge",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_SOI",
@@ -893,12 +893,12 @@
       "inclusion_reason": "SiPho与模拟混合信号代工并有1.6T量产披露",
       "notes": "客户披露受保密限制",
       "priority": "P1",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "TSEM",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://ir.towersemi.com/financial-information/quarterly-results/",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_VECO",
@@ -908,12 +908,12 @@
       "inclusion_reason": "InP设备订单是激光产能的领先指标",
       "notes": "订单应用归因仍需核",
       "priority": "P1",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "VECO",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://ir.veeco.com/news-and-events/news-details/2026/Veeco-Books-Multi-System-Lumina-and-Spector-Orders-for-Manufacturing-Indium-Phosphide-InP-based-Optical-Components/default.aspx",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_VIAV",
@@ -1873,11 +1873,12 @@
   "coverage_summary": {
     "active_watch_entity_count": 3,
     "candidate_status_counts": {
-      "source_verified": 64
+      "promoted": 10,
+      "source_verified": 54
     },
     "disclosure_count": 38,
-    "four_available_slot_complete_count": 12,
-    "four_slot_complete_count": 14,
+    "four_available_slot_complete_count": 21,
+    "four_slot_complete_count": 24,
     "latest_disclosure_at": "2026-08-06",
     "latest_retrieved_at": "2026-08-11",
     "latest_reviewed_at": "2026-08-11",
@@ -1885,7 +1886,7 @@
       "anchor_reviewed": 30,
       "no_relevant_claims": 8
     },
-    "quarterly_company_count": 14
+    "quarterly_company_count": 24
   },
   "discovery_queue": [],
   "entity_relationships": [
