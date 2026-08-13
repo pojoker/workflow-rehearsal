@@ -378,13 +378,24 @@ def load_event_facts(root: Path) -> dict:
             # Candidate events remain legal but are excluded from the radar.
             continue
         if event["lifecycle_stage"] in MATURE_COMMERCIAL_STAGES:
-            supporting_disclosures = [
-                disclosures[event_claims[link["event_claim_id"]]["disclosure_id"]]
+            supporting_claims = [
+                event_claims[link["event_claim_id"]]
                 for link in reviewed_links
                 if link["relationship"] in {"reports", "supports"}
             ]
+            supporting_disclosures = [
+                disclosures[claim["disclosure_id"]]
+                for claim in supporting_claims
+            ]
             if event["event_status"] in {"asserted", "corroborated"} and not supporting_disclosures:
                 raise EventLedgerError(f"{where}: mature commercial stage lacks supporting report")
+            if supporting_claims and all(
+                claim["statement_kind"] == "forward_looking"
+                for claim in supporting_claims
+            ):
+                raise EventLedgerError(
+                    f"{where}: forward-looking claims alone cannot support mature commercial stage"
+                )
             if supporting_disclosures and all(item["disclosure_type"] == "technical_blog" for item in supporting_disclosures):
                 raise EventLedgerError(f"{where}: technical blog alone cannot support mature commercial stage")
         if event["event_status"] == "corroborated":

@@ -84,9 +84,10 @@ CSV 是事实源，`out/` 只由渲染器生成，禁止手改。`raw/` 可保�
 4. 被收购公司、子公司和品牌先登记 `entity_relationships.csv`；历史事件可以保留原主体，
    但公司数与独立证据不重复计算。
 
-当前扩展池为 14 家。Broadcom、Marvell、Nokia、Ciena、MACOM、Credo 已登记各四个
-官方季度材料。Ciena 四季改用公司 IR 托管的完整逐字稿；MACOM 四份业绩稿明确记录为
-`no_relevant_claims`，不以 SEC 的其他披露倒灌管理层原话。产品公告中的送样、GA、出货和
-试验默认仍是第一方 `asserted`；MACOM–IQE 的投资与长期供应协议因取得双方不同来源确认，
-才提升为 `corroborated`，但不代表有效产能增加或卡点解除。Lumentum 样本继续区分官网
-技术作者演示、官方业绩材料和第三方逐字稿；系统没有独立验证 AAOI 所称的 MOCVD backlog。
+当前正式季度池为 37 家，事件监控层为 36 家，另有 10 家停留在发现队列。季度公司的
+`universe.csv` 晋级必须同批登记四个不同季度槽；事件监控公司的晋级只要求连续两期一手
+来源复核，不强制制造无意义的四季度材料。Ciena 四季使用公司 IR 托管的完整逐字稿；
+`no_relevant_claims` 只表示已按登记范围复核后没有相关主张，不等于行业负面证据。产品公告
+中的送样、GA、出货和试验默认仍是第一方 `asserted`；只有不同起源的独立来源支持才提升为
+`corroborated`，且不代表有效产能增加或卡点解除。Lumentum 样本继续区分官网技术作者演示、
+官方业绩材料和第三方逐字稿；系统没有独立验证 AAOI 所称的 MOCVD backlog。

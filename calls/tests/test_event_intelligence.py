@@ -368,6 +368,17 @@ class EventIntelligenceTest(unittest.TestCase):
         with self.assertRaisesRegex(EventLedgerError, "technical blog alone"):
             load_event_facts(self.root)
 
+    def test_forward_looking_claim_alone_cannot_support_mature_stage(self) -> None:
+        self.mutate("event_claims.csv", "ECL001", {"statement_kind": "forward_looking"})
+        with self.assertRaisesRegex(EventLedgerError, "forward-looking claims alone"):
+            load_event_facts(self.root)
+
+    def test_mature_stage_allows_mixed_forward_and_fact_support(self) -> None:
+        self.mutate("event_claims.csv", "ECL001", {"statement_kind": "forward_looking"})
+        self.add_independent_support()
+        facts = load_event_facts(self.root)
+        self.assertEqual(facts["events"]["EV001"]["lifecycle_stage"], "volume_order")
+
     def test_retrieval_time_is_required_but_never_used_as_event_time(self) -> None:
         projection = derive_event_projection(load_event_facts(self.root))
         event = next(row for row in projection["radar_events"] if row["event_id"] == "EV001")

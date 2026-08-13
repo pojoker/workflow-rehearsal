@@ -72,6 +72,10 @@ def render_event_radar(projection: dict) -> str:
         row for row in projection.get("discovery_queue", [])
         if row.get("queue_type") == "company_candidate_review"
     ]
+    processing_queue = [
+        row for row in projection.get("discovery_queue", [])
+        if row.get("queue_type") != "company_candidate_review"
+    ]
 
     def esc(value: object) -> str:
         return html.escape(str(value or ""), quote=True)
@@ -130,7 +134,7 @@ def render_event_radar(projection: dict) -> str:
         f"（四槽 {esc(coverage.get('four_slot_complete_count', 0))} / "
         f"四槽均可用 {esc(coverage.get('four_available_slot_complete_count', 0))}） · "
         f"事件监控 {esc(coverage.get('active_watch_entity_count', 0))} 家 · "
-        f"发现候选 {candidate_text} · "
+        f"候选池 {candidate_text} · "
         f"晋级复核 {esc(coverage.get('tier_reviewed_candidate_count', 0))} 家/"
         f"{esc(coverage.get('tier_review_count', 0))} 期"
     )
@@ -145,6 +149,16 @@ def render_event_radar(projection: dict) -> str:
         f'{len(candidate_queue)} 家待进一步复核</summary><ul>{queue_rows}</ul></details>'
         if candidate_queue else ""
     )
+    processing_rows = "".join(
+        f'<li>{esc(row.get("queue_type"))} · '
+        f'{esc(row.get("title") or row.get("summary") or row.get("event_id") or row.get("disclosure_id"))}</li>'
+        for row in processing_queue
+    )
+    processing_html = (
+        '<details class="event-queue"><summary>披露与事件处理队列：'
+        f'{len(processing_queue)} 项</summary><ul>{processing_rows}</ul></details>'
+        if processing_queue else ""
+    )
     return (
         '<div class="event-radar">'
         '<h3>本期公司事件</h3>'
@@ -154,6 +168,7 @@ def render_event_radar(projection: dict) -> str:
         f'<div class="event-coverage">处理覆盖：{coverage_text} · 最新披露 {esc(coverage.get("latest_disclosure_at") or "unknown")} · 最新复核 {esc(coverage.get("latest_reviewed_at") or "unknown")}</div>'
         f'<div class="event-version" data-event-version="{data_version}">数据版本：{data_version}</div>'
         f'{queue_html}'
+        f'{processing_html}'
         f'<div class="event-list">{"".join(cards) or "尚无已完成锚点复核的事件。"}</div>'
         '</div>'
     )
