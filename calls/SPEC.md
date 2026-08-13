@@ -111,8 +111,9 @@
 公司分层采用 `discovery candidate → watch entity / quarterly coverage company`。发现候选
 不进入事件雷达或覆盖率；事件监控实体不承担四季度完整性；只有启用的季度覆盖公司才必须
 恰好登记四个季度槽。品牌或被收购实体通过带生效时间的关系保存历史身份，不与母公司重复
-计算公司数或来源独立性。候选进入 `promotion_ready/promoted` 前必须有两个不同正式披露期的
-`company_tier_reviews`，且不能两期均为 `no_relevant_signal`。
+计算公司数或来源独立性。候选晋级季度覆盖层前必须有两个不同正式披露期的
+`company_tier_reviews`，且不能两期均为 `no_relevant_signal`；事件监控层仅要求已核一手
+来源，不借用季度材料闸门，也不计入四季度覆盖率。
 
 ## 6. 分析纪律
 

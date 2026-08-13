@@ -198,12 +198,19 @@ def load_event_facts(root: Path) -> dict:
             raise EventLedgerError(
                 f"{where}: only promoted candidate may set promoted_entity_id"
             )
-        if row["verification_status"] in {"promotion_ready", "promoted"}:
+        if (
+            row["suggested_tier"] == "quarterly"
+            and row["verification_status"] in {"promotion_ready", "promoted"}
+        ):
             reviews = tier_reviews_by_candidate.get(candidate_id, [])
             if len(reviews) < 2:
-                raise EventLedgerError(f"{where}: promotion needs two formal tier reviews")
+                raise EventLedgerError(
+                    f"{where}: quarterly promotion needs two formal tier reviews"
+                )
             if all(item["signal_class"] == "no_relevant_signal" for item in reviews):
-                raise EventLedgerError(f"{where}: promotion lacks optical or adjacent signal")
+                raise EventLedgerError(
+                    f"{where}: quarterly promotion lacks optical or adjacent signal"
+                )
 
     for relationship_id, row in relationships.items():
         where = f"entity_relationships:{relationship_id}"

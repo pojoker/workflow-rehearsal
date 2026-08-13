@@ -450,6 +450,32 @@ class EventIntelligenceTest(unittest.TestCase):
         with self.assertRaisesRegex(EventLedgerError, "requires formal disclosure material"):
             load_event_facts(self.root)
 
+    def test_watch_promotion_does_not_require_quarterly_tier_reviews(self) -> None:
+        self.append("watch_entities.csv", {
+            "entity_id": "WATCH_TEST",
+            "entity_name": "Private Photonics",
+            "entity_type": "company",
+            "inclusion_reason": "event-driven private company",
+            "monitoring_status": "active",
+            "source_ref": "https://example.com/official-product",
+        })
+        self.append("company_candidates.csv", {
+            "candidate_id": "CAND_TEST",
+            "entity_name": "Private Photonics",
+            "entity_type": "company",
+            "suggested_role": "upstream_enabler",
+            "suggested_tier": "watch",
+            "priority": "P3",
+            "capability_scope": "D12",
+            "inclusion_reason": "event-driven private company",
+            "source_ref": "https://example.com/official-product",
+            "verification_status": "promoted",
+            "promoted_entity_id": "WATCH_TEST",
+            "reviewed_at": "2026-08-13",
+        })
+        facts = load_event_facts(self.root)
+        self.assertIn("WATCH_TEST", facts["entities"])
+
     def test_entity_relationships_are_time_aware_and_closed_over_entities(self) -> None:
         fixture = {
             "relationship_id": "REL_TEST",
