@@ -2272,6 +2272,53 @@
     {
       "events": [
         {
+          "counterparty_ids": [
+            "NVDA"
+          ],
+          "date_precision": "exact",
+          "event_category": "capacity_constraint",
+          "event_id": "EV027",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "second paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_GLW_20260506_NVDA",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL029",
+              "evidence_id": "EE029",
+              "independence_class": "first_party",
+              "origin_group": "OG_GLW_NVDA_20260506",
+              "provenance_class": "first_party",
+              "published_at": "2026-05-06",
+              "quote": "Corning will increase its U.S.-based optical connectivity manufacturing capacity by 10x and expand its U.S. fiber production capacity by more than 50%",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "forward_looking",
+              "title": "NVIDIA and Corning announce long-term optical manufacturing partnership",
+              "url": "https://investor.corning.com/news-and-events/news/news-details/2026/NVIDIA-and-Corning-Announce-Long-Term-Partnership-To-Strengthen-U-S--Manufacturing-for-AI-Infrastructure/default.aspx"
+            }
+          ],
+          "lifecycle_stage": "announced",
+          "occurred_end": "2026-05-06",
+          "occurred_start": "2026-05-06",
+          "previous_event_id": "",
+          "primary_subject_id": "GLW",
+          "program_id": "PRG_GLW_NVDA_OPTICAL",
+          "summary": "Corning提出美国光连接产能十倍和光纤产能提升逾50%的目标",
+          "theme_ids": [
+            "T017",
+            "T019"
+          ]
+        }
+      ],
+      "primary_subject_id": "GLW"
+    },
+    {
+      "events": [
+        {
           "counterparty_ids": [],
           "date_precision": "exact",
           "event_category": "capacity_constraint",
@@ -2727,6 +2774,53 @@
     {
       "events": [
         {
+          "counterparty_ids": [
+            "WATCH_LUMILENS"
+          ],
+          "date_precision": "exact",
+          "event_category": "commercial_adoption",
+          "event_id": "EV028",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "notable business highlights supply agreement bullet",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_POET_20260514_LUMILENS",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL031",
+              "evidence_id": "EE031",
+              "independence_class": "first_party",
+              "origin_group": "OG_POET_20260514_LUMILENS",
+              "provenance_class": "first_party",
+              "published_at": "2026-05-14",
+              "quote": "Lumilens has placed an initial purchase order with the Company for the manufacturing of EOI-based engines valued at $50 million",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "fact_assertion",
+              "title": "POET first-quarter 2026 results and Lumilens purchase order",
+              "url": "https://www.poet-technologies.com/news/poet-technologies-reports-first-quarter-2026-financial-results"
+            }
+          ],
+          "lifecycle_stage": "volume_order",
+          "occurred_end": "2026-05-14",
+          "occurred_start": "2026-05-14",
+          "previous_event_id": "",
+          "primary_subject_id": "POET",
+          "program_id": "PRG_POET_LUMILENS",
+          "summary": "POET称获得Lumilens价值5000万美元EOI光引擎初始采购订单",
+          "theme_ids": [
+            "T010",
+            "T017"
+          ]
+        }
+      ],
+      "primary_subject_id": "POET"
+    },
+    {
+      "events": [
+        {
           "counterparty_ids": [],
           "date_precision": "exact",
           "event_category": "capacity_constraint",
@@ -2819,19 +2913,19 @@
     }
   ],
   "coverage_summary": {
-    "active_watch_entity_count": 35,
+    "active_watch_entity_count": 36,
     "candidate_status_counts": {
       "promoted": 54,
       "source_verified": 10
     },
-    "disclosure_count": 43,
+    "disclosure_count": 46,
     "four_available_slot_complete_count": 34,
     "four_slot_complete_count": 37,
     "latest_disclosure_at": "2026-08-06",
     "latest_retrieved_at": "2026-08-13",
     "latest_reviewed_at": "2026-08-13",
     "processing_status_counts": {
-      "anchor_reviewed": 35,
+      "anchor_reviewed": 38,
       "no_relevant_claims": 8
     },
     "quarterly_company_count": 37,
@@ -4126,6 +4220,90 @@
         "T007",
         "T008"
       ]
+    },
+    {
+      "counterparty_ids": [
+        "NVDA"
+      ],
+      "date_precision": "exact",
+      "event_category": "capacity_constraint",
+      "event_id": "EV027",
+      "event_status": "asserted",
+      "evidence": [
+        {
+          "anchor": "second paragraph",
+          "claim_reviewed_at": "2026-08-13",
+          "content_class": "commercial_disclosure",
+          "disclosure_id": "D_GLW_20260506_NVDA",
+          "disclosure_reviewed_at": "2026-08-13",
+          "disclosure_type": "official_release",
+          "event_claim_id": "ECL029",
+          "evidence_id": "EE029",
+          "independence_class": "first_party",
+          "origin_group": "OG_GLW_NVDA_20260506",
+          "provenance_class": "first_party",
+          "published_at": "2026-05-06",
+          "quote": "Corning will increase its U.S.-based optical connectivity manufacturing capacity by 10x and expand its U.S. fiber production capacity by more than 50%",
+          "relationship": "reports",
+          "retrieved_at": "2026-08-13",
+          "statement_kind": "forward_looking",
+          "title": "NVIDIA and Corning announce long-term optical manufacturing partnership",
+          "url": "https://investor.corning.com/news-and-events/news/news-details/2026/NVIDIA-and-Corning-Announce-Long-Term-Partnership-To-Strengthen-U-S--Manufacturing-for-AI-Infrastructure/default.aspx"
+        }
+      ],
+      "lifecycle_stage": "announced",
+      "occurred_end": "2026-05-06",
+      "occurred_start": "2026-05-06",
+      "previous_event_id": "",
+      "primary_subject_id": "GLW",
+      "program_id": "PRG_GLW_NVDA_OPTICAL",
+      "summary": "Corning提出美国光连接产能十倍和光纤产能提升逾50%的目标",
+      "theme_ids": [
+        "T017",
+        "T019"
+      ]
+    },
+    {
+      "counterparty_ids": [
+        "WATCH_LUMILENS"
+      ],
+      "date_precision": "exact",
+      "event_category": "commercial_adoption",
+      "event_id": "EV028",
+      "event_status": "asserted",
+      "evidence": [
+        {
+          "anchor": "notable business highlights supply agreement bullet",
+          "claim_reviewed_at": "2026-08-13",
+          "content_class": "commercial_disclosure",
+          "disclosure_id": "D_POET_20260514_LUMILENS",
+          "disclosure_reviewed_at": "2026-08-13",
+          "disclosure_type": "official_release",
+          "event_claim_id": "ECL031",
+          "evidence_id": "EE031",
+          "independence_class": "first_party",
+          "origin_group": "OG_POET_20260514_LUMILENS",
+          "provenance_class": "first_party",
+          "published_at": "2026-05-14",
+          "quote": "Lumilens has placed an initial purchase order with the Company for the manufacturing of EOI-based engines valued at $50 million",
+          "relationship": "reports",
+          "retrieved_at": "2026-08-13",
+          "statement_kind": "fact_assertion",
+          "title": "POET first-quarter 2026 results and Lumilens purchase order",
+          "url": "https://www.poet-technologies.com/news/poet-technologies-reports-first-quarter-2026-financial-results"
+        }
+      ],
+      "lifecycle_stage": "volume_order",
+      "occurred_end": "2026-05-14",
+      "occurred_start": "2026-05-14",
+      "previous_event_id": "",
+      "primary_subject_id": "POET",
+      "program_id": "PRG_POET_LUMILENS",
+      "summary": "POET称获得Lumilens价值5000万美元EOI光引擎初始采购订单",
+      "theme_ids": [
+        "T010",
+        "T017"
+      ]
     }
   ],
   "theme_impacts": [
@@ -4545,6 +4723,48 @@
           "summary": "Lumentum第一方博客披露1.6T 2xDR4现场演示",
           "theme_ids": [
             "T010"
+          ]
+        },
+        {
+          "counterparty_ids": [
+            "WATCH_LUMILENS"
+          ],
+          "date_precision": "exact",
+          "event_category": "commercial_adoption",
+          "event_id": "EV028",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "notable business highlights supply agreement bullet",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_POET_20260514_LUMILENS",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL031",
+              "evidence_id": "EE031",
+              "independence_class": "first_party",
+              "origin_group": "OG_POET_20260514_LUMILENS",
+              "provenance_class": "first_party",
+              "published_at": "2026-05-14",
+              "quote": "Lumilens has placed an initial purchase order with the Company for the manufacturing of EOI-based engines valued at $50 million",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "fact_assertion",
+              "title": "POET first-quarter 2026 results and Lumilens purchase order",
+              "url": "https://www.poet-technologies.com/news/poet-technologies-reports-first-quarter-2026-financial-results"
+            }
+          ],
+          "lifecycle_stage": "volume_order",
+          "occurred_end": "2026-05-14",
+          "occurred_start": "2026-05-14",
+          "previous_event_id": "",
+          "primary_subject_id": "POET",
+          "program_id": "PRG_POET_LUMILENS",
+          "summary": "POET称获得Lumilens价值5000万美元EOI光引擎初始采购订单",
+          "theme_ids": [
+            "T010",
+            "T017"
           ]
         }
       ],
@@ -5177,6 +5397,90 @@
         },
         {
           "counterparty_ids": [
+            "NVDA"
+          ],
+          "date_precision": "exact",
+          "event_category": "capacity_constraint",
+          "event_id": "EV027",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "second paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_GLW_20260506_NVDA",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL029",
+              "evidence_id": "EE029",
+              "independence_class": "first_party",
+              "origin_group": "OG_GLW_NVDA_20260506",
+              "provenance_class": "first_party",
+              "published_at": "2026-05-06",
+              "quote": "Corning will increase its U.S.-based optical connectivity manufacturing capacity by 10x and expand its U.S. fiber production capacity by more than 50%",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "forward_looking",
+              "title": "NVIDIA and Corning announce long-term optical manufacturing partnership",
+              "url": "https://investor.corning.com/news-and-events/news/news-details/2026/NVIDIA-and-Corning-Announce-Long-Term-Partnership-To-Strengthen-U-S--Manufacturing-for-AI-Infrastructure/default.aspx"
+            }
+          ],
+          "lifecycle_stage": "announced",
+          "occurred_end": "2026-05-06",
+          "occurred_start": "2026-05-06",
+          "previous_event_id": "",
+          "primary_subject_id": "GLW",
+          "program_id": "PRG_GLW_NVDA_OPTICAL",
+          "summary": "Corning提出美国光连接产能十倍和光纤产能提升逾50%的目标",
+          "theme_ids": [
+            "T017",
+            "T019"
+          ]
+        },
+        {
+          "counterparty_ids": [
+            "WATCH_LUMILENS"
+          ],
+          "date_precision": "exact",
+          "event_category": "commercial_adoption",
+          "event_id": "EV028",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "notable business highlights supply agreement bullet",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_POET_20260514_LUMILENS",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL031",
+              "evidence_id": "EE031",
+              "independence_class": "first_party",
+              "origin_group": "OG_POET_20260514_LUMILENS",
+              "provenance_class": "first_party",
+              "published_at": "2026-05-14",
+              "quote": "Lumilens has placed an initial purchase order with the Company for the manufacturing of EOI-based engines valued at $50 million",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "fact_assertion",
+              "title": "POET first-quarter 2026 results and Lumilens purchase order",
+              "url": "https://www.poet-technologies.com/news/poet-technologies-reports-first-quarter-2026-financial-results"
+            }
+          ],
+          "lifecycle_stage": "volume_order",
+          "occurred_end": "2026-05-14",
+          "occurred_start": "2026-05-14",
+          "previous_event_id": "",
+          "primary_subject_id": "POET",
+          "program_id": "PRG_POET_LUMILENS",
+          "summary": "POET称获得Lumilens价值5000万美元EOI光引擎初始采购订单",
+          "theme_ids": [
+            "T010",
+            "T017"
+          ]
+        },
+        {
+          "counterparty_ids": [
             "WATCH_DUST"
           ],
           "date_precision": "exact",
@@ -5300,6 +5604,53 @@
         }
       ],
       "theme_id": "T017"
+    },
+    {
+      "events": [
+        {
+          "counterparty_ids": [
+            "NVDA"
+          ],
+          "date_precision": "exact",
+          "event_category": "capacity_constraint",
+          "event_id": "EV027",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "second paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_GLW_20260506_NVDA",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL029",
+              "evidence_id": "EE029",
+              "independence_class": "first_party",
+              "origin_group": "OG_GLW_NVDA_20260506",
+              "provenance_class": "first_party",
+              "published_at": "2026-05-06",
+              "quote": "Corning will increase its U.S.-based optical connectivity manufacturing capacity by 10x and expand its U.S. fiber production capacity by more than 50%",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "forward_looking",
+              "title": "NVIDIA and Corning announce long-term optical manufacturing partnership",
+              "url": "https://investor.corning.com/news-and-events/news/news-details/2026/NVIDIA-and-Corning-Announce-Long-Term-Partnership-To-Strengthen-U-S--Manufacturing-for-AI-Infrastructure/default.aspx"
+            }
+          ],
+          "lifecycle_stage": "announced",
+          "occurred_end": "2026-05-06",
+          "occurred_start": "2026-05-06",
+          "previous_event_id": "",
+          "primary_subject_id": "GLW",
+          "program_id": "PRG_GLW_NVDA_OPTICAL",
+          "summary": "Corning提出美国光连接产能十倍和光纤产能提升逾50%的目标",
+          "theme_ids": [
+            "T017",
+            "T019"
+          ]
+        }
+      ],
+      "theme_id": "T019"
     },
     {
       "events": [

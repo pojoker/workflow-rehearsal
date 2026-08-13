@@ -27,3 +27,6 @@ EE025,EV023,ECL025,reports,first_party,OG_GFS_20260729_CHIPS,GlobalFoundries单�
 EE026,EV024,ECL026,reports,first_party,OG_TSEM_20260714_JAPAN,Tower单方产能规划公告
 EE027,EV025,ECL027,reports,first_party,OG_VECO_20260611_ENNOSTAR,Veeco单方资格认证公告
 EE028,EV026,ECL028,reports,first_party,OG_LITE_20260326_GREENSBORO,Lumentum单方产能爬坡目标公告
+EE029,EV027,ECL029,reports,first_party,OG_GLW_NVDA_20260506,Corning托管联合新闻稿
+EE030,EV027,ECL030,supports,same_origin,OG_GLW_NVDA_20260506,NVIDIA官网为同一联合新闻稿副本；不构成独立来源
+EE031,EV028,ECL031,reports,first_party,OG_POET_20260514_LUMILENS,POET单方季度业绩与订单披露
