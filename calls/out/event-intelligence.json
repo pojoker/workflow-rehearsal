@@ -1775,6 +1775,53 @@
     {
       "events": [
         {
+          "counterparty_ids": [
+            "LITE"
+          ],
+          "date_precision": "exact",
+          "event_category": "supply_chain_arrangement",
+          "event_id": "EV022",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "opening paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_AXTI_20260729_LITE",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL024",
+              "evidence_id": "EE024",
+              "independence_class": "first_party",
+              "origin_group": "OG_AXTI_20260729_LITE",
+              "provenance_class": "first_party",
+              "published_at": "2026-07-29",
+              "quote": "entered into a definitive agreement with Lumentum Operations LLC for the supply and capacity reservation of indium phosphide wafer substrates",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "fact_assertion",
+              "title": "AXT announces long-term supplier agreement with Lumentum",
+              "url": "https://investors.axt.com/Investors/news/news-details/2026/AXT-Inc--Announces-Long-Term-Supplier-Agreement-with-Lumentum/default.aspx"
+            }
+          ],
+          "lifecycle_stage": "not_applicable",
+          "occurred_end": "2026-07-29",
+          "occurred_start": "2026-07-29",
+          "previous_event_id": "",
+          "primary_subject_id": "AXTI",
+          "program_id": "PRG_AXTI_LITE_INP",
+          "summary": "AXT称与Lumentum签署InP晶圆供给和产能预留协议",
+          "theme_ids": [
+            "T007",
+            "T016"
+          ]
+        }
+      ],
+      "primary_subject_id": "AXTI"
+    },
+    {
+      "events": [
+        {
           "counterparty_ids": [],
           "date_precision": "exact",
           "event_category": "commercial_adoption",
@@ -2178,6 +2225,92 @@
     },
     {
       "events": [
+        {
+          "counterparty_ids": [],
+          "date_precision": "exact",
+          "event_category": "capacity_constraint",
+          "event_id": "EV023",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "opening paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_GFS_20260729_CHIPS",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL025",
+              "evidence_id": "EE025",
+              "independence_class": "first_party",
+              "origin_group": "OG_GFS_20260729_CHIPS",
+              "provenance_class": "first_party",
+              "published_at": "2026-07-29",
+              "quote": "entered into a letter of intent with the U.S. Department of Commerce to accelerate research and development of next-generation silicon photonics",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "fact_assertion",
+              "title": "GlobalFoundries signs CHIPS R&D letter of intent for silicon photonics",
+              "url": "https://investors.gf.com/news-releases/news-release-details/globalfoundries-signs-letter-intent-us-department-commerce-300"
+            }
+          ],
+          "lifecycle_stage": "announced",
+          "occurred_end": "2026-07-29",
+          "occurred_start": "2026-07-29",
+          "previous_event_id": "",
+          "primary_subject_id": "GFS",
+          "program_id": "PRG_GFS_US_SIPHO",
+          "summary": "GlobalFoundries称签署3亿美元硅光研发资助LOI",
+          "theme_ids": [
+            "T013",
+            "T015",
+            "T017"
+          ]
+        }
+      ],
+      "primary_subject_id": "GFS"
+    },
+    {
+      "events": [
+        {
+          "counterparty_ids": [],
+          "date_precision": "exact",
+          "event_category": "capacity_constraint",
+          "event_id": "EV026",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "capacity expansion paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_LITE_20260326_GREENSBORO",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL028",
+              "evidence_id": "EE028",
+              "independence_class": "first_party",
+              "origin_group": "OG_LITE_20260326_GREENSBORO",
+              "provenance_class": "first_party",
+              "published_at": "2026-03-26",
+              "quote": "The facility is expected to ramp production in mid-2028",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "forward_looking",
+              "title": "Lumentum announces new U.S. InP manufacturing facility",
+              "url": "https://investor.lumentum.com/financial-news-releases/news-details/2026/Lumentum-Announces-New-U-S--Manufacturing-Facility-to-Produce-Advanced-Lasers-for-the-Worlds-Largest-AI-Data-Centers/default.aspx"
+            }
+          ],
+          "lifecycle_stage": "announced",
+          "occurred_end": "2026-03-26",
+          "occurred_start": "2026-03-26",
+          "previous_event_id": "",
+          "primary_subject_id": "LITE",
+          "program_id": "PRG_LITE_GREENSBORO_INP",
+          "summary": "Lumentum提出Greensboro美国InP工厂2028年中爬坡目标",
+          "theme_ids": [
+            "T007",
+            "T008"
+          ]
+        },
         {
           "counterparty_ids": [],
           "date_precision": "exact",
@@ -2590,22 +2723,115 @@
         }
       ],
       "primary_subject_id": "NOK"
+    },
+    {
+      "events": [
+        {
+          "counterparty_ids": [],
+          "date_precision": "exact",
+          "event_category": "capacity_constraint",
+          "event_id": "EV024",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "track one paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_TSEM_20260714_JAPAN",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL026",
+              "evidence_id": "EE026",
+              "independence_class": "first_party",
+              "origin_group": "OG_TSEM_20260714_JAPAN",
+              "provenance_class": "first_party",
+              "published_at": "2026-07-14",
+              "quote": "full production readiness expected during the fourth quarter of 2027",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "forward_looking",
+              "title": "Tower announces dual-track silicon photonics capacity expansion in Japan",
+              "url": "https://ir.towersemi.com/news-releases/news-release-details/tower-semiconductor-meti-support-announces-strategic-capacity"
+            }
+          ],
+          "lifecycle_stage": "announced",
+          "occurred_end": "2026-07-14",
+          "occurred_start": "2026-07-14",
+          "previous_event_id": "",
+          "primary_subject_id": "TSEM",
+          "program_id": "PRG_TSEM_JP_SIPHO",
+          "summary": "Tower提出日本300mm硅光产能2027Q4生产准备目标",
+          "theme_ids": [
+            "T013",
+            "T015",
+            "T017"
+          ]
+        }
+      ],
+      "primary_subject_id": "TSEM"
+    },
+    {
+      "events": [
+        {
+          "counterparty_ids": [
+            "WATCH_ENNOSTAR"
+          ],
+          "date_precision": "exact",
+          "event_category": "product_stage",
+          "event_id": "EV025",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "opening paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_VECO_20260611_ENNOSTAR",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL027",
+              "evidence_id": "EE027",
+              "independence_class": "first_party",
+              "origin_group": "OG_VECO_20260611_ENNOSTAR",
+              "provenance_class": "first_party",
+              "published_at": "2026-06-11",
+              "quote": "first commercial acceptance and qualification of its LUMINA+ metal organic chemical vapor deposition system by Ennostar Corporation",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "fact_assertion",
+              "title": "Ennostar qualifies Veeco LUMINA+ MOCVD system",
+              "url": "https://ir.veeco.com/news-and-events/news-details/2026/Ennostar-Qualifies-Veecos-New-LUMINA-MOCVD-System-for-Advanced-Product-Applications/default.aspx"
+            }
+          ],
+          "lifecycle_stage": "qualifying",
+          "occurred_end": "2026-06-11",
+          "occurred_start": "2026-06-11",
+          "previous_event_id": "",
+          "primary_subject_id": "VECO",
+          "program_id": "PRG_VECO_LUMINAPLUS",
+          "summary": "Veeco称LUMINA+ MOCVD获Ennostar商业验收与生产资格",
+          "theme_ids": [
+            "T007",
+            "T008"
+          ]
+        }
+      ],
+      "primary_subject_id": "VECO"
     }
   ],
   "coverage_summary": {
-    "active_watch_entity_count": 34,
+    "active_watch_entity_count": 35,
     "candidate_status_counts": {
       "promoted": 54,
       "source_verified": 10
     },
-    "disclosure_count": 38,
+    "disclosure_count": 43,
     "four_available_slot_complete_count": 34,
     "four_slot_complete_count": 37,
     "latest_disclosure_at": "2026-08-06",
-    "latest_retrieved_at": "2026-08-11",
-    "latest_reviewed_at": "2026-08-11",
+    "latest_retrieved_at": "2026-08-13",
+    "latest_reviewed_at": "2026-08-13",
     "processing_status_counts": {
-      "anchor_reviewed": 30,
+      "anchor_reviewed": 35,
       "no_relevant_claims": 8
     },
     "quarterly_company_count": 37,
@@ -3694,6 +3920,212 @@
       "theme_ids": [
         "T021"
       ]
+    },
+    {
+      "counterparty_ids": [
+        "LITE"
+      ],
+      "date_precision": "exact",
+      "event_category": "supply_chain_arrangement",
+      "event_id": "EV022",
+      "event_status": "asserted",
+      "evidence": [
+        {
+          "anchor": "opening paragraph",
+          "claim_reviewed_at": "2026-08-13",
+          "content_class": "commercial_disclosure",
+          "disclosure_id": "D_AXTI_20260729_LITE",
+          "disclosure_reviewed_at": "2026-08-13",
+          "disclosure_type": "official_release",
+          "event_claim_id": "ECL024",
+          "evidence_id": "EE024",
+          "independence_class": "first_party",
+          "origin_group": "OG_AXTI_20260729_LITE",
+          "provenance_class": "first_party",
+          "published_at": "2026-07-29",
+          "quote": "entered into a definitive agreement with Lumentum Operations LLC for the supply and capacity reservation of indium phosphide wafer substrates",
+          "relationship": "reports",
+          "retrieved_at": "2026-08-13",
+          "statement_kind": "fact_assertion",
+          "title": "AXT announces long-term supplier agreement with Lumentum",
+          "url": "https://investors.axt.com/Investors/news/news-details/2026/AXT-Inc--Announces-Long-Term-Supplier-Agreement-with-Lumentum/default.aspx"
+        }
+      ],
+      "lifecycle_stage": "not_applicable",
+      "occurred_end": "2026-07-29",
+      "occurred_start": "2026-07-29",
+      "previous_event_id": "",
+      "primary_subject_id": "AXTI",
+      "program_id": "PRG_AXTI_LITE_INP",
+      "summary": "AXT称与Lumentum签署InP晶圆供给和产能预留协议",
+      "theme_ids": [
+        "T007",
+        "T016"
+      ]
+    },
+    {
+      "counterparty_ids": [],
+      "date_precision": "exact",
+      "event_category": "capacity_constraint",
+      "event_id": "EV023",
+      "event_status": "asserted",
+      "evidence": [
+        {
+          "anchor": "opening paragraph",
+          "claim_reviewed_at": "2026-08-13",
+          "content_class": "commercial_disclosure",
+          "disclosure_id": "D_GFS_20260729_CHIPS",
+          "disclosure_reviewed_at": "2026-08-13",
+          "disclosure_type": "official_release",
+          "event_claim_id": "ECL025",
+          "evidence_id": "EE025",
+          "independence_class": "first_party",
+          "origin_group": "OG_GFS_20260729_CHIPS",
+          "provenance_class": "first_party",
+          "published_at": "2026-07-29",
+          "quote": "entered into a letter of intent with the U.S. Department of Commerce to accelerate research and development of next-generation silicon photonics",
+          "relationship": "reports",
+          "retrieved_at": "2026-08-13",
+          "statement_kind": "fact_assertion",
+          "title": "GlobalFoundries signs CHIPS R&D letter of intent for silicon photonics",
+          "url": "https://investors.gf.com/news-releases/news-release-details/globalfoundries-signs-letter-intent-us-department-commerce-300"
+        }
+      ],
+      "lifecycle_stage": "announced",
+      "occurred_end": "2026-07-29",
+      "occurred_start": "2026-07-29",
+      "previous_event_id": "",
+      "primary_subject_id": "GFS",
+      "program_id": "PRG_GFS_US_SIPHO",
+      "summary": "GlobalFoundries称签署3亿美元硅光研发资助LOI",
+      "theme_ids": [
+        "T013",
+        "T015",
+        "T017"
+      ]
+    },
+    {
+      "counterparty_ids": [],
+      "date_precision": "exact",
+      "event_category": "capacity_constraint",
+      "event_id": "EV024",
+      "event_status": "asserted",
+      "evidence": [
+        {
+          "anchor": "track one paragraph",
+          "claim_reviewed_at": "2026-08-13",
+          "content_class": "commercial_disclosure",
+          "disclosure_id": "D_TSEM_20260714_JAPAN",
+          "disclosure_reviewed_at": "2026-08-13",
+          "disclosure_type": "official_release",
+          "event_claim_id": "ECL026",
+          "evidence_id": "EE026",
+          "independence_class": "first_party",
+          "origin_group": "OG_TSEM_20260714_JAPAN",
+          "provenance_class": "first_party",
+          "published_at": "2026-07-14",
+          "quote": "full production readiness expected during the fourth quarter of 2027",
+          "relationship": "reports",
+          "retrieved_at": "2026-08-13",
+          "statement_kind": "forward_looking",
+          "title": "Tower announces dual-track silicon photonics capacity expansion in Japan",
+          "url": "https://ir.towersemi.com/news-releases/news-release-details/tower-semiconductor-meti-support-announces-strategic-capacity"
+        }
+      ],
+      "lifecycle_stage": "announced",
+      "occurred_end": "2026-07-14",
+      "occurred_start": "2026-07-14",
+      "previous_event_id": "",
+      "primary_subject_id": "TSEM",
+      "program_id": "PRG_TSEM_JP_SIPHO",
+      "summary": "Tower提出日本300mm硅光产能2027Q4生产准备目标",
+      "theme_ids": [
+        "T013",
+        "T015",
+        "T017"
+      ]
+    },
+    {
+      "counterparty_ids": [
+        "WATCH_ENNOSTAR"
+      ],
+      "date_precision": "exact",
+      "event_category": "product_stage",
+      "event_id": "EV025",
+      "event_status": "asserted",
+      "evidence": [
+        {
+          "anchor": "opening paragraph",
+          "claim_reviewed_at": "2026-08-13",
+          "content_class": "commercial_disclosure",
+          "disclosure_id": "D_VECO_20260611_ENNOSTAR",
+          "disclosure_reviewed_at": "2026-08-13",
+          "disclosure_type": "official_release",
+          "event_claim_id": "ECL027",
+          "evidence_id": "EE027",
+          "independence_class": "first_party",
+          "origin_group": "OG_VECO_20260611_ENNOSTAR",
+          "provenance_class": "first_party",
+          "published_at": "2026-06-11",
+          "quote": "first commercial acceptance and qualification of its LUMINA+ metal organic chemical vapor deposition system by Ennostar Corporation",
+          "relationship": "reports",
+          "retrieved_at": "2026-08-13",
+          "statement_kind": "fact_assertion",
+          "title": "Ennostar qualifies Veeco LUMINA+ MOCVD system",
+          "url": "https://ir.veeco.com/news-and-events/news-details/2026/Ennostar-Qualifies-Veecos-New-LUMINA-MOCVD-System-for-Advanced-Product-Applications/default.aspx"
+        }
+      ],
+      "lifecycle_stage": "qualifying",
+      "occurred_end": "2026-06-11",
+      "occurred_start": "2026-06-11",
+      "previous_event_id": "",
+      "primary_subject_id": "VECO",
+      "program_id": "PRG_VECO_LUMINAPLUS",
+      "summary": "Veeco称LUMINA+ MOCVD获Ennostar商业验收与生产资格",
+      "theme_ids": [
+        "T007",
+        "T008"
+      ]
+    },
+    {
+      "counterparty_ids": [],
+      "date_precision": "exact",
+      "event_category": "capacity_constraint",
+      "event_id": "EV026",
+      "event_status": "asserted",
+      "evidence": [
+        {
+          "anchor": "capacity expansion paragraph",
+          "claim_reviewed_at": "2026-08-13",
+          "content_class": "commercial_disclosure",
+          "disclosure_id": "D_LITE_20260326_GREENSBORO",
+          "disclosure_reviewed_at": "2026-08-13",
+          "disclosure_type": "official_release",
+          "event_claim_id": "ECL028",
+          "evidence_id": "EE028",
+          "independence_class": "first_party",
+          "origin_group": "OG_LITE_20260326_GREENSBORO",
+          "provenance_class": "first_party",
+          "published_at": "2026-03-26",
+          "quote": "The facility is expected to ramp production in mid-2028",
+          "relationship": "reports",
+          "retrieved_at": "2026-08-13",
+          "statement_kind": "forward_looking",
+          "title": "Lumentum announces new U.S. InP manufacturing facility",
+          "url": "https://investor.lumentum.com/financial-news-releases/news-details/2026/Lumentum-Announces-New-U-S--Manufacturing-Facility-to-Produce-Advanced-Lasers-for-the-Worlds-Largest-AI-Data-Centers/default.aspx"
+        }
+      ],
+      "lifecycle_stage": "announced",
+      "occurred_end": "2026-03-26",
+      "occurred_start": "2026-03-26",
+      "previous_event_id": "",
+      "primary_subject_id": "LITE",
+      "program_id": "PRG_LITE_GREENSBORO_INP",
+      "summary": "Lumentum提出Greensboro美国InP工厂2028年中爬坡目标",
+      "theme_ids": [
+        "T007",
+        "T008"
+      ]
     }
   ],
   "theme_impacts": [
@@ -3779,6 +4211,222 @@
         }
       ],
       "theme_id": "T004"
+    },
+    {
+      "events": [
+        {
+          "counterparty_ids": [],
+          "date_precision": "exact",
+          "event_category": "capacity_constraint",
+          "event_id": "EV026",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "capacity expansion paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_LITE_20260326_GREENSBORO",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL028",
+              "evidence_id": "EE028",
+              "independence_class": "first_party",
+              "origin_group": "OG_LITE_20260326_GREENSBORO",
+              "provenance_class": "first_party",
+              "published_at": "2026-03-26",
+              "quote": "The facility is expected to ramp production in mid-2028",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "forward_looking",
+              "title": "Lumentum announces new U.S. InP manufacturing facility",
+              "url": "https://investor.lumentum.com/financial-news-releases/news-details/2026/Lumentum-Announces-New-U-S--Manufacturing-Facility-to-Produce-Advanced-Lasers-for-the-Worlds-Largest-AI-Data-Centers/default.aspx"
+            }
+          ],
+          "lifecycle_stage": "announced",
+          "occurred_end": "2026-03-26",
+          "occurred_start": "2026-03-26",
+          "previous_event_id": "",
+          "primary_subject_id": "LITE",
+          "program_id": "PRG_LITE_GREENSBORO_INP",
+          "summary": "Lumentum提出Greensboro美国InP工厂2028年中爬坡目标",
+          "theme_ids": [
+            "T007",
+            "T008"
+          ]
+        },
+        {
+          "counterparty_ids": [
+            "WATCH_ENNOSTAR"
+          ],
+          "date_precision": "exact",
+          "event_category": "product_stage",
+          "event_id": "EV025",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "opening paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_VECO_20260611_ENNOSTAR",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL027",
+              "evidence_id": "EE027",
+              "independence_class": "first_party",
+              "origin_group": "OG_VECO_20260611_ENNOSTAR",
+              "provenance_class": "first_party",
+              "published_at": "2026-06-11",
+              "quote": "first commercial acceptance and qualification of its LUMINA+ metal organic chemical vapor deposition system by Ennostar Corporation",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "fact_assertion",
+              "title": "Ennostar qualifies Veeco LUMINA+ MOCVD system",
+              "url": "https://ir.veeco.com/news-and-events/news-details/2026/Ennostar-Qualifies-Veecos-New-LUMINA-MOCVD-System-for-Advanced-Product-Applications/default.aspx"
+            }
+          ],
+          "lifecycle_stage": "qualifying",
+          "occurred_end": "2026-06-11",
+          "occurred_start": "2026-06-11",
+          "previous_event_id": "",
+          "primary_subject_id": "VECO",
+          "program_id": "PRG_VECO_LUMINAPLUS",
+          "summary": "Veeco称LUMINA+ MOCVD获Ennostar商业验收与生产资格",
+          "theme_ids": [
+            "T007",
+            "T008"
+          ]
+        },
+        {
+          "counterparty_ids": [
+            "LITE"
+          ],
+          "date_precision": "exact",
+          "event_category": "supply_chain_arrangement",
+          "event_id": "EV022",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "opening paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_AXTI_20260729_LITE",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL024",
+              "evidence_id": "EE024",
+              "independence_class": "first_party",
+              "origin_group": "OG_AXTI_20260729_LITE",
+              "provenance_class": "first_party",
+              "published_at": "2026-07-29",
+              "quote": "entered into a definitive agreement with Lumentum Operations LLC for the supply and capacity reservation of indium phosphide wafer substrates",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "fact_assertion",
+              "title": "AXT announces long-term supplier agreement with Lumentum",
+              "url": "https://investors.axt.com/Investors/news/news-details/2026/AXT-Inc--Announces-Long-Term-Supplier-Agreement-with-Lumentum/default.aspx"
+            }
+          ],
+          "lifecycle_stage": "not_applicable",
+          "occurred_end": "2026-07-29",
+          "occurred_start": "2026-07-29",
+          "previous_event_id": "",
+          "primary_subject_id": "AXTI",
+          "program_id": "PRG_AXTI_LITE_INP",
+          "summary": "AXT称与Lumentum签署InP晶圆供给和产能预留协议",
+          "theme_ids": [
+            "T007",
+            "T016"
+          ]
+        }
+      ],
+      "theme_id": "T007"
+    },
+    {
+      "events": [
+        {
+          "counterparty_ids": [],
+          "date_precision": "exact",
+          "event_category": "capacity_constraint",
+          "event_id": "EV026",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "capacity expansion paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_LITE_20260326_GREENSBORO",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL028",
+              "evidence_id": "EE028",
+              "independence_class": "first_party",
+              "origin_group": "OG_LITE_20260326_GREENSBORO",
+              "provenance_class": "first_party",
+              "published_at": "2026-03-26",
+              "quote": "The facility is expected to ramp production in mid-2028",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "forward_looking",
+              "title": "Lumentum announces new U.S. InP manufacturing facility",
+              "url": "https://investor.lumentum.com/financial-news-releases/news-details/2026/Lumentum-Announces-New-U-S--Manufacturing-Facility-to-Produce-Advanced-Lasers-for-the-Worlds-Largest-AI-Data-Centers/default.aspx"
+            }
+          ],
+          "lifecycle_stage": "announced",
+          "occurred_end": "2026-03-26",
+          "occurred_start": "2026-03-26",
+          "previous_event_id": "",
+          "primary_subject_id": "LITE",
+          "program_id": "PRG_LITE_GREENSBORO_INP",
+          "summary": "Lumentum提出Greensboro美国InP工厂2028年中爬坡目标",
+          "theme_ids": [
+            "T007",
+            "T008"
+          ]
+        },
+        {
+          "counterparty_ids": [
+            "WATCH_ENNOSTAR"
+          ],
+          "date_precision": "exact",
+          "event_category": "product_stage",
+          "event_id": "EV025",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "opening paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_VECO_20260611_ENNOSTAR",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL027",
+              "evidence_id": "EE027",
+              "independence_class": "first_party",
+              "origin_group": "OG_VECO_20260611_ENNOSTAR",
+              "provenance_class": "first_party",
+              "published_at": "2026-06-11",
+              "quote": "first commercial acceptance and qualification of its LUMINA+ metal organic chemical vapor deposition system by Ennostar Corporation",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "fact_assertion",
+              "title": "Ennostar qualifies Veeco LUMINA+ MOCVD system",
+              "url": "https://ir.veeco.com/news-and-events/news-details/2026/Ennostar-Qualifies-Veecos-New-LUMINA-MOCVD-System-for-Advanced-Product-Applications/default.aspx"
+            }
+          ],
+          "lifecycle_stage": "qualifying",
+          "occurred_end": "2026-06-11",
+          "occurred_start": "2026-06-11",
+          "previous_event_id": "",
+          "primary_subject_id": "VECO",
+          "program_id": "PRG_VECO_LUMINAPLUS",
+          "summary": "Veeco称LUMINA+ MOCVD获Ennostar商业验收与生产资格",
+          "theme_ids": [
+            "T007",
+            "T008"
+          ]
+        }
+      ],
+      "theme_id": "T008"
     },
     {
       "events": [
@@ -3990,6 +4638,93 @@
         {
           "counterparty_ids": [],
           "date_precision": "exact",
+          "event_category": "capacity_constraint",
+          "event_id": "EV024",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "track one paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_TSEM_20260714_JAPAN",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL026",
+              "evidence_id": "EE026",
+              "independence_class": "first_party",
+              "origin_group": "OG_TSEM_20260714_JAPAN",
+              "provenance_class": "first_party",
+              "published_at": "2026-07-14",
+              "quote": "full production readiness expected during the fourth quarter of 2027",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "forward_looking",
+              "title": "Tower announces dual-track silicon photonics capacity expansion in Japan",
+              "url": "https://ir.towersemi.com/news-releases/news-release-details/tower-semiconductor-meti-support-announces-strategic-capacity"
+            }
+          ],
+          "lifecycle_stage": "announced",
+          "occurred_end": "2026-07-14",
+          "occurred_start": "2026-07-14",
+          "previous_event_id": "",
+          "primary_subject_id": "TSEM",
+          "program_id": "PRG_TSEM_JP_SIPHO",
+          "summary": "Tower提出日本300mm硅光产能2027Q4生产准备目标",
+          "theme_ids": [
+            "T013",
+            "T015",
+            "T017"
+          ]
+        },
+        {
+          "counterparty_ids": [],
+          "date_precision": "exact",
+          "event_category": "capacity_constraint",
+          "event_id": "EV023",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "opening paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_GFS_20260729_CHIPS",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL025",
+              "evidence_id": "EE025",
+              "independence_class": "first_party",
+              "origin_group": "OG_GFS_20260729_CHIPS",
+              "provenance_class": "first_party",
+              "published_at": "2026-07-29",
+              "quote": "entered into a letter of intent with the U.S. Department of Commerce to accelerate research and development of next-generation silicon photonics",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "fact_assertion",
+              "title": "GlobalFoundries signs CHIPS R&D letter of intent for silicon photonics",
+              "url": "https://investors.gf.com/news-releases/news-release-details/globalfoundries-signs-letter-intent-us-department-commerce-300"
+            }
+          ],
+          "lifecycle_stage": "announced",
+          "occurred_end": "2026-07-29",
+          "occurred_start": "2026-07-29",
+          "previous_event_id": "",
+          "primary_subject_id": "GFS",
+          "program_id": "PRG_GFS_US_SIPHO",
+          "summary": "GlobalFoundries称签署3亿美元硅光研发资助LOI",
+          "theme_ids": [
+            "T013",
+            "T015",
+            "T017"
+          ]
+        }
+      ],
+      "theme_id": "T013"
+    },
+    {
+      "events": [
+        {
+          "counterparty_ids": [],
+          "date_precision": "exact",
           "event_category": "commercial_adoption",
           "event_id": "EV001",
           "event_status": "asserted",
@@ -4024,6 +4759,88 @@
           "summary": "AAOI第一方披露首笔1.6T批量订单",
           "theme_ids": [
             "T015"
+          ]
+        },
+        {
+          "counterparty_ids": [],
+          "date_precision": "exact",
+          "event_category": "capacity_constraint",
+          "event_id": "EV024",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "track one paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_TSEM_20260714_JAPAN",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL026",
+              "evidence_id": "EE026",
+              "independence_class": "first_party",
+              "origin_group": "OG_TSEM_20260714_JAPAN",
+              "provenance_class": "first_party",
+              "published_at": "2026-07-14",
+              "quote": "full production readiness expected during the fourth quarter of 2027",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "forward_looking",
+              "title": "Tower announces dual-track silicon photonics capacity expansion in Japan",
+              "url": "https://ir.towersemi.com/news-releases/news-release-details/tower-semiconductor-meti-support-announces-strategic-capacity"
+            }
+          ],
+          "lifecycle_stage": "announced",
+          "occurred_end": "2026-07-14",
+          "occurred_start": "2026-07-14",
+          "previous_event_id": "",
+          "primary_subject_id": "TSEM",
+          "program_id": "PRG_TSEM_JP_SIPHO",
+          "summary": "Tower提出日本300mm硅光产能2027Q4生产准备目标",
+          "theme_ids": [
+            "T013",
+            "T015",
+            "T017"
+          ]
+        },
+        {
+          "counterparty_ids": [],
+          "date_precision": "exact",
+          "event_category": "capacity_constraint",
+          "event_id": "EV023",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "opening paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_GFS_20260729_CHIPS",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL025",
+              "evidence_id": "EE025",
+              "independence_class": "first_party",
+              "origin_group": "OG_GFS_20260729_CHIPS",
+              "provenance_class": "first_party",
+              "published_at": "2026-07-29",
+              "quote": "entered into a letter of intent with the U.S. Department of Commerce to accelerate research and development of next-generation silicon photonics",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "fact_assertion",
+              "title": "GlobalFoundries signs CHIPS R&D letter of intent for silicon photonics",
+              "url": "https://investors.gf.com/news-releases/news-release-details/globalfoundries-signs-letter-intent-us-department-commerce-300"
+            }
+          ],
+          "lifecycle_stage": "announced",
+          "occurred_end": "2026-07-29",
+          "occurred_start": "2026-07-29",
+          "previous_event_id": "",
+          "primary_subject_id": "GFS",
+          "program_id": "PRG_GFS_US_SIPHO",
+          "summary": "GlobalFoundries称签署3亿美元硅光研发资助LOI",
+          "theme_ids": [
+            "T013",
+            "T015",
+            "T017"
           ]
         }
       ],
@@ -4230,6 +5047,48 @@
           "theme_ids": [
             "T016"
           ]
+        },
+        {
+          "counterparty_ids": [
+            "LITE"
+          ],
+          "date_precision": "exact",
+          "event_category": "supply_chain_arrangement",
+          "event_id": "EV022",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "opening paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_AXTI_20260729_LITE",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL024",
+              "evidence_id": "EE024",
+              "independence_class": "first_party",
+              "origin_group": "OG_AXTI_20260729_LITE",
+              "provenance_class": "first_party",
+              "published_at": "2026-07-29",
+              "quote": "entered into a definitive agreement with Lumentum Operations LLC for the supply and capacity reservation of indium phosphide wafer substrates",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "fact_assertion",
+              "title": "AXT announces long-term supplier agreement with Lumentum",
+              "url": "https://investors.axt.com/Investors/news/news-details/2026/AXT-Inc--Announces-Long-Term-Supplier-Agreement-with-Lumentum/default.aspx"
+            }
+          ],
+          "lifecycle_stage": "not_applicable",
+          "occurred_end": "2026-07-29",
+          "occurred_start": "2026-07-29",
+          "previous_event_id": "",
+          "primary_subject_id": "AXTI",
+          "program_id": "PRG_AXTI_LITE_INP",
+          "summary": "AXT称与Lumentum签署InP晶圆供给和产能预留协议",
+          "theme_ids": [
+            "T007",
+            "T016"
+          ]
         }
       ],
       "theme_id": "T016"
@@ -4354,6 +5213,88 @@
           "program_id": "PRG_CRDO_DUST",
           "summary": "Credo完成对DustPhotonics的收购",
           "theme_ids": [
+            "T017"
+          ]
+        },
+        {
+          "counterparty_ids": [],
+          "date_precision": "exact",
+          "event_category": "capacity_constraint",
+          "event_id": "EV024",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "track one paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_TSEM_20260714_JAPAN",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL026",
+              "evidence_id": "EE026",
+              "independence_class": "first_party",
+              "origin_group": "OG_TSEM_20260714_JAPAN",
+              "provenance_class": "first_party",
+              "published_at": "2026-07-14",
+              "quote": "full production readiness expected during the fourth quarter of 2027",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "forward_looking",
+              "title": "Tower announces dual-track silicon photonics capacity expansion in Japan",
+              "url": "https://ir.towersemi.com/news-releases/news-release-details/tower-semiconductor-meti-support-announces-strategic-capacity"
+            }
+          ],
+          "lifecycle_stage": "announced",
+          "occurred_end": "2026-07-14",
+          "occurred_start": "2026-07-14",
+          "previous_event_id": "",
+          "primary_subject_id": "TSEM",
+          "program_id": "PRG_TSEM_JP_SIPHO",
+          "summary": "Tower提出日本300mm硅光产能2027Q4生产准备目标",
+          "theme_ids": [
+            "T013",
+            "T015",
+            "T017"
+          ]
+        },
+        {
+          "counterparty_ids": [],
+          "date_precision": "exact",
+          "event_category": "capacity_constraint",
+          "event_id": "EV023",
+          "event_status": "asserted",
+          "evidence": [
+            {
+              "anchor": "opening paragraph",
+              "claim_reviewed_at": "2026-08-13",
+              "content_class": "commercial_disclosure",
+              "disclosure_id": "D_GFS_20260729_CHIPS",
+              "disclosure_reviewed_at": "2026-08-13",
+              "disclosure_type": "official_release",
+              "event_claim_id": "ECL025",
+              "evidence_id": "EE025",
+              "independence_class": "first_party",
+              "origin_group": "OG_GFS_20260729_CHIPS",
+              "provenance_class": "first_party",
+              "published_at": "2026-07-29",
+              "quote": "entered into a letter of intent with the U.S. Department of Commerce to accelerate research and development of next-generation silicon photonics",
+              "relationship": "reports",
+              "retrieved_at": "2026-08-13",
+              "statement_kind": "fact_assertion",
+              "title": "GlobalFoundries signs CHIPS R&D letter of intent for silicon photonics",
+              "url": "https://investors.gf.com/news-releases/news-release-details/globalfoundries-signs-letter-intent-us-department-commerce-300"
+            }
+          ],
+          "lifecycle_stage": "announced",
+          "occurred_end": "2026-07-29",
+          "occurred_start": "2026-07-29",
+          "previous_event_id": "",
+          "primary_subject_id": "GFS",
+          "program_id": "PRG_GFS_US_SIPHO",
+          "summary": "GlobalFoundries称签署3亿美元硅光研发资助LOI",
+          "theme_ids": [
+            "T013",
+            "T015",
             "T017"
           ]
         }

@@ -20,3 +20,8 @@ EV018,PRG_CRDO_DUST,capital_relationship,not_applicable,asserted,CRDO,WATCH_DUST
 EV019,PRG_CIEN_SCALEACROSS,commercial_adoption,first_shipment,asserted,CIEN,,T021,2025-09-04,2025-09-04,exact,,,全球,,Ciena称首个scale-across项目已开始产生收入出货,第一方管理层陈述；客户未具名且不是短距IMDD模块
 EV020,PRG_CIEN_SUPPLY_CONSTRAINT,capacity_constraint,not_applicable,asserted,CIEN,,T016,2026-03-05,2026-03-05,exact,,,全球,,Ciena称供应约束实际压低第一季度可实现收入,管理层未识别具体受限元件；不作为单一器件行业卡点
 EV021,PRG_CIEN_HYPERRAIL,commercial_adoption,announced,asserted,CIEN,,T021,2026-06-04,2026-06-04,exact,,,全球,,Ciena称获得首个Hyper-Rail多轨订单,订单没有客户名称金额数量或交付状态
+EV022,PRG_AXTI_LITE_INP,supply_chain_arrangement,not_applicable,asserted,AXTI,LITE,T007;T016,2026-07-29,2026-07-29,exact,,,全球,,AXT称与Lumentum签署InP晶圆供给和产能预留协议,只有AXT一方披露；协议不等于交付或实际产能形成
+EV023,PRG_GFS_US_SIPHO,capacity_constraint,announced,asserted,GFS,,T013;T015;T017,2026-07-29,2026-07-29,exact,,美国,美国,美国,GlobalFoundries称签署3亿美元硅光研发资助LOI,LOI与expected award不等于最终拨款或量产产能
+EV024,PRG_TSEM_JP_SIPHO,capacity_constraint,announced,asserted,TSEM,,T013;T015;T017,2026-07-14,2026-07-14,exact,,日本,全球,日本,Tower提出日本300mm硅光产能2027Q4生产准备目标,目标日期尚需后续正式材料验证
+EV025,PRG_VECO_LUMINAPLUS,product_stage,qualifying,asserted,VECO,WATCH_ENNOSTAR,T007;T008,2026-06-11,2026-06-11,exact,,中国台湾,全球,,Veeco称LUMINA+ MOCVD获Ennostar商业验收与生产资格,设备覆盖AsP高量产但应用不只光通信
+EV026,PRG_LITE_GREENSBORO_INP,capacity_constraint,announced,asserted,LITE,,T007;T008,2026-03-26,2026-03-26,exact,,美国,美国,美国,Lumentum提出Greensboro美国InP工厂2028年中爬坡目标,设施当前运营但InP产品线仍需改造

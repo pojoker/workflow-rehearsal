@@ -204,6 +204,18 @@
 | AIXTRON | 2026-07-30 | H1 2026 正式报告，抽取 AsP/InP、datacom laser 和设备订单表述 | `EQ1`；T007/T008；正式报告比泛设备新闻更高价值 | [正式报告 PDF](https://www.aixtron.com/investoren/publikationen/2026/englisch/Half-Year%20Group%20Financial%20Report_2026.pdf) |
 | ASMPT | 2026-07-29 | H1/Q2 2026 正式结果，抽取 photonics/CPO 封装与订单信号 | `EQ3/EQ4/EQ5`；T015/T017；财报中的 AI 订单不能自动全部归因光子 | [正式结果 PDF](https://www.asmpt.com/site/assets/files/85463/asmpt_2026_q2_press_release.pdf) |
 
+## 已进入事件雷达的首批扩容事件
+
+本轮先落入 5 条能改变产能、供应或商业阶段判断的原子事件，而非把所有新闻都转成事件。每条均保留短引、稳定锚点和来源 URL；目前都还是 `asserted`，没有因公司官网发布或具名对手方而自动升级为独立确认。
+
+| event_id | 主体 | 事件 | 证据边界 |
+|---|---|---|---|
+| EV022 | AXT | 与 Lumentum 签署 InP 晶圆供给和产能预留协议 | 只有 AXT 一方披露；协议不等于交付数量、良率或有效产能 |
+| EV023 | GlobalFoundries | 与美国商务部签署 3 亿美元硅光研发资助 LOI | LOI 与 expected award 不等于最终拨款或高量产能力 |
+| EV024 | Tower | 日本 300mm 硅光第一轨产能提出 2027Q4 生产准备目标 | `forward_looking`；必须用后续正式材料验收 |
+| EV025 | Veeco | LUMINA+ MOCVD 获 Ennostar 商业验收与生产资格 | Veeco 单方公告；设备应用横跨显示、光通信等市场 |
+| EV026 | Lumentum | Greensboro 美国 InP 工厂提出 2028 年中爬坡目标 | 设施当前运营不等于 InP 改造完成或已经量产 |
+
 ## 证据限制与落库闸门
 
 - 64 家候选均至少有一个第一方技术/IR入口，但这不代表所有 ticker、总部/制造地、季度发布日期已完成交易所级复核；表中“未核/待核”不得原样进入结构化账本。当前正式季度层共 37 家（原 14 家 + 首批 10 家 + 第二批 13 家）；第二批其余 7 家只进入事件监控。

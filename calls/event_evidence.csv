@@ -22,3 +22,8 @@ EE020,EV018,ECL020,reports,first_party,OG_CRDO_20260528_DUST_CLOSE,Credo单方�
 EE021,EV019,ECL021,reports,first_party,OG_CIEN_20250904_Q3,Ciena官方托管电话会逐字稿
 EE022,EV020,ECL022,reports,first_party,OG_CIEN_20260305_Q1,Ciena官方托管电话会逐字稿
 EE023,EV021,ECL023,reports,first_party,OG_CIEN_20260604_Q2,Ciena官方托管电话会逐字稿
+EE024,EV022,ECL024,reports,first_party,OG_AXTI_20260729_LITE,AXT单方协议公告
+EE025,EV023,ECL025,reports,first_party,OG_GFS_20260729_CHIPS,GlobalFoundries单方LOI公告
+EE026,EV024,ECL026,reports,first_party,OG_TSEM_20260714_JAPAN,Tower单方产能规划公告
+EE027,EV025,ECL027,reports,first_party,OG_VECO_20260611_ENNOSTAR,Veeco单方资格认证公告
+EE028,EV026,ECL028,reports,first_party,OG_LITE_20260326_GREENSBORO,Lumentum单方产能爬坡目标公告
