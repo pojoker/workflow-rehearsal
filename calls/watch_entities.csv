@@ -19,3 +19,27 @@ WATCH_SUSS,SUSS MicroTec,company,SUSS,永久键合与异质集成设备事件监
 WATCH_SAMCO,Samco,company,Samco Inc.,InP刻蚀沉积设备产品与订单事件监控,active,,https://www.samco.co.jp/en/disclosure/,正式财务材料未给出光通信客户或收入
 WATCH_KEYS,Keysight,company,Keysight Technologies,224G与1.6T验证产品及客户采用事件监控,active,,https://investor.keysight.com/financial-information/quarterly-reports/default.aspx,通信测试总收入不等同光模块测试收入
 WATCH_ACCTON,Accton,company,Accton Technology,800G LPO与光交换系统展示和出货事件监控,active,,https://www.accton.com/shareholder/,网络设备总收入不等同光学产品收入
+WATCH_FREIBERGER,Freiberger Compound Materials,company,Freiberger,GaAs与InP衬底产品产能及客户事件监控,active,,https://freiberger.com/en/technology/,私企不承担季度材料义务
+WATCH_NTTID,NTT Innovative Devices,company,NTT Electronics,相干DSP产品发布和合作事件监控,active,,https://www.ntt-innovative-devices.com/en/optical_communications/dsp_products.html,集团子公司不补母公司季度槽
+WATCH_FUJITSUOC,Fujitsu Optical Components,company,Fujitsu Optical Components Limited,相干收发器和光器件事件监控,active,,https://www.fujitsu.com/jp/group/foc/imagesgig5/FOC%20Product%20Line-up_20201202.pdf,母公司财务口径不归因子公司光学业务
+WATCH_OPENLIGHT,OpenLight,company,OpenLight Photonics,集成激光硅光平台PDK与量产事件监控,active,,https://openlightphotonics.com/,第一方技术主张不自动升级商业事实
+WATCH_SICOYA,Sicoya,company,Sicoya GmbH,硅光芯片和收发组件客户量产事件监控,active,,https://sicoya.com/en/silicon-photonic-components/,客户和量产透明度有限
+WATCH_SCINTIL,SCINTIL Photonics,company,SCINTIL,异质集成硅光融资样片与量产事件监控,active,,https://www.scintil-photonics.com/,融资不等于客户采用
+WATCH_XSCAPE,Xscape Photonics,company,Xscape,多波长光引擎样片客户和量产事件监控,active,,https://www.xscapephotonics.com/falconx,新路线保持asserted状态
+WATCH_AVICENA,Avicena,company,Avicena Tech,microLED光互联评估与量产事件监控,active,,https://avicena.tech/avicena-launches-the-worlds-first-microled-optical-interconnect-eval-kit/,评估套件不等于规模部署
+WATCH_AYAR,Ayar Labs,company,Ayar,光I/O芯粒外置光源样片客户与产能事件监控,active,,https://ayarlabs.com/news/ayar-labs-unveils-worlds-first-ucie-optical-chiplet-for-ai-scale-up-architectures/,私企不补季度槽
+WATCH_LIGHTMATTER,Lightmatter,company,Lightmatter Inc.,Passage光互联商业采用事件监控,active,,https://lightmatter.co/products/passage,产品主张与客户采用分开
+WATCH_RANOVUS,Ranovus,company,Ranovus Inc.,Odin CPO合作演示与量产迁移事件监控,active,,https://ranovus.com/wp-content/uploads/2024/03/Ranovus-CPO-3.0-MediaTek-announcement-March-20-2024-Final.pdf,演示不自动升级量产
+WATCH_SOURCEPHOTONICS,Source Photonics,company,Source Photonics Inc.,800G与1.6T模块产品产能和客户事件监控,active,,https://www.sourcephotonics.com/news/source-photonics-announce-the-product-availability-of-its-200g-per-lane-based-1-6t-and-800g-pam4-transceiver-family-products-at-ofc25/,无连续公开季度材料
+WATCH_MOLEX,Molex,company,Molex LLC,CPO连接与光路交换新品并购事件监控,active,,https://www.molex.com/en-us/news/molex-accelerates-ai-cluster-deployment-with-one-stop-optical-interconnect-architecture-and-debut-of-high-radix-optical-circuit-switch-platform,Koch私有子公司
+WATCH_SENKO,SENKO Advanced Components,company,SENKO,高密度光连接产品合作与采用事件监控,active,,https://www.senko.com/mpc-series/,私企不补季度槽
+WATCH_TERAMOUNT,Teramount,company,Teramount Ltd.,PhotonicPlug产品及Molex拟收购状态事件监控,active,,https://www.molex.com/en-us/news/agreement-to-acquire-teramount-to-accelerate-scalable-co-packaged-optics-adoption,收购完成前不登记为已并入
+WATCH_FICONTEC,ficonTEC,company,ficonTEC Service GmbH,光子装配测试自动化订单事件监控,active,,https://www.ficontec.com/,订单应用范围需逐条核验
+WATCH_PI,PI,company,Physik Instrumente,光子对准产品和订单事件监控,active,,https://www.pi-usa.us/en/products/photonics-alignment-solutions,订单应用不可分时不归因光模块
+WATCH_EVG,EV Group,company,EVG,die-to-wafer键合及异质集成事件监控,active,,https://www.evgroup.com/fileadmin/media/products/bonding/Die_to_Wafer_bonding_systems/White_Paper_D2W_Bonding.pdf,应用跨行业
+WATCH_EXFO,EXFO,company,EXFO Inc.,800G实验室与制造测试产品采用事件监控,active,,https://www.exfo.com/en/products/lab-manufacturing-testing/network-protocol-testing/ethernet-testing/ftbx-88800-series/,电信测试与AI集群内部互联分开
+WATCH_GOOGL,Alphabet,company,Google;Google Cloud,云侧带宽容量需求事件监控,active,,https://abc.xyz/investor/events/,一般资本开支不自动映射光模块
+WATCH_MSFT,Microsoft,company,Microsoft Azure,AI数据中心容量与明确光网络需求事件监控,active,,https://www.microsoft.com/en-us/investor/events/fy-2026/earnings-fy-2026-q3,一般资本开支不自动映射光模块
+WATCH_AMZN,Amazon,company,AWS;Amazon Web Services,AWS基础设施需求与明确光学披露事件监控,active,,https://ir.aboutamazon.com/news-release/news-release-details/2026/Amazon-com-Announces-First-Quarter-Results/,无光学细节时不形成事件结论
+WATCH_ORCL,Oracle,company,Oracle Cloud Infrastructure;OCI,云容量与具名光学合作事件监控,active,,https://investor.oracle.com/investor-news/news-details/2026/Oracle-Announces-Record-Q4-and-FY-2026-Results-Driven-by-Cloud-Infrastructure--Cloud-Applications/,订单不直接换算光模块消耗
+WATCH_AMD,AMD,company,Advanced Micro Devices,rack-scale平台与明确互连需求事件监控,active,,https://ir.amd.com/news-events/press-releases/detail/1261/amd-showcases-helios-rack-scale-platform-built-on-the-open-compute-project-open-rack-for-ai-introduced-by-meta,平台发布不证明具体光学BOM

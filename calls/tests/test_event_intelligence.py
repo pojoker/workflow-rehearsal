@@ -245,6 +245,44 @@ class EventIntelligenceTest(unittest.TestCase):
         }
         self.assertEqual(promoted, quarterly_ids | watch_ids)
 
+    def test_long_tail_is_partitioned_without_fake_quarterly_coverage(self) -> None:
+        _, universe = self._rows("universe.csv")
+        _, watch_rows = self._rows("watch_entities.csv")
+        _, candidates = self._rows("company_candidates.csv")
+        watch_ids = {
+            "WATCH_FREIBERGER", "WATCH_NTTID", "WATCH_FUJITSUOC",
+            "WATCH_OPENLIGHT", "WATCH_SICOYA", "WATCH_SCINTIL",
+            "WATCH_XSCAPE", "WATCH_AVICENA", "WATCH_AYAR",
+            "WATCH_LIGHTMATTER", "WATCH_RANOVUS", "WATCH_SOURCEPHOTONICS",
+            "WATCH_MOLEX", "WATCH_SENKO", "WATCH_TERAMOUNT",
+            "WATCH_FICONTEC", "WATCH_PI", "WATCH_EVG", "WATCH_EXFO",
+            "WATCH_GOOGL", "WATCH_MSFT", "WATCH_AMZN", "WATCH_ORCL",
+            "WATCH_AMD",
+        }
+        discovery_ids = {
+            "CAND_HAMAMATSU", "CAND_MCHP", "CAND_LWLG",
+            "CAND_SMARTOPTICS", "CAND_AMKR", "CAND_DELTA", "CAND_TEL",
+            "CAND_RBBN", "CAND_EKI", "CAND_HPE",
+        }
+        enabled = {row["company_id"] for row in universe if row["enabled"] == "yes"}
+        active_watch = {
+            row["entity_id"] for row in watch_rows
+            if row["monitoring_status"] == "active"
+        }
+        p3_rows = [row for row in candidates if row["priority"] == "P3"]
+        promoted = {
+            row["promoted_entity_id"] for row in p3_rows
+            if row["verification_status"] == "promoted"
+        }
+        held = {
+            row["candidate_id"] for row in p3_rows
+            if row["verification_status"] == "source_verified"
+        }
+        self.assertEqual(promoted, watch_ids)
+        self.assertEqual(held, discovery_ids)
+        self.assertTrue(watch_ids <= active_watch)
+        self.assertFalse(watch_ids & enabled)
+
     def test_first_party_cannot_self_corroborate(self) -> None:
         self.mutate("events.csv", "EV001", {"event_status": "corroborated"})
         with self.assertRaisesRegex(EventLedgerError, "lacks independent supporting origin"):

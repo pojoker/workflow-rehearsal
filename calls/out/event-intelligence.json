@@ -53,12 +53,12 @@
       "inclusion_reason": "rack-scale平台提供互连需求背景",
       "notes": "平台发布不证明具体光学BOM",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_AMD",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://ir.amd.com/news-events/press-releases/detail/1261/amd-showcases-helios-rack-scale-platform-built-on-the-open-compute-project-open-rack-for-ai-introduced-by-meta",
       "suggested_role": "downstream",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_AMKR",
@@ -83,12 +83,12 @@
       "inclusion_reason": "AWS AI基础设施需求只做需求验证",
       "notes": "光学细节通常缺失",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_AMZN",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://ir.aboutamazon.com/news-release/news-release-details/2026/Amazon-com-Announces-First-Quarter-Results/",
       "suggested_role": "downstream",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_ASE",
@@ -128,12 +128,12 @@
       "inclusion_reason": "microLED光互联提供非主流路线对照",
       "notes": "量产待证",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_AVICENA",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://avicena.tech/avicena-launches-the-worlds-first-microled-optical-interconnect-eval-kit/",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_AXT",
@@ -158,12 +158,12 @@
       "inclusion_reason": "UCIe光I/O芯粒与外置光源适合样片客户产能监控",
       "notes": "私企",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_AYAR",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://ayarlabs.com/news/ayar-labs-unveils-worlds-first-ucie-optical-chiplet-for-ai-scale-up-architectures/",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_CLS",
@@ -218,12 +218,12 @@
       "inclusion_reason": "die-to-wafer bonding适合异质集成事件监控",
       "notes": "应用横跨多行业",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_EVG",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.evgroup.com/fileadmin/media/products/bonding/Die_to_Wafer_bonding_systems/White_Paper_D2W_Bonding.pdf",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_EXFO",
@@ -233,12 +233,12 @@
       "inclusion_reason": "800G实验室与制造测试适合事件监控",
       "notes": "电信测试需与AI内部互联区分",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_EXFO",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.exfo.com/en/products/lab-manufacturing-testing/network-protocol-testing/ethernet-testing/ftbx-88800-series/",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_FICONTEC",
@@ -248,12 +248,12 @@
       "inclusion_reason": "光子装配与测试自动化适合订单事件监控",
       "notes": "私企",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_FICONTEC",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.ficontec.com/",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_FORM",
@@ -278,12 +278,12 @@
       "inclusion_reason": "GaAs与InP晶圆提供材料端事件信号",
       "notes": "私企不承担季度义务",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_FREIBERGER",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://freiberger.com/en/technology/",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_FUJIKURA",
@@ -308,12 +308,12 @@
       "inclusion_reason": "相干收发器和调制接收器适合事件监控",
       "notes": "母公司季度难归因",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_FUJITSUOC",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.fujitsu.com/jp/group/foc/imagesgig5/FOC%20Product%20Line-up_20201202.pdf",
       "suggested_role": "core_peer",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_FURUKAWA",
@@ -368,12 +368,12 @@
       "inclusion_reason": "云侧高带宽与容量需求只做需求验证",
       "notes": "一般capex不能映射MOD1",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_GOOGL",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://abc.xyz/investor/events/event-details/2025/Thomas-Kurian-CEO-of-Google-Cloud-at-the-Goldman-Sachs-Communacopia--Technology-Conference-on-September-9-2025Thomas-Kurian-CEO-of-Google-Cloud-at-the-Goldman-Sachs-Communacopia--Technology-Conference-on-September-9-2025/default.aspx",
       "suggested_role": "downstream",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_HAMAMATSU",
@@ -443,12 +443,12 @@
       "inclusion_reason": "Passage NPO与OBO适合商业采用监控",
       "notes": "路线风险",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_LIGHTMATTER",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://lightmatter.co/products/passage",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_LWLG",
@@ -503,12 +503,12 @@
       "inclusion_reason": "CPO连接和OCS适合新品并购事件监控",
       "notes": "Koch私有子公司",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_MOLEX",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.molex.com/en-us/news/molex-accelerates-ai-cluster-deployment-with-one-stop-optical-interconnect-architecture-and-debut-of-high-radix-optical-circuit-switch-platform",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_MSFT",
@@ -518,12 +518,12 @@
       "inclusion_reason": "AI数据中心容量和资本开支只做需求验证",
       "notes": "不补光学四季度槽",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_MSFT",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.microsoft.com/en-us/investor/events/fy-2026/earnings-fy-2026-q3",
       "suggested_role": "downstream",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_MXL",
@@ -563,12 +563,12 @@
       "inclusion_reason": "相干DSP产品适合按发布与合作监控",
       "notes": "NTT子公司",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_NTTID",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.ntt-innovative-devices.com/en/optical_communications/dsp_products.html",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_OPENLIGHT",
@@ -578,12 +578,12 @@
       "inclusion_reason": "集成激光硅光平台适合跟踪PDK与量产事件",
       "notes": "私企",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_OPENLIGHT",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://openlightphotonics.com/",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_ORCL",
@@ -593,12 +593,12 @@
       "inclusion_reason": "OCI容量与具名合作可做客户侧验证",
       "notes": "订单与光模块消耗非一一对应",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_ORCL",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://investor.oracle.com/investor-news/news-details/2026/Oracle-Announces-Record-Q4-and-FY-2026-Results-Driven-by-Cloud-Infrastructure--Cloud-Applications/",
       "suggested_role": "downstream",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_OXIG",
@@ -623,12 +623,12 @@
       "inclusion_reason": "光子对准适合产品和订单事件监控",
       "notes": "订单应用不可分",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_PI",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.pi-usa.us/en/products/photonics-alignment-solutions",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_POET",
@@ -653,12 +653,12 @@
       "inclusion_reason": "Odin CPO适合跟踪合作演示与量产迁移",
       "notes": "演示与量产需分开",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_RANOVUS",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://ranovus.com/wp-content/uploads/2024/03/Ranovus-CPO-3.0-MediaTek-announcement-March-20-2024-Final.pdf",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_RBBN",
@@ -713,12 +713,12 @@
       "inclusion_reason": "异质集成硅光提供新路线样本",
       "notes": "融资与量产不确定",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_SCINTIL",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.scintil-photonics.com/",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_SENKO",
@@ -728,12 +728,12 @@
       "inclusion_reason": "高密度连接适合产品与合作事件监控",
       "notes": "私企",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_SENKO",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.senko.com/mpc-series/",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_SICOYA",
@@ -743,12 +743,12 @@
       "inclusion_reason": "硅光芯片与收发组件适合事件监控",
       "notes": "客户量产透明度低",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_SICOYA",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://sicoya.com/en/silicon-photonic-components/",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_SIVERS",
@@ -818,12 +818,12 @@
       "inclusion_reason": "800G与1.6T PAM4模块适合产品产能事件监控",
       "notes": "无连续公开财报",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_SOURCEPHOTONICS",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.sourcephotonics.com/news/source-photonics-announce-the-product-availability-of-its-200g-per-lane-based-1-6t-and-800g-pam4-transceiver-family-products-at-ofc25/",
       "suggested_role": "core_peer",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_SUMITOMO",
@@ -878,12 +878,12 @@
       "inclusion_reason": "PhotonicPlug与并购事件适合监控",
       "notes": "并购状态待持续核",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_TERAMOUNT",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.molex.com/en-us/news/agreement-to-acquire-teramount-to-accelerate-scalable-co-packaged-optics-adoption",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_TSEM",
@@ -953,12 +953,12 @@
       "inclusion_reason": "多波长光引擎适合跟踪客户采用",
       "notes": "路线新",
       "priority": "P3",
-      "promoted_entity_id": "",
+      "promoted_entity_id": "WATCH_XSCAPE",
       "reviewed_at": "2026-08-13",
       "source_ref": "https://www.xscapephotonics.com/falconx",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "watch",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     }
   ],
   "company_tier_reviews": [
@@ -2593,10 +2593,10 @@
     }
   ],
   "coverage_summary": {
-    "active_watch_entity_count": 10,
+    "active_watch_entity_count": 34,
     "candidate_status_counts": {
-      "promoted": 30,
-      "source_verified": 34
+      "promoted": 54,
+      "source_verified": 10
     },
     "disclosure_count": 38,
     "four_available_slot_complete_count": 34,

@@ -85,6 +85,11 @@
 
 ## 长尾：34 家（watch entity / discovery queue）
 
+长尾已按证据用途完成分流：24 家具有可靠第一方入口、但不适合承担季度完整性义务，进入事件监控层；10 家仍留在发现队列，等待至少两期正式材料复核，不用产品页冒充季度经营证据。
+
+- **事件监控（24）**：Freiberger、NTT Innovative Devices、Fujitsu Optical Components、OpenLight、Sicoya、SCINTIL、Xscape、Avicena、Ayar Labs、Lightmatter、Ranovus、Source Photonics、Molex、SENKO、Teramount、ficonTEC、PI、EV Group、EXFO、Alphabet、Microsoft、Amazon、Oracle、AMD。
+- **发现队列（10）**：Hamamatsu、Microchip、Lightwave Logic、Smartoptics、Amkor、Delta Electronics、TE Connectivity、Ribbon、Ekinops、HPE。它们不是被否定，只是现阶段不能证明“季度材料里的光学信号密度”足以支持正式覆盖。
+
 | 角色 | 公司（属性；总部/制造未核即不写） | 能力与映射 | 建议；核心风险 | 官方来源 |
 |---|---|---|---|---|
 | 光电子 | Hamamatsu（TSE: 6965） | InGaAs photodiode；`C3` | discovery；数据中心收入不透明 | [官方技术页](https://www.hamamatsu.com/eu/en/news/featured-products_and_technologies/2024/meeting-optical-communication-demands.html) |
@@ -134,7 +139,7 @@
 |---|---:|---|
 | 第一批 | 10 | 先建立四期正式材料；逐条抽取产品、产能、验证和限制声明 |
 | 第二批 | 20 | 已完成两期复核：13 家进入季度层，7 家进入事件监控层 |
-| 长尾 | 34 | 事件驱动 watch/discovery；不承诺四季度完整性 |
+| 长尾 | 34 | 已分流：24 家事件监控，10 家保留发现队列；不制造四季度空槽 |
 | 合计 | **64** | 不含当前 14 家与既有 IQE、DustPhotonics |
 
 ## 第一批 10 家：最近四个可得季度正式材料清单
@@ -205,4 +210,4 @@
 - 第一批 40 个季度槽中，**39 个达到 period/period_end/published_date/官方直接材料 URL 可用的完整口径，1 个仍不可用**：AXT 2026Q2。截至核验只找到发布预告，未找到结果正文、监管附件或可确认的财报回放直链。GlobalFoundries 与 Veeco 的 Q2 文件已在 8 月 5 日发布，前者有公司 IR 正文与 SEC 6-K，后者可用 SEC 10-Q；FormFactor 2026Q2 只有官方 earnings webcast 事件页，按项目既定的 equivalent-material 口径计完整，但不得标成 earnings release 或 transcript。
 - 公司官网的产品页和博客属于公司自述。对“量产、客户采用、订单规模、性能领先”等主张，仍需用财报/监管披露、客户材料或设备/供应链另一端交叉验证。
 - 对日本/欧洲公司，半年报、九个月报告、年度报告可能是最稳定的正式材料；应标 `equivalent_material`，不能伪造成美式季度电话会 transcript。
-- watch/discovery 的存在是为了提高信息召回，不降低 canonical 的证据门槛，也不自动生成行业结论。
+- watch/discovery 的存在是为了提高信息召回，不降低 canonical 的证据门槛，也不自动生成行业结论。当前 64 家新增候选已经全部完成分层：23 家进入季度层、31 家进入事件监控层、10 家保留在发现队列。
