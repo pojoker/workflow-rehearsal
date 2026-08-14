@@ -165,7 +165,7 @@ for n, d, t, u in digest['ann'][:15]:
     out.append(f'- {n} | {d} | [{t[:50]}]({u})')
 out.append(f'\n## 召回净队列差分: 新增{len(new_hits)} / 消失{len(gone)}')
 for x in digest['q_delta_new']:
-    co, cell, w, seg = x.split('|')
+    co, cell, w, seg = x.split('|', 3)
     out.append(f'- [{co}|{cell}] {w} | {seg[:60]}')
 out.append(f'\n## 校验')
 for l in chk_line[:3]:
