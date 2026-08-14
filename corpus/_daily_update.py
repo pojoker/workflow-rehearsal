@@ -137,10 +137,14 @@ if os.path.exists(prev_file):
     prev = set(open(prev_file, encoding='utf-8').read().splitlines())
 os.makedirs('tmp/daily', exist_ok=True)
 os.rename(prev_file, 'tmp/daily/queue-prev.txt') if os.path.exists(prev_file) else None
-scan_out = subprocess.run(['python3', 'scan.py'], capture_output=True, text=True).stdout
-cur = []
-for m in re.finditer(r'\[(?:空格|参与|  )\]\s*(\S+) \| (\S+) \| (.+?) \| (.+)', scan_out):
-    cur.append(f'{m.group(1)}|{m.group(2)}|{m.group(3)}|{m.group(4)}')
+# scan()只print前40条(q[:40]),解析print输出会把"窗口移位"误报成新增/消失差分;
+# 改为进程内import拿全量q(格式与历史文件一致:seg截50字符),2026-08-15修复
+import io, contextlib
+spec4 = importlib.util.spec_from_file_location('scan', os.path.join(ROOT, 'scan.py'))
+_scan = importlib.util.module_from_spec(spec4); sys.modules['scan'] = _scan; spec4.loader.exec_module(_scan)
+with contextlib.redirect_stdout(io.StringIO()):
+    _q = _scan.scan()
+cur = [f'{co}|{cell}|{w}|{seg[:50]}' for _pr, _hid, co, cell, w, seg in _q]
 with open(prev_file, 'w', encoding='utf-8') as f:
     f.write('\n'.join(cur))
 new_hits = [x for x in cur if x.split('|')[0] + '|' + x.split('|')[1] not in {p.split('|')[0] + '|' + p.split('|')[1] for p in prev}]
