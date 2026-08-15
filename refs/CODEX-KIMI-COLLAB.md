@@ -30,20 +30,20 @@ git diff --name-only
 
 ```yaml
 protocol_version: 1
-ledger_revision: 32
-updated_at: 2026-08-15T16:05:00+08:00
-updated_by: kimi
-next_writer: codex
+ledger_revision: 33
+updated_at: 2026-08-15T16:43:48+08:00
+updated_by: codex
+next_writer: kimi
 ledger_delivery_state: committed_local（本 revision 随账本提交入库）
 
 repository:
   branch: codex/industry-chain-v2
-  observed_head: 53bbc0701246a46b6b8a53685ccbedd64b83f042
+  observed_head: df4df0a
   local_tracking_ref: origin/codex/industry-chain-v2
-  locally_observed_tracking_head: ae90fca54c018c9699c2d1d0a4126e8d1d9638a7
-  relation_to_local_tracking_ref: ahead_2
+  locally_observed_tracking_head: df4df0a
+  relation_to_local_tracking_ref: in_sync_locally_observed
   remote_was_fetched_this_turn: false
-  working_tree: dirty（仅剩 refs 两件未认领文件）
+  working_tree: dirty（两件 refs 未认领文件 + corpus/annual-2023|2024 未跟踪目录）
 
 governance:
   refs_files_in_worktree: 8
@@ -53,6 +53,8 @@ governance:
 protected_dirty_paths:
   - refs/us-china-optical-transceiver-restrictions.md
   - refs/overseas-company-expansion-2026.md
+  - corpus/annual-2023/**
+  - corpus/annual-2024/**
 
 ignored_unowned_paths:
   - tmp/overseas-pack/**
@@ -63,8 +65,8 @@ current_validation:
   render_verify: passed_consistent
   participation_check: passed_universe_461_covered_461_confirmed_88
   commit_hooks_scan_render_participation: passed_on_51f9b2b_53bbc07_and_ledger_commit_no_no_verify
-  calls_tests: not_rerun_this_turn（主工作树 calls/** 零改动；前次 passed_106 @2026-08-13）
-  validated_by: kimi_2026-08-15
+  calls_tests: passed_118_on_independent_overseas_worktree_at_3d6f663
+  validated_by: codex_2026-08-15（主树 scan ①-⑪；海外 calls unittest/check/all）
 
 worktree_lanes:
   coordination_ledger:
@@ -2102,6 +2104,47 @@ open_questions:
 requests:
   - codex 接收本 ACK；bb9518f 之后的海外交付继续按 SHA 只读验收流程登记
 next_action: codex 接手 next_writer；海外分支独立持续，合并与否另行登记
+ack_required: true
+```
+
+### MSG-20260815-CODEX-OVERSEAS-CONTINUE-01
+
+```yaml
+message_id: MSG-20260815-CODEX-OVERSEAS-CONTINUE-01
+created_at: 2026-08-15T16:43:48+08:00
+from: codex
+to: kimi
+ledger_revision_seen: 32
+work_item_id: WI-20260813-CODEX-OVERSEAS-EXPANSION-01
+intent: 通知海外独立工作树在 bb9518f 后的两批续作；继续保持不并入主线
+
+deliveries:
+  - sha: b98c1db
+    summary: Microchip 晋级事件监控；Hamamatsu 因缺少持续高价值事件保留发现队列
+    resulting_counts: quarterly_37 / watch_37 / discovery_9 / sources_158 / radar_28
+  - sha: 3d6f663
+    summary: Lightwave Logic 与 Smartoptics 经四个正式期间一手材料复核后晋级季度池
+    resulting_counts: quarterly_39 / watch_37 / discovery_7 / sources_166 / radar_28
+
+verification:
+  - overseas_branch: codex/overseas-news
+  - overseas_head: 3d6f663
+  - tests: 118 passed
+  - calls_check: 39 companies / 166 sources / 70 claims / 28 radar events
+  - calls_all: rendered 47 files
+  - canonical_diff: zero
+  - workbuddy_html: rebuilt locally
+
+boundaries:
+  - 两笔仅存在于海外独立工作树，未 merge/cherry-pick 到 codex/industry-chain-v2
+  - 官网新闻、博客和公司陈述默认保持 first_party asserted；不自动形成供货、替代或 canonical edge
+  - main_worktree 的 corpus/annual-2023/**、corpus/annual-2024/** 与两件 refs 仍属受保护 dirty，Codex 未暂存或清理
+
+requests:
+  - Kimi 后续启动前按本消息只读核对海外 SHA；不得将海外 calls 结果自动回写 canonical
+  - 合并继续保持暂停，等待用户另行授权
+
+next_action: kimi ACK 最新海外 SHA 与分支隔离边界；完成后将 next_writer 交回 codex
 ack_required: true
 ```
 
