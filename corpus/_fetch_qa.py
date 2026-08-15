@@ -6,6 +6,11 @@
 - 单线程限速(纪律5);链路: queryKeyboardInfo→secid; searchResult(infoTypes=11)分页。
 - 沪市(sns.sseinfo.com)未接入,调用沪市代码时如实报错。
 jsonl 行: {code,secid,question,answer,answer_date,ask_date,index_id,empty,fetch_date,source}
+- 事故教训(2026-08-15): 覆盖式写入 + 兜底仅"零条触发"双重缺陷导致丢历史。
+  主通道部分返回(如002792仅2条、非零未触发兜底; 000063丢45条)时, 整体重写
+  qa.jsonl 把190/45条历史问答直接抹掉, 被 scan.py ⑩点锚不变量当场拦截。
+  修复=两层: (1)各通道改并集合并落盘(_merge_write, 按 index_id 并集, 行数只增不减, 宁多勿缺);
+  (2)兜底触发条件加宽(fetch): 主通道返回条数 < 现有快照50% 且快照>20时, 即使非零也走 p5w 兜底。
 """
 import argparse
 import sys,os,json,time,re,datetime
@@ -27,6 +32,49 @@ def request(method,url,**kwargs):
     _LAST_REQUEST=time.monotonic()
     r.raise_for_status()
     return r
+
+def _merge_write(code, out):
+    """合并落盘: 写入前读现有qa.jsonl, 按 index_id 做并集(空 index_id 退化为内容指纹),
+    已有条目保留、新拉取的追加/更新(fetch_date 等元数据取新); 任何情况下行数只增不减(宁多勿缺)。"""
+    d=os.path.join(ROOT,'corpus','qa',code); os.makedirs(d,exist_ok=True)
+    fp=os.path.join(d,'qa.jsonl')
+    def key(o):
+        i=o.get('index_id')
+        if i: return ('id',str(i))
+        return ('c',o.get('question'),o.get('answer'),o.get('ask_date'),o.get('answer_date'))
+    existing={}; order=[]
+    if os.path.exists(fp):
+        with open(fp,encoding='utf-8') as f:
+            for line in f:
+                line=line.strip()
+                if not line: continue
+                try: e=json.loads(line)
+                except Exception: continue
+                k=key(e)
+                if k not in existing:
+                    existing[k]=e; order.append(k)
+    merged=dict(existing)
+    for o in out: merged[key(o)]=o
+    final=[]; seen=set()
+    for k in order:
+        if k not in seen:
+            final.append(merged[k]); seen.add(k)
+    for o in out:
+        k=key(o)
+        if k not in seen:
+            final.append(o); seen.add(k)
+    with open(fp,'w',encoding='utf-8') as f:
+        for o in final: f.write(json.dumps(o,ensure_ascii=False)+'\n')
+    return len(final)
+
+def _snapshot_count(code):
+    """现有 qa.jsonl 快照条数(用于缩水兜底判定)。"""
+    fp=os.path.join(ROOT,'corpus','qa',code,'qa.jsonl')
+    if not os.path.exists(fp): return 0
+    n=0
+    with open(fp,encoding='utf-8') as f:
+        for _ in f: n+=1
+    return n
 
 def secid_of(code):
     r=request('POST','https://irm.cninfo.com.cn/newircs/index/queryKeyboardInfo',
@@ -78,10 +126,7 @@ def fetch_p5w(code,since):
             'index_id':str(a.get('pid') or ''),
             'empty':bool(not ans or EMPTY_PAT.match(re.sub(r'\s','',ans)) or (len(ans)<75 and ('披露为准' in ans or '公告为准' in ans or '定期报告' in ans))),
             'fetch_date':today,'source':'ir.p5w.net interaction/getNewR.shtml(全景网投关平台,全市场镜像)'})
-    d=os.path.join(ROOT,'corpus','qa',code); os.makedirs(d,exist_ok=True)
-    fp=os.path.join(d,'qa.jsonl')
-    with open(fp,'w',encoding='utf-8') as f:
-        for o in out: f.write(json.dumps(o,ensure_ascii=False)+'\n')
+    _merge_write(code,out)
     print(f'[{code} {name}] {len(out)}条(空回答{sum(1 for o in out if o["empty"])})')
     return len(out)
 
@@ -119,10 +164,8 @@ def fetch_sse(code,since):
             'answer_date':ad,'ask_date':qd,'index_id':'',
             'empty':bool(not a or EMPTY_PAT.match(re.sub(r'\s','',a)) or (len(a)<75 and ('披露为准' in a or '公告为准' in a))),
             'fetch_date':today,'source':'sns.sseinfo.com userfeeds.do(type=11)'})
-    d=os.path.join(ROOT,'corpus','qa',code); os.makedirs(d,exist_ok=True)
-    fp=os.path.join(d,'qa.jsonl')
-    with open(fp,'w',encoding='utf-8') as f:
-        for o in out: f.write(json.dumps(o,ensure_ascii=False)+'\n')
+    fp=os.path.join(ROOT,'corpus','qa',code,'qa.jsonl')
+    _merge_write(code,out)
     print(f'[{code} {name}] {len(out)}条(空回答{sum(1 for o in out if o["empty"])}) → {fp}')
     return len(out)
 
@@ -161,16 +204,16 @@ def fetch_irm(code,since):
             'empty':bool(not ans or EMPTY_PAT.match(re.sub(r'\s','',ans))),
             'fetch_date':today,
             'source':'irm.cninfo.com.cn searchResult(infoTypes=11)'})
-    d=os.path.join(ROOT,'corpus','qa',code); os.makedirs(d,exist_ok=True)
-    fp=os.path.join(d,'qa.jsonl')
-    with open(fp,'w',encoding='utf-8') as f:
-        for o in out: f.write(json.dumps(o,ensure_ascii=False)+'\n')
+    fp=os.path.join(ROOT,'corpus','qa',code,'qa.jsonl')
+    _merge_write(code,out)
     n_empty=sum(1 for o in out if o['empty'])
     print(f'[{code} {name}] {len(out)}条(空回答{n_empty}) → {fp}')
     return len(out)
 
 def fetch(code,since):
-    """主通道按市场分派；0条/失败时全景网兜底(全市场镜像,含沪深,纪律9双通道)。"""
+    """主通道按市场分派；0条/失败时全景网兜底(全市场镜像,含沪深,纪律9双通道)。
+    2026-08-15勘误: 主通道"部分返回"(非零但远低于历史)也会绕过兜底并覆盖写入丢历史;
+    故非零也按"缩水"判定走p5w, 且各通道改并集合并落盘(见_merge_write)。"""
     if code.startswith('6'):
         n=fetch_sse(code,since)
     elif code.startswith('92') or code.startswith('8'):
@@ -181,6 +224,11 @@ def fetch(code,since):
         m=fetch_p5w(code,since)
         if m: print(f'[{code}] 主通道{n},p5w兜底{m}条(前科:002792/600641/688079主通道假阴性)')
         return m if m is not None else n
+    # 兜底加宽: 主通道非零但缩水(<现有快照50%且快照>20)也走p5w, 两通道并集合并落盘
+    snap=_snapshot_count(code)
+    if snap>20 and n<0.5*snap:
+        m=fetch_p5w(code,since)
+        if m: print(f'[{code}] 主通道{n}条缩水触发p5w兜底{m}条(前科:002792/600641/688079主通道假阴性)')
     return n
 
 if __name__=='__main__':
