@@ -26,7 +26,7 @@ with open('corpus/_frozen.csv', encoding='utf-8-sig') as f:
         frozen[r['代码']] = r['名称']
 
 def watched_codes():
-    """待判行公司 ∪ 在建点公司 (宇宙内)"""
+    """待判行公司 ∪ 全部已入点公司(生产中+在建, 宇宙内)——2026-08-15起从在建/待判扩到全量已入点"""
     codes = set()
     for r in csv.DictReader(open('triage.csv', encoding='utf-8-sig')):
         if r['处置'] == '待判':
@@ -34,7 +34,7 @@ def watched_codes():
                 if n == r['公司']:
                     codes.add(c)
     for r in csv.DictReader(open('points.csv', encoding='utf-8-sig')):
-        if r['状态'] == '在建':
+        if r['状态'] in ('生产中', '在建'):
             for c, n in frozen.items():
                 if n == r['公司']:
                     codes.add(c)
