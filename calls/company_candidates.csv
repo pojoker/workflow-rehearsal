@@ -34,7 +34,7 @@ CAND_FREIBERGER,Freiberger Compound Materials,company,upstream_enabler,watch,P3,
 CAND_NTTID,NTT Innovative Devices,company,upstream_enabler,watch,P3,C5/C6,相干DSP产品适合按发布与合作监控,https://www.ntt-innovative-devices.com/en/optical_communications/dsp_products.html,promoted,WATCH_NTTID,2026-08-13,NTT子公司
 CAND_FUJITSUOC,Fujitsu Optical Components,company,core_peer,watch,P3,C6/MOD2,相干收发器和调制接收器适合事件监控,https://www.fujitsu.com/jp/group/foc/imagesgig5/FOC%20Product%20Line-up_20201202.pdf,promoted,WATCH_FUJITSUOC,2026-08-13,母公司季度难归因
 CAND_MCHP,Microchip,company,upstream_enabler,watch,P3,C5,高速Ethernet PHY可能提供电侧信号,https://www.microchip.com/en-us/products/high-speed-networking-and-video/ethernet/ethernet-phys/meta-dx-family,promoted,WATCH_MCHP,2026-08-15,两期正式材料仅电侧相邻信号；晋级watch且不建光侧事件
-CAND_LWLG,Lightwave Logic,company,upstream_enabler,quarterly,P3,M3/C4,电光聚合物调制器提供新材料路线,https://www.lightwavelogic.com/,source_verified,,2026-08-13,商业化和收入风险高
+CAND_LWLG,Lightwave Logic,company,upstream_enabler,quarterly,P3,M3/C4,电光聚合物调制器提供新材料路线,https://www.sec.gov/Archives/edgar/data/1325964/000107997326001097/lwlg_10q-063026.htm,promoted,LWLG,2026-08-15,四期SEC正式材料逐槽登记；商业化规模极小与量产最早2027年需分层跟踪
 CAND_OPENLIGHT,OpenLight,company,upstream_enabler,watch,P3,C1/C4,集成激光硅光平台适合跟踪PDK与量产事件,https://openlightphotonics.com/,promoted,WATCH_OPENLIGHT,2026-08-13,私企
 CAND_SICOYA,Sicoya,company,upstream_enabler,watch,P3,C4/D12,硅光芯片与收发组件适合事件监控,https://sicoya.com/en/silicon-photonic-components/,promoted,WATCH_SICOYA,2026-08-13,客户量产透明度低
 CAND_SCINTIL,SCINTIL Photonics,company,upstream_enabler,watch,P3,C1/C4,异质集成硅光提供新路线样本,https://www.scintil-photonics.com/,promoted,WATCH_SCINTIL,2026-08-13,融资与量产不确定
@@ -44,7 +44,7 @@ CAND_AYAR,Ayar Labs,company,upstream_enabler,watch,P3,C4/D12,UCIe光I/O芯粒与
 CAND_LIGHTMATTER,Lightmatter,company,upstream_enabler,watch,P3,D12,Passage NPO与OBO适合商业采用监控,https://lightmatter.co/products/passage,promoted,WATCH_LIGHTMATTER,2026-08-13,路线风险
 CAND_RANOVUS,Ranovus,company,upstream_enabler,watch,P3,D12,Odin CPO适合跟踪合作演示与量产迁移,https://ranovus.com/wp-content/uploads/2024/03/Ranovus-CPO-3.0-MediaTek-announcement-March-20-2024-Final.pdf,promoted,WATCH_RANOVUS,2026-08-13,演示与量产需分开
 CAND_SOURCEPHOTONICS,Source Photonics,company,core_peer,watch,P3,MOD1,800G与1.6T PAM4模块适合产品产能事件监控,https://www.sourcephotonics.com/news/source-photonics-announce-the-product-availability-of-its-200g-per-lane-based-1-6t-and-800g-pam4-transceiver-family-products-at-ofc25/,promoted,WATCH_SOURCEPHOTONICS,2026-08-13,无连续公开财报
-CAND_SMARTOPTICS,Smartoptics,company,system_vendor,quarterly,P3,MOD1/MOD2,OSFP与开放光传输提供欧洲长尾样本,https://smartoptics.com/products/optical-transceivers/osfp/,source_verified,,2026-08-13,规模和AI暴露待核
+CAND_SMARTOPTICS,Smartoptics,company,system_vendor,quarterly,P3,MOD1/MOD2,OSFP与开放光传输提供欧洲长尾样本,https://smartoptics.com/cision-post/smartoptics-group-asa-smop-q2-2026-financial-results/,promoted,SMOP,2026-08-15,四期Oslo Bors季度报告逐槽登记；财务愿景为前瞻不当作已实现收入
 CAND_AMKR,Amkor,company,upstream_enabler,quarterly,P3,P1,光子与光学封装提供OSAT补充,https://amkor.com/technology/,source_verified,,2026-08-13,官网证据较泛
 CAND_DELTA,Delta Electronics,company,system_vendor,quarterly,P3,MOD1/D12,COBO与800G概念验证提供系统集成样本,https://landing.deltaww.com/en-US/news/12998,source_verified,,2026-08-13,旧演示不能证明当前量产
 CAND_TEL,TE Connectivity,company,upstream_enabler,quarterly,P3,D9,数据中心与CPO连接提供连接器长尾样本,https://www.te.com/en/about-te/news-center/te-ofc-2026.html,source_verified,,2026-08-13,光互联收入难分拆

@@ -456,14 +456,14 @@
       "entity_name": "Lightwave Logic",
       "entity_type": "company",
       "inclusion_reason": "电光聚合物调制器提供新材料路线",
-      "notes": "商业化和收入风险高",
+      "notes": "四期SEC正式材料逐槽登记；商业化规模极小与量产最早2027年需分层跟踪",
       "priority": "P3",
-      "promoted_entity_id": "",
-      "reviewed_at": "2026-08-13",
-      "source_ref": "https://www.lightwavelogic.com/",
+      "promoted_entity_id": "LWLG",
+      "reviewed_at": "2026-08-15",
+      "source_ref": "https://www.sec.gov/Archives/edgar/data/1325964/000107997326001097/lwlg_10q-063026.htm",
       "suggested_role": "upstream_enabler",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_MCHP",
@@ -771,14 +771,14 @@
       "entity_name": "Smartoptics",
       "entity_type": "company",
       "inclusion_reason": "OSFP与开放光传输提供欧洲长尾样本",
-      "notes": "规模和AI暴露待核",
+      "notes": "四期Oslo Bors季度报告逐槽登记；财务愿景为前瞻不当作已实现收入",
       "priority": "P3",
-      "promoted_entity_id": "",
-      "reviewed_at": "2026-08-13",
-      "source_ref": "https://smartoptics.com/products/optical-transceivers/osfp/",
+      "promoted_entity_id": "SMOP",
+      "reviewed_at": "2026-08-15",
+      "source_ref": "https://smartoptics.com/cision-post/smartoptics-group-asa-smop-q2-2026-financial-results/",
       "suggested_role": "system_vendor",
       "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_SMTC",
@@ -1323,6 +1323,30 @@
       "source_ref": "https://investor.keysight.com/investor-news-and-events/financial-press-releases/press-release-details/2026/Keysight-Technologies-Reports-Second-Quarter-2026-Results/default.aspx"
     },
     {
+      "candidate_id": "CAND_LWLG",
+      "material_type": "regulatory_filing",
+      "notes": "官网90天复核仅有播客研讨会等媒体内容；PDK公告(2026-03-03)在窗口外且为第一方asserted",
+      "period_label": "2026Q1",
+      "published_date": "2026-05-15",
+      "review_id": "TR_LWLG_2026Q1",
+      "reviewed_at": "2026-08-15",
+      "signal_class": "direct_optical",
+      "signal_summary": "10-Q确认MOA于2026年1月执行且Phase1对价已确认；硅光EO聚合物调制器商业化框架下的开发阶段",
+      "source_ref": "https://www.sec.gov/Archives/edgar/data/1325964/000155335026000087/lwlg_10q-033126.htm"
+    },
+    {
+      "candidate_id": "CAND_LWLG",
+      "material_type": "regulatory_filing",
+      "notes": "收入极小且单客户依赖；JDA Phase2待客户验收；产品阶段为开发早期",
+      "period_label": "2026Q2",
+      "published_date": "2026-08-14",
+      "review_id": "TR_LWLG_2026Q2",
+      "reviewed_at": "2026-08-15",
+      "signal_class": "direct_optical",
+      "signal_summary": "10-Q披露EO聚合物调制材料唯一许可协议收入与2026年1月签署的硅光调制器JDA；公司明确量产收入最早2027年",
+      "source_ref": "https://www.sec.gov/Archives/edgar/data/1325964/000107997326001097/lwlg_10q-063026.htm"
+    },
+    {
       "candidate_id": "CAND_MCHP",
       "material_type": "regulatory_filing",
       "notes": "官网新闻页90天复核最高价值事件仍为电侧PCIe6/CXL3.1 retimer",
@@ -1537,6 +1561,30 @@
       "signal_class": "direct_optical",
       "signal_summary": "季度报告提供光子业务设计赢单与量产窗口",
       "source_ref": "https://www.sivers-semiconductors.com/wp-content/uploads/2026/05/Sivers-Interim-report-Q126_FINAL_ENG.pdf"
+    },
+    {
+      "candidate_id": "CAND_SMARTOPTICS",
+      "material_type": "regulatory_filing",
+      "notes": "开放光传输与DCI为直接光学业务；收入与客户均为第一方披露",
+      "period_label": "2026Q1",
+      "published_date": "2026-05-07",
+      "review_id": "TR_SMOP_2026Q1",
+      "reviewed_at": "2026-08-15",
+      "signal_class": "direct_optical",
+      "signal_summary": "Q1正式报告收入2290万美元同比+59.6%；明确AI驱动网络扩容与数据中心互联及供应链挑战",
+      "source_ref": "https://smartoptics.com/cision-post/smartoptics-group-asa-smop-q1-2026-financial-results/"
+    },
+    {
+      "candidate_id": "CAND_SMARTOPTICS",
+      "material_type": "regulatory_filing",
+      "notes": "愿景与可寻址市场为前瞻；Netnod合作(2026-06-18)为具名伙伴选择但单方公告",
+      "period_label": "2026Q2",
+      "published_date": "2026-07-13",
+      "review_id": "TR_SMOP_2026Q2",
+      "reviewed_at": "2026-08-15",
+      "signal_class": "direct_optical",
+      "signal_summary": "Q2正式报告收入2890万美元同比+54.6%创历史新高；间接超大规模与AI数据中心业务贡献增长；发布新财务愿景",
+      "source_ref": "https://smartoptics.com/cision-post/smartoptics-group-asa-smop-q2-2026-financial-results/"
     },
     {
       "candidate_id": "CAND_SMTC",
@@ -2963,12 +3011,12 @@
   "coverage_summary": {
     "active_watch_entity_count": 37,
     "candidate_status_counts": {
-      "promoted": 55,
-      "source_verified": 9
+      "promoted": 57,
+      "source_verified": 7
     },
     "disclosure_count": 46,
-    "four_available_slot_complete_count": 34,
-    "four_slot_complete_count": 37,
+    "four_available_slot_complete_count": 36,
+    "four_slot_complete_count": 39,
     "latest_disclosure_at": "2026-08-06",
     "latest_retrieved_at": "2026-08-13",
     "latest_reviewed_at": "2026-08-13",
@@ -2976,9 +3024,9 @@
       "anchor_reviewed": 38,
       "no_relevant_claims": 8
     },
-    "quarterly_company_count": 37,
-    "tier_review_count": 64,
-    "tier_reviewed_candidate_count": 32
+    "quarterly_company_count": 39,
+    "tier_review_count": 68,
+    "tier_reviewed_candidate_count": 34
   },
   "discovery_queue": [
     {
@@ -3027,29 +3075,11 @@
       "verification_status": "source_verified"
     },
     {
-      "candidate_id": "CAND_LWLG",
-      "entity_name": "Lightwave Logic",
-      "priority": "P3",
-      "queue_type": "company_candidate_review",
-      "source_ref": "https://www.lightwavelogic.com/",
-      "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
-    },
-    {
       "candidate_id": "CAND_RBBN",
       "entity_name": "Ribbon Communications",
       "priority": "P3",
       "queue_type": "company_candidate_review",
       "source_ref": "https://ribboncommunications.com/solutions/service-provider-solutions/ip-optical/ribbons-automated-ip-routing-and-optical-networking",
-      "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
-    },
-    {
-      "candidate_id": "CAND_SMARTOPTICS",
-      "entity_name": "Smartoptics",
-      "priority": "P3",
-      "queue_type": "company_candidate_review",
-      "source_ref": "https://smartoptics.com/products/optical-transceivers/osfp/",
       "suggested_tier": "quarterly",
       "verification_status": "source_verified"
     },

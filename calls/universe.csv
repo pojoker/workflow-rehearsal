@@ -36,3 +36,5 @@ VIAV,VIAVI,upstream_enabler,1.6T测试验证需求与量产测试卡点观察方
 ADTN,ADTRAN,system_vendor,800G低功耗模块及开放光传输观察方,yes
 WIWYNN,Wiwynn,system_vendor,机架级AI系统与CPO互连需求观察方,yes
 GLW,Corning,upstream_enabler,AI数据中心光纤与无源连接需求观察方,yes
+LWLG,Lightwave Logic,upstream_enabler,电光聚合物调制器新材料路线与硅光集成商业化观察方,yes
+SMOP,Smartoptics,system_vendor,开放光传输与数据中心互联系统观察方,yes

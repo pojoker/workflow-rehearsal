@@ -117,7 +117,7 @@ class EventIntelligenceTest(unittest.TestCase):
         self.assertEqual(
             {row["candidate_id"] for row in projection["discovery_queue"]},
             {
-                "CAND_HAMAMATSU", "CAND_LWLG", "CAND_SMARTOPTICS", "CAND_AMKR",
+                "CAND_HAMAMATSU", "CAND_AMKR",
                 "CAND_DELTA", "CAND_TEL", "CAND_RBBN", "CAND_EKI", "CAND_HPE",
             },
         )
@@ -292,7 +292,7 @@ class EventIntelligenceTest(unittest.TestCase):
             "WATCH_AMD",
         }
         discovery_ids = {
-            "CAND_HAMAMATSU", "CAND_LWLG", "CAND_SMARTOPTICS", "CAND_AMKR",
+            "CAND_HAMAMATSU", "CAND_AMKR",
             "CAND_DELTA", "CAND_TEL", "CAND_RBBN", "CAND_EKI", "CAND_HPE",
         }
         enabled = {row["company_id"] for row in universe if row["enabled"] == "yes"}
@@ -313,9 +313,16 @@ class EventIntelligenceTest(unittest.TestCase):
             row["candidate_id"]: row["promoted_entity_id"]
             for row in p3_rows if row["verification_status"] == "promoted"
         }
-        # 本批新增的 watch 晋级（MCHP）由候选表派生，不把固定集合重复硬编码。
-        self.assertEqual(promoted, watch_ids | {promoted_by["CAND_MCHP"]})
+        # 本批新增的 watch 晋级（MCHP）由候选表派生；LWLG/SMARTOPTICS 为同批 quarterly 晋级。
+        promoted_quarterly = {
+            promoted_by["CAND_LWLG"], promoted_by["CAND_SMARTOPTICS"],
+        }
+        self.assertEqual(promoted, watch_ids | {promoted_by["CAND_MCHP"]} | promoted_quarterly)
         self.assertEqual(promoted_by["CAND_MCHP"], "WATCH_MCHP")
+        self.assertEqual(promoted_by["CAND_LWLG"], "LWLG")
+        self.assertEqual(promoted_by["CAND_SMARTOPTICS"], "SMOP")
+        self.assertIn(promoted_by["CAND_LWLG"], enabled)
+        self.assertIn(promoted_by["CAND_SMARTOPTICS"], enabled)
         self.assertNotIn("CAND_HAMAMATSU", promoted_by)
         hamamatsu = next(row for row in p3_rows if row["candidate_id"] == "CAND_HAMAMATSU")
         self.assertEqual(hamamatsu["verification_status"], "source_verified")
@@ -359,17 +366,17 @@ class EventIntelligenceTest(unittest.TestCase):
             self.assertNotIn(entity_id, enabled)
             self.assertNotIn(entity_id, radar_subjects)
 
-        # 事件监控37家；发现队列9家：Hamamatsu 在队列内、Microchip 不在。
+        # 事件监控37家；发现队列7家：Hamamatsu 在队列内、Microchip 不在。
         coverage = projection["coverage_summary"]
         self.assertEqual(coverage["active_watch_entity_count"], 37)
-        self.assertEqual(coverage["candidate_status_counts"]["source_verified"], 9)
+        self.assertEqual(coverage["candidate_status_counts"]["source_verified"], 7)
         queue_candidates = {
             row.get("candidate_id") for row in projection["discovery_queue"]
             if row.get("queue_type") == "company_candidate_review"
         }
         self.assertIn("CAND_HAMAMATSU", queue_candidates)
         self.assertNotIn("CAND_MCHP", queue_candidates)
-        self.assertEqual(len(queue_candidates), 9)
+        self.assertEqual(len(queue_candidates), 7)
 
         # 每家两个不同正式期间 tier review 保留为已核结果：Hamamatsu 两期无光信号
         # （零结果双通道），Microchip 两期相邻电连接信号且明确非光模块采用。
@@ -403,6 +410,65 @@ class EventIntelligenceTest(unittest.TestCase):
         self.mutate("events.csv", "EV001", {"event_status": "corroborated"})
         with self.assertRaisesRegex(EventLedgerError, "lacks independent supporting origin"):
             load_event_facts(self.root)
+
+    def test_lwlg_and_smartoptics_promoted_to_quarterly_with_four_slots(self) -> None:
+        facts = load_event_facts(self.root)
+        projection = derive_event_projection(facts)
+        _, universe = self._rows("universe.csv")
+        _, sources = self._rows("sources.csv")
+        _, candidates = self._rows("company_candidates.csv")
+        _, reviews = self._rows("company_tier_reviews.csv")
+
+        enabled = {row["company_id"] for row in universe if row["enabled"] == "yes"}
+        self.assertIn("LWLG", enabled)
+        self.assertIn("SMOP", enabled)
+        # 两家均不进 watch 层：quarterly 晋级后由四季度材料承担监控义务。
+        self.assertNotIn("LWLG", {row["entity_id"] for row in facts["watch_entities"].values()})
+        self.assertNotIn("SMOP", {row["entity_id"] for row in facts["watch_entities"].values()})
+
+        by_id = {row["candidate_id"]: row for row in candidates}
+        self.assertEqual(by_id["CAND_LWLG"]["verification_status"], "promoted")
+        self.assertEqual(by_id["CAND_LWLG"]["promoted_entity_id"], "LWLG")
+        self.assertEqual(by_id["CAND_SMARTOPTICS"]["verification_status"], "promoted")
+        self.assertEqual(by_id["CAND_SMARTOPTICS"]["promoted_entity_id"], "SMOP")
+
+        # 每家同批登记四个不同季度槽且全部 A 级可用。
+        candidate_id_by_company = {"LWLG": "CAND_LWLG", "SMOP": "CAND_SMARTOPTICS"}
+        for company_id in ("LWLG", "SMOP"):
+            quarterly = [
+                row for row in sources
+                if row["company_id"] == company_id and row["source_scope"] == "quarterly"
+            ]
+            self.assertEqual(len(quarterly), 4, company_id)
+            self.assertEqual(len({row["slot_label"] for row in quarterly}), 4, company_id)
+            self.assertTrue(all(row["availability"] == "available" for row in quarterly))
+            self.assertTrue(all(row["source_grade"] == "A" for row in quarterly))
+            self.assertTrue(all(row["material_type"] == "regulatory_filing" for row in quarterly))
+            promoted_reviews = [
+                row for row in reviews
+                if row["candidate_id"] == candidate_id_by_company[company_id]
+            ]
+            self.assertEqual(len(promoted_reviews), 2, company_id)
+            self.assertTrue(
+                all(row["signal_class"] == "direct_optical" for row in promoted_reviews)
+            )
+
+        # 两家均不进入 radar（无新增事件），发现队列从 9 家减至 7 家。
+        self.assertNotIn(
+            "LWLG", {row["primary_subject_id"] for row in projection["radar_events"]}
+        )
+        self.assertNotIn(
+            "SMOP", {row["primary_subject_id"] for row in projection["radar_events"]}
+        )
+        self.assertEqual(
+            projection["coverage_summary"]["candidate_status_counts"]["source_verified"],
+            7,
+        )
+        self.assertEqual(projection["coverage_summary"]["quarterly_company_count"], 39)
+        # LITE/AAOI/AXTI 各有一个不可用槽位；新增两家四槽均可用后仍为 36。
+        self.assertEqual(
+            projection["coverage_summary"]["four_available_slot_complete_count"], 36
+        )
 
     def test_corroborated_requires_first_party_asserted_origin(self) -> None:
         self.add_independent_support()
@@ -526,7 +592,7 @@ class EventIntelligenceTest(unittest.TestCase):
         self.assertIn("Narrative", section)
         self.assertIn("原文短引", section)
         self.assertIn("数据版本：", section)
-        self.assertIn("发现队列：9 家待进一步复核", section)
+        self.assertIn("发现队列：7 家待进一步复核", section)
         self.assertIn("Hamamatsu Photonics", section)
         self.assertIn("official blog lines 24-30", section)
         self.assertIn('href="https://investors.ao-inc.com/node/16751"', section)
