@@ -381,7 +381,7 @@
       "entity_name": "Hamamatsu Photonics",
       "entity_type": "company",
       "inclusion_reason": "InGaAs探测器可能补足接收器件",
-      "notes": "数据中心收入不透明",
+      "notes": "数据中心收入不透明；两期tier review为零结果故不升watch",
       "priority": "P3",
       "promoted_entity_id": "",
       "reviewed_at": "2026-08-13",
@@ -471,14 +471,14 @@
       "entity_name": "Microchip",
       "entity_type": "company",
       "inclusion_reason": "高速Ethernet PHY可能提供电侧信号",
-      "notes": "光学特异性低",
+      "notes": "两期正式材料仅电侧相邻信号；晋级watch且不建光侧事件",
       "priority": "P3",
-      "promoted_entity_id": "",
-      "reviewed_at": "2026-08-13",
+      "promoted_entity_id": "WATCH_MCHP",
+      "reviewed_at": "2026-08-15",
       "source_ref": "https://www.microchip.com/en-us/products/high-speed-networking-and-video/ethernet/ethernet-phys/meta-dx-family",
       "suggested_role": "upstream_enabler",
-      "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
+      "suggested_tier": "watch",
+      "verification_status": "promoted"
     },
     {
       "candidate_id": "CAND_MELCO",
@@ -1251,6 +1251,30 @@
       "source_ref": "https://investor.corning.com/news-and-events/news/news-details/2026/Cornings-Strong-Second-Quarter-2026-Financial-Results1-Demonstrate-Progress-on-Recently-Upgraded-Springboard-Plan/default.aspx"
     },
     {
+      "candidate_id": "CAND_HAMAMATSU",
+      "material_type": "regulatory_filing",
+      "notes": "两期不同正式披露互为零结果通道",
+      "period_label": "FY2026H1",
+      "published_date": "2026-05-14",
+      "review_id": "TR_HAMAMATSU_FY2026H1",
+      "reviewed_at": "2026-08-15",
+      "signal_class": "no_relevant_signal",
+      "signal_summary": "半年报仅出现工业业务受生成式AI投资支持表述；光通信未单列且无接收器件经营信号",
+      "source_ref": "https://www.hamamatsu.com/jp/en/news/investor-relations/2026/20260514000000.html"
+    },
+    {
+      "candidate_id": "CAND_HAMAMATSU",
+      "material_type": "earnings_presentation",
+      "notes": "官网产品页90天复核无光通信采用事件（第二通道）",
+      "period_label": "FY2026Q1",
+      "published_date": "2026-02-11",
+      "review_id": "TR_HAMAMATSU_FY2026Q1",
+      "reviewed_at": "2026-08-15",
+      "signal_class": "no_relevant_signal",
+      "signal_summary": "业绩简报全文复核无光通信销售额或探测器订单信号",
+      "source_ref": "https://www.hamamatsu.com/content/dam/hamamatsu-photonics/sites/documents/01_HQ/ir/financial-information/results-briefing/h_ir_260211_se_en.pdf"
+    },
+    {
       "candidate_id": "CAND_JBL",
       "material_type": "regulatory_filing",
       "notes": "具体1.6T产品另用官方产品事件",
@@ -1297,6 +1321,30 @@
       "signal_class": "adjacent_segment",
       "signal_summary": "季度材料提供商业通信测试需求的上层信号",
       "source_ref": "https://investor.keysight.com/investor-news-and-events/financial-press-releases/press-release-details/2026/Keysight-Technologies-Reports-Second-Quarter-2026-Results/default.aspx"
+    },
+    {
+      "candidate_id": "CAND_MCHP",
+      "material_type": "regulatory_filing",
+      "notes": "官网新闻页90天复核最高价值事件仍为电侧PCIe6/CXL3.1 retimer",
+      "period_label": "FY2026Q4",
+      "published_date": "2026-05-07",
+      "review_id": "TR_MCHP_FY2026Q4",
+      "reviewed_at": "2026-08-15",
+      "signal_class": "adjacent_segment",
+      "signal_summary": "正式业绩附件含data center/AI engagement与Gen6 retimer电侧表述；明确非光模块采用",
+      "source_ref": "https://ir.microchip.com/sec-filings/all-sec-filings/content/0000827054-26-000012/exhibit991q4fy26.htm"
+    },
+    {
+      "candidate_id": "CAND_MCHP",
+      "material_type": "earnings_release",
+      "notes": "design wins为第一方宣称无独立验证",
+      "period_label": "FY2027Q1",
+      "published_date": "2026-08-06",
+      "review_id": "TR_MCHP_FY2027Q1",
+      "reviewed_at": "2026-08-15",
+      "signal_class": "adjacent_segment",
+      "signal_summary": "PCIe Gen6 connectivity design wins由6增至12；属电侧连接信号，非光模块采用",
+      "source_ref": "https://ir.microchip.com/news-events/press-releases/detail/1409/microchip-technology-announces-financial-results-for-first-quarter-of-fiscal-year-2027"
     },
     {
       "candidate_id": "CAND_MELCO",
@@ -2913,10 +2961,10 @@
     }
   ],
   "coverage_summary": {
-    "active_watch_entity_count": 36,
+    "active_watch_entity_count": 37,
     "candidate_status_counts": {
-      "promoted": 54,
-      "source_verified": 10
+      "promoted": 55,
+      "source_verified": 9
     },
     "disclosure_count": 46,
     "four_available_slot_complete_count": 34,
@@ -2929,8 +2977,8 @@
       "no_relevant_claims": 8
     },
     "quarterly_company_count": 37,
-    "tier_review_count": 60,
-    "tier_reviewed_candidate_count": 30
+    "tier_review_count": 64,
+    "tier_reviewed_candidate_count": 32
   },
   "discovery_queue": [
     {
@@ -2984,15 +3032,6 @@
       "priority": "P3",
       "queue_type": "company_candidate_review",
       "source_ref": "https://www.lightwavelogic.com/",
-      "suggested_tier": "quarterly",
-      "verification_status": "source_verified"
-    },
-    {
-      "candidate_id": "CAND_MCHP",
-      "entity_name": "Microchip",
-      "priority": "P3",
-      "queue_type": "company_candidate_review",
-      "source_ref": "https://www.microchip.com/en-us/products/high-speed-networking-and-video/ethernet/ethernet-phys/meta-dx-family",
       "suggested_tier": "quarterly",
       "verification_status": "source_verified"
     },

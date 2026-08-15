@@ -117,9 +117,8 @@ class EventIntelligenceTest(unittest.TestCase):
         self.assertEqual(
             {row["candidate_id"] for row in projection["discovery_queue"]},
             {
-                "CAND_HAMAMATSU", "CAND_MCHP", "CAND_LWLG",
-                "CAND_SMARTOPTICS", "CAND_AMKR", "CAND_DELTA", "CAND_TEL",
-                "CAND_RBBN", "CAND_EKI", "CAND_HPE",
+                "CAND_HAMAMATSU", "CAND_LWLG", "CAND_SMARTOPTICS", "CAND_AMKR",
+                "CAND_DELTA", "CAND_TEL", "CAND_RBBN", "CAND_EKI", "CAND_HPE",
             },
         )
         self.assertEqual(
@@ -293,9 +292,8 @@ class EventIntelligenceTest(unittest.TestCase):
             "WATCH_AMD",
         }
         discovery_ids = {
-            "CAND_HAMAMATSU", "CAND_MCHP", "CAND_LWLG",
-            "CAND_SMARTOPTICS", "CAND_AMKR", "CAND_DELTA", "CAND_TEL",
-            "CAND_RBBN", "CAND_EKI", "CAND_HPE",
+            "CAND_HAMAMATSU", "CAND_LWLG", "CAND_SMARTOPTICS", "CAND_AMKR",
+            "CAND_DELTA", "CAND_TEL", "CAND_RBBN", "CAND_EKI", "CAND_HPE",
         }
         enabled = {row["company_id"] for row in universe if row["enabled"] == "yes"}
         active_watch = {
@@ -311,10 +309,95 @@ class EventIntelligenceTest(unittest.TestCase):
             row["candidate_id"] for row in p3_rows
             if row["verification_status"] == "source_verified"
         }
-        self.assertEqual(promoted, watch_ids)
+        promoted_by = {
+            row["candidate_id"]: row["promoted_entity_id"]
+            for row in p3_rows if row["verification_status"] == "promoted"
+        }
+        # 本批新增的 watch 晋级（MCHP）由候选表派生，不把固定集合重复硬编码。
+        self.assertEqual(promoted, watch_ids | {promoted_by["CAND_MCHP"]})
+        self.assertEqual(promoted_by["CAND_MCHP"], "WATCH_MCHP")
+        self.assertNotIn("CAND_HAMAMATSU", promoted_by)
+        hamamatsu = next(row for row in p3_rows if row["candidate_id"] == "CAND_HAMAMATSU")
+        self.assertEqual(hamamatsu["verification_status"], "source_verified")
+        self.assertEqual(hamamatsu["promoted_entity_id"], "")
+        self.assertIn(hamamatsu["candidate_id"], held)
+        self.assertNotIn("WATCH_HAMAMATSU", active_watch)
         self.assertEqual(held, discovery_ids)
         self.assertTrue(watch_ids <= active_watch)
         self.assertFalse(watch_ids & enabled)
+
+    def test_hamamatsu_held_in_discovery_and_microchip_promoted_to_watch(self) -> None:
+        facts = load_event_facts(self.root)
+        projection = derive_event_projection(facts)
+        _, universe = self._rows("universe.csv")
+        _, watch_rows = self._rows("watch_entities.csv")
+        _, candidates = self._rows("company_candidates.csv")
+        _, reviews = self._rows("company_tier_reviews.csv")
+
+        enabled = {row["company_id"] for row in universe if row["enabled"] == "yes"}
+        active_watch = {
+            row["entity_id"] for row in watch_rows
+            if row["monitoring_status"] == "active"
+        }
+        by_id = {row["candidate_id"]: row for row in candidates}
+
+        # Hamamatsu 近90天无相关状态变化事件：退回发现队列，保持 source_verified。
+        hamamatsu = by_id["CAND_HAMAMATSU"]
+        self.assertEqual(hamamatsu["verification_status"], "source_verified")
+        self.assertEqual(hamamatsu["promoted_entity_id"], "")
+        self.assertNotIn("WATCH_HAMAMATSU", active_watch)
+        # Microchip 两期 adjacent_segment 正式材料形式上过 quarterly 最低材料门槛，
+        # 但实质仅电侧邻接、无直接光学采用：只升 watch、不升 quarterly。
+        mchp = by_id["CAND_MCHP"]
+        self.assertEqual(mchp["verification_status"], "promoted")
+        self.assertEqual(mchp["promoted_entity_id"], "WATCH_MCHP")
+        self.assertIn("WATCH_MCHP", active_watch)
+
+        # 两者均不进 universe 四季度槽，也不进 radar。
+        radar_subjects = {row["primary_subject_id"] for row in projection["radar_events"]}
+        for entity_id in ("WATCH_HAMAMATSU", "WATCH_MCHP"):
+            self.assertNotIn(entity_id, enabled)
+            self.assertNotIn(entity_id, radar_subjects)
+
+        # 事件监控37家；发现队列9家：Hamamatsu 在队列内、Microchip 不在。
+        coverage = projection["coverage_summary"]
+        self.assertEqual(coverage["active_watch_entity_count"], 37)
+        self.assertEqual(coverage["candidate_status_counts"]["source_verified"], 9)
+        queue_candidates = {
+            row.get("candidate_id") for row in projection["discovery_queue"]
+            if row.get("queue_type") == "company_candidate_review"
+        }
+        self.assertIn("CAND_HAMAMATSU", queue_candidates)
+        self.assertNotIn("CAND_MCHP", queue_candidates)
+        self.assertEqual(len(queue_candidates), 9)
+
+        # 每家两个不同正式期间 tier review 保留为已核结果：Hamamatsu 两期无光信号
+        # （零结果双通道），Microchip 两期相邻电连接信号且明确非光模块采用。
+        hamamatsu_reviews = sorted(
+            (row for row in reviews if row["candidate_id"] == "CAND_HAMAMATSU"),
+            key=lambda row: row["period_label"],
+        )
+        mchp_reviews = sorted(
+            (row for row in reviews if row["candidate_id"] == "CAND_MCHP"),
+            key=lambda row: row["period_label"],
+        )
+        self.assertEqual(len(hamamatsu_reviews), 2)
+        self.assertEqual(len(mchp_reviews), 2)
+        self.assertNotEqual(
+            hamamatsu_reviews[0]["period_label"], hamamatsu_reviews[1]["period_label"]
+        )
+        self.assertNotEqual(
+            mchp_reviews[0]["period_label"], mchp_reviews[1]["period_label"]
+        )
+        self.assertTrue(
+            all(row["signal_class"] == "no_relevant_signal" for row in hamamatsu_reviews)
+        )
+        self.assertTrue(
+            all(row["signal_class"] == "adjacent_segment" for row in mchp_reviews)
+        )
+        self.assertTrue(
+            all("非光模块采用" in row["signal_summary"] for row in mchp_reviews)
+        )
 
     def test_first_party_cannot_self_corroborate(self) -> None:
         self.mutate("events.csv", "EV001", {"event_status": "corroborated"})
@@ -443,7 +526,7 @@ class EventIntelligenceTest(unittest.TestCase):
         self.assertIn("Narrative", section)
         self.assertIn("原文短引", section)
         self.assertIn("数据版本：", section)
-        self.assertIn("发现队列：10 家待进一步复核", section)
+        self.assertIn("发现队列：9 家待进一步复核", section)
         self.assertIn("Hamamatsu Photonics", section)
         self.assertIn("official blog lines 24-30", section)
         self.assertIn('href="https://investors.ao-inc.com/node/16751"', section)
