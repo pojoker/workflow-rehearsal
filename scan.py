@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""scan.py — 扫描+不变量①-⑪。用法: python3 scan.py [--check]
+"""scan.py — 扫描+不变量①-⑫。用法: python3 scan.py [--check]
 --check: 只跑不变量(<10s)。扫描分母=corpus/annual(_frozen登记);legacy-input=证据库不参与扫描。"""
 import sys,os,csv,re,glob,time,subprocess
 
@@ -38,6 +38,40 @@ def staleness():
     miss=sorted(frozen-have)
     print(f"[语料] 最新文件距今{n:.0f}天; 宇宙内缺席年报 {len(miss)} 家"+(f"(样例:{','.join(miss[:5])})" if miss else ''))
     if n>120: print("[黄灯] 语料距今>120天,该投喂了(README年报季提示)")
+
+def _check_shipment_row(r):
+    """⑪ 出货量推断层行级校验(ADR-0001). 行为与原内联循环逐字一致, 供主循环与 --selftest 调用."""
+    if not re.fullmatch(r'SE\d{3}',r.get('row_id','?')): fail('⑪',f"shipments row_id须为SE###: {r.get('row_id')}")
+    lv = r.get('证据等级','')
+    if lv not in ('B','C','D'): fail('⑪',f"{r.get('row_id')} 证据等级{lv}非法(推断层封顶C,B仅直接披露,禁A)")
+    if str(r.get('情景标记','')).startswith('scenario') and lv!='D': fail('⑪',f"{r.get('row_id')} 情景行必须为D级")
+    if r.get('单位','') not in ('只','颗','件','支','片','只/个','支/套','片/个','台','台/套','千克','千只','KK','万只','万颗','万个','万件','万支','万片','万平方米','万美元'): fail('⑪',f"{r.get('row_id')} 单位非法: {r.get('单位')}")
+    # 出货量必须为数值(收入事实不入本表,见⑫;2026-08-16评审R1/R2返修;REVLINE-R6-01:NaN/Inf拦截)
+    try: _qv=float(str(r.get('出货量','')).replace(',',''))
+    except ValueError: fail('⑪',f"{r.get('row_id')} 出货量非数值: {r.get('出货量')}")
+    else:
+        import math
+        if not math.isfinite(_qv): fail('⑪',f"{r.get('row_id')} 出货量非有限值: {r.get('出货量')}")
+
+def _check_revenue_row(r, cells):
+    """⑫ 分部收入事实表行级校验(2026-08-16评审方案A). 行为与原内联循环逐字一致, 供主循环与 --selftest 调用."""
+    rid=r.get('row_id','?')
+    if not re.fullmatch(r'SR\d{3}',rid): fail('⑫',f'row_id须为SR###: {rid}')
+    if r.get('evidence_grade','') not in ('B','C','D'): fail('⑫',f'{rid} 证据等级非法(禁A)')
+    scope=r.get('mapping_scope','')
+    if scope not in ('exact','mixed_scope','unmapped'): fail('⑫',f'{rid} mapping_scope非法: {scope}')
+    try:
+        _av=float(str(r.get('amount','')).replace(',',''))
+        import math
+        if not math.isfinite(_av) or _av<=0: fail('⑫',f'{rid} amount非有限正数: {r.get("amount")}')
+    except ValueError: fail('⑫',f'{rid} amount非数值: {r.get("amount")}')
+    if r.get('currency','') not in ('CNY','USD'): fail('⑫',f'{rid} currency非法')
+    cs=[c.strip() for c in (r.get('cell_ids') or '').split(',') if c.strip()]
+    if scope=='exact':
+        if not cs: fail('⑫',f'{rid} exact但cell_ids为空')
+        for c in cs:
+            if c not in cells: fail('⑫',f'{rid} cell_id {c} 不在tree.yaml')
+    elif cs: fail('⑫',f'{rid} {scope}不得挂cell_ids(混合/未映射口径)')
 
 def invariants():
     pts,egs,trg=rows('points.csv'),rows('edges.csv'),rows('triage.csv')
@@ -180,32 +214,11 @@ def invariants():
     # ⑪出货量推断层: shipments.csv 行级校验(ADR-0001)
     if os.path.exists(os.path.join(ROOT,'shipments.csv')):
         for r in rows('shipments.csv'):
-            if not re.fullmatch(r'SE\d{3}',r.get('row_id','?')): fail('⑪',f"shipments row_id须为SE###: {r.get('row_id')}")
-            lv = r.get('证据等级','')
-            if lv not in ('B','C','D'): fail('⑪',f"{r.get('row_id')} 证据等级{lv}非法(推断层封顶C,B仅直接披露,禁A)")
-            if str(r.get('情景标记','')).startswith('scenario') and lv!='D': fail('⑪',f"{r.get('row_id')} 情景行必须为D级")
-            if r.get('单位','') not in ('只','颗','件','支','片','只/个','支/套','片/个','台','台/套','千克','千只','KK','万只','万颗','万个','万件','万支','万片','万平方米','万美元'): fail('⑪',f"{r.get('row_id')} 单位非法: {r.get('单位')}")
-            # 出货量必须为数值(收入事实不入本表,见⑫;2026-08-16评审R1/R2返修)
-            try: float(str(r.get('出货量','')).replace(',',''))
-            except ValueError: fail('⑪',f"{r.get('row_id')} 出货量非数值: {r.get('出货量')}")
+            _check_shipment_row(r)
     # ⑫分部收入事实表(2026-08-16评审方案A): 收入事实独立成层,与出货量数量事实机器可分
     if os.path.exists(os.path.join(ROOT,'company_segment_revenue.csv')):
         for r in rows('company_segment_revenue.csv'):
-            rid=r.get('row_id','?')
-            if not re.fullmatch(r'SR\d{3}',rid): fail('⑫',f'row_id须为SR###: {rid}')
-            if r.get('evidence_grade','') not in ('B','C','D'): fail('⑫',f'{rid} 证据等级非法(禁A)')
-            scope=r.get('mapping_scope','')
-            if scope not in ('exact','mixed_scope','unmapped'): fail('⑫',f'{rid} mapping_scope非法: {scope}')
-            try:
-                if float(str(r.get('amount','')).replace(',',''))<=0: fail('⑫',f'{rid} amount非正数')
-            except ValueError: fail('⑫',f'{rid} amount非数值: {r.get("amount")}')
-            if r.get('currency','') not in ('CNY','USD'): fail('⑫',f'{rid} currency非法')
-            cs=[c.strip() for c in (r.get('cell_ids') or '').split(',') if c.strip()]
-            if scope=='exact':
-                if not cs: fail('⑫',f'{rid} exact但cell_ids为空')
-                for c in cs:
-                    if c not in cells: fail('⑫',f'{rid} cell_id {c} 不在tree.yaml')
-            elif cs: fail('⑫',f'{rid} {scope}不得挂cell_ids(混合/未映射口径)')
+            _check_revenue_row(r, cells)
     # ⑩互动易qa车道: jsonl格式合法+必备键;点锚引用的qa快照必须存在且真含引语
     for qf in glob.glob(os.path.join(ROOT,'corpus/qa/*/qa.jsonl')):
         try:
@@ -277,10 +290,59 @@ def scan():
     for pr,hid,co,cell,w,seg in q[:40]: print(f'  [{labels[pr]}] {co} | {cell} | {w} | {seg[:50]}')
     return q
 
+def selftest():
+    """--selftest: 纯内存 fixture 回归 ⑪/⑫ 行级校验, 不读写真实csv.
+    fail() 为收集式(仅追加 ERR,不 sys.exit/不抛异常), 故逐用例直接调用行校验函数,
+    以调用前后 ERR 增量判定该用例是否触发拦截. 任一用例 FAIL 则返回非0."""
+    total=0; fails=0
+    def case(name, fn, expect_fail):
+        nonlocal total, fails
+        total+=1
+        before=len(ERR)
+        try:
+            fn()
+            added=ERR[before:]
+        except Exception as e:  # 越界异常也视为校验未生效 → FAIL(防御性,不影响正常路径)
+            added=[f'EXC: {e}']
+        delta=len(added)
+        ok=(delta>0) if expect_fail else (delta==0)
+        if ok:
+            print(f'[PASS] {name}')
+        else:
+            fails+=1
+            print(f'[FAIL] {name} :: {"; ".join(added) if added else "(期望失败却无fail触发)"}')
+        del ERR[before:]  # 隔离用例, 避免污染后续 delta 统计
+    # ---- ⑪ shipments.csv ----
+    def f_ship_good(): _check_shipment_row({'row_id':'SE001','证据等级':'B','情景标记':'','单位':'只','出货量':'1000'})
+    case('⑪ 正例: 正常行通过', f_ship_good, expect_fail=False)
+    for bad_qty in ('nan','inf','-','abc',''):
+        def f(q=bad_qty): _check_shipment_row({'row_id':'SE002','证据等级':'B','情景标记':'','单位':'只','出货量':q})
+        case(f'⑪ 反例: 出货量={bad_qty!r} 被拦', f, expect_fail=True)
+    case('⑪ 反例: 单位=- 被拦', lambda: _check_shipment_row({'row_id':'SE003','证据等级':'B','情景标记':'','单位':'-','出货量':'1000'}), True)
+    case('⑪ 反例: 证据等级=A 被拦', lambda: _check_shipment_row({'row_id':'SE004','证据等级':'A','情景标记':'','单位':'只','出货量':'1000'}), True)
+    case('⑪ 反例: scenario非D 被拦', lambda: _check_shipment_row({'row_id':'SE005','证据等级':'C','情景标记':'scenario_abc','单位':'只','出货量':'1000'}), True)
+    # ---- ⑫ company_segment_revenue.csv ----
+    cells_full={'D1','MOD1','D9'}  # 含本组用例所需格
+    def f_rev_exact(): _check_revenue_row({'row_id':'SR001','evidence_grade':'B','mapping_scope':'exact','amount':'100','currency':'CNY','cell_ids':'D1'}, cells_full)
+    case('⑫ 正例: exact+有效cell通过', f_rev_exact, expect_fail=False)
+    def f_rev_mixed(): _check_revenue_row({'row_id':'SR002','evidence_grade':'C','mapping_scope':'mixed_scope','amount':'50','currency':'USD','cell_ids':''}, cells_full)
+    case('⑫ 正例: mixed_scope+空cell_ids通过', f_rev_mixed, expect_fail=False)
+    for bad_amt in ('nan','inf','0','-5'):
+        def f(a=bad_amt): _check_revenue_row({'row_id':'SR003','evidence_grade':'B','mapping_scope':'exact','amount':a,'currency':'CNY','cell_ids':'D1'}, cells_full)
+        case(f'⑫ 反例: amount={bad_amt!r} 被拦', f, expect_fail=True)
+    case('⑫ 反例: currency=JPY 被拦', lambda: _check_revenue_row({'row_id':'SR004','evidence_grade':'B','mapping_scope':'exact','amount':'100','currency':'JPY','cell_ids':'D1'}, cells_full), True)
+    case('⑫ 反例: exact但cell_ids空 被拦', lambda: _check_revenue_row({'row_id':'SR005','evidence_grade':'B','mapping_scope':'exact','amount':'100','currency':'CNY','cell_ids':''}, cells_full), True)
+    case('⑫ 反例: mixed_scope挂cell_ids 被拦', lambda: _check_revenue_row({'row_id':'SR006','evidence_grade':'B','mapping_scope':'mixed_scope','amount':'100','currency':'CNY','cell_ids':'D1'}, cells_full), True)
+    case('⑫ 反例: cell_ids含树外格子 被拦', lambda: _check_revenue_row({'row_id':'SR007','evidence_grade':'B','mapping_scope':'exact','amount':'100','currency':'CNY','cell_ids':'ZZ1'}, {'MOD1','D9'}), True)
+    print(f'\n[selftest] 合计 {total} 用例, 通过 {total-fails}, 失败 {fails}')
+    return 1 if fails else 0
+
 if __name__=='__main__':
+    if '--selftest' in sys.argv:
+        sys.exit(selftest())
     staleness()
     invariants()
     if ERR:
         print('\n'.join('\033[31m'+e+'\033[0m' for e in ERR)); sys.exit(1)
-    print('不变量全绿(①-⑪)')
+    print('不变量全绿(①-⑫)')
     if '--check' not in sys.argv: scan()
