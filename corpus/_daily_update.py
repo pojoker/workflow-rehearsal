@@ -42,10 +42,85 @@ def watched_codes():
 
 session = fetch.build_session()
 digest = {'ir_new': [], 'qa_new': [], 'ann': [], 'q_delta_new': [], 'q_delta_gone': []}
+log_lines = []  # 静默降级: 网络/解析异常记一行, 不拖垮主流程
+FOUR = {'半导体', '光学光电子', '通信设备', '元件'}  # 申万四行业分母
+CNINFO_API = 'https://webapi.cninfo.com.cn/api/stock/p_stock2110'
+# 功能2: 宇宙外公司补录候选的光通信关键词(独立正则, 不污染 scan 的 KW)
+OPT_KW = re.compile(r'光模块|光通信|光通讯|CPO|光芯片|光器件|光引擎|硅光|800G|1\.6T|相干', re.I)
+frozen_names = set(frozen.values())  # 名称集合, 用于宇宙外判定
+
+def parse_sw_industry(text):
+    """从 p_stock2110 响应解析当前申万二级行业名(F005V)。失败/无当前记录返回 None。"""
+    try:
+        data = json.loads(text)
+    except Exception:
+        return None
+    recs = data if isinstance(data, list) else (data.get('result') or data.get('data') or [])
+    if isinstance(recs, dict):
+        recs = [recs]
+    cur = None
+    for r in recs:  # 优先取当前有效申万记录 F001V=008003 & F008C=1
+        if not isinstance(r, dict):
+            continue
+        if str(r.get('F001V') or r.get('f001v') or '') == '008003' and str(r.get('F008C') or r.get('f008c') or '') == '1':
+            cur = r; break
+    if cur is None:
+        for r in recs:  # 兜底: 任意含 F005V 的记录
+            if isinstance(r, dict) and (r.get('F005V') or r.get('f005v') or r.get('industryName')):
+                cur = r; break
+    if cur is None:
+        return None
+    return str(cur.get('F005V') or cur.get('f005v') or cur.get('industryName') or '').strip()
+
+def rescreen_due():
+    """每月1日, 或对当月首次运行(日报文件尚未生成)触发一次分母重筛。"""
+    marker = f'tmp/daily/.rescreen-{TODAY[:7]}.done'
+    if os.path.exists(marker):
+        return False
+    if datetime.date.today().day == 1:
+        return True
+    if not os.path.exists(f'tmp/daily/{TODAY}.txt'):  # 当月首次运行
+        return True
+    return False
+
+def run_rescreen():
+    """功能1-月度分母重筛(备选方案: 无全量行业接口, 仅复核存量+不新增)。
+    逐家查 p_stock2110, 与 _frozen 对比, 仅输出 diff 提示, 不改 _frozen.csv。"""
+    os.makedirs('tmp/daily', exist_ok=True)
+    month = TODAY[:7]
+    checked = 0; moved_out = []; unresolved = 0
+    for code, name in frozen.items():
+        try:
+            r = session.get(CNINFO_API, params={'scode': code, 'sdate': '1990-01-01', 'edate': TODAY}, timeout=30)
+            ind = parse_sw_industry(r.text)
+        except Exception as e:
+            log_lines.append(f'[重筛] {code} p_stock2110 失败: {str(e)[:50]}')
+            unresolved += 1
+            time.sleep(1.0); continue
+        checked += 1
+        if not ind:
+            unresolved += 1  # 无当前申万记录, 不妄判移出
+        elif ind not in FOUR:
+            moved_out.append((code, name, ind))
+        time.sleep(1.0)
+    try:  # 写月度标记, 本月仅跑一次(即使部分失败也不再重复整轮)
+        open(f'tmp/daily/.rescreen-{month}.done', 'w', encoding='utf-8').write(TODAY)
+    except Exception:
+        pass
+    return {'month': month, 'checked': checked, 'moved_out': moved_out, 'unresolved': unresolved}
+
+rescreen_result = None
+if rescreen_due():
+    try:
+        rescreen_result = run_rescreen()
+    except Exception as e:
+        log_lines.append(f'[重筛] 月度重筛整体失败: {str(e)[:60]}')
 
 # ---------- 1) 投关表全局增量(近3天) ----------
 seen_titles = set()
 hits = []
+seen_outlier = set()  # 功能2: 宇宙外补录候选去重
+outlier_hits = []
 for tab, cat, titlef in (('relation', 'category_dyhd_szdy', None), ('fulltext', '', '投资者关系')):
     for page in (1, 2, 3):
         payload = {'pageNum': str(page), 'pageSize': '30', 'column': '', 'tabName': tab, 'plate': '',
@@ -60,19 +135,28 @@ for tab, cat, titlef in (('relation', 'category_dyhd_szdy', None), ('fulltext', 
             break
         for a in anns:
             code = str(a.get('secCode') or '')
-            if code not in frozen:
-                continue
+            name = str(a.get('secName') or '')
             title = fetch.clean_html_title(str(a.get('announcementTitle') or ''))
             if titlef and titlef not in title:
                 continue
             url = str(a.get('adjunctUrl') or '')
             if not url.lower().endswith('.pdf'):
                 continue
-            key = code + title
-            if key in seen_titles:
+            if code in frozen or name in frozen_names:  # 宇宙内: 原流程下载投关表
+                key = code + title
+                if key in seen_titles:
+                    continue
+                seen_titles.add(key)
+                hits.append((code, fetch.parse_announcement_date(a.get('announcementTime')), title, url))
                 continue
-            seen_titles.add(key)
-            hits.append((code, fetch.parse_announcement_date(a.get('announcementTime')), title, url))
+            # 功能2: 宇宙外公司 + 光通信关键词 -> 补录候选(不下载, 仅标题提示)
+            m = OPT_KW.search(title)
+            if m:
+                okey = name + title
+                if okey in seen_outlier:
+                    continue
+                seen_outlier.add(okey)
+                outlier_hits.append((name, fetch.parse_announcement_date(a.get('announcementTime')), m.group(0), title))
         time.sleep(1.3)
 
 for code, d, title, url in hits:
@@ -176,6 +260,31 @@ for l in chk_line[:3]:
     out.append(f'- {l}')
 evidence_hint = bool(digest['ir_new'] or digest['qa_new'] or digest['ann'] or new_hits)
 out.append(f'\n> 判定闸建议: {"有增量,值得开闸复核" if evidence_hint else "无实质增量,今日免开闸"}')
+# ---------- 功能2: 补录候选(宇宙外·光通信命中) ----------
+out.append(f'\n## 补录候选(宇宙外·光通信命中) {len(outlier_hits)} 条')
+if outlier_hits:
+    for n, d, kw, ctx in outlier_hits[:30]:
+        out.append(f'- {n} | {d} | 命中:{kw} | {ctx[:60]}')
+else:
+    out.append('- 无')
+# ---------- 功能1: 分母差分(月度重筛) ----------
+if rescreen_result:
+    rr = rescreen_result
+    out.append(f'\n## 分母差分(月度重筛 {rr["month"]})')
+    out.append(f'- 复核存量 {rr["checked"]} 家 / 移出 {len(rr["moved_out"])} 家 / 新增 0 家(全量接口未取得)')
+    out.append('- 方法: p_stock2110 逐家核验(F001V=008003 & F008C=1)取当前申万二级; 全量成分接口未取得, 本月仅复核存量')
+    if rr['moved_out']:
+        for c, n, ind in rr['moved_out'][:30]:
+            out.append(f'- 移出候选: {c} {n} (现归类:{ind})')
+    else:
+        out.append('- 移出候选: 无')
+    if rr['unresolved']:
+        out.append(f'- 未成功核验: {rr["unresolved"]} 家(网络/解析失败, 见日志段, 未做移出判定)')
+# ---------- 日志段(静默降级记录) ----------
+if log_lines:
+    out.append('\n## 日志')
+    for l in log_lines:
+        out.append(f'- {l}')
 open(f'tmp/daily/{TODAY}.txt', 'w', encoding='utf-8').write('\n'.join(out))
 print('\n'.join(out[:8]))
 print(f'...\n日报: tmp/daily/{TODAY}.txt')
