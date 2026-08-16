@@ -94,7 +94,7 @@ def invariants():
     WL={'README.md','CLAUDE.md','tree.yaml','knowledge.yaml','points.csv','edges.csv','triage.csv','words.txt',
         'scan.py','render.py','participation.py','make_participation_pdf.py',
         'build_detailed_capability_report.py','capability_details.csv',
-        'route_bom.csv','macro_evidence.csv','shipments.csv',
+        'route_bom.csv','macro_evidence.csv','shipments.csv','company_segment_revenue.csv',
         'RESTART-v2.md','CONTEXT.md','.gitignore','.git','.DS_Store'}
     for f in os.listdir(ROOT):
         if os.path.isfile(os.path.join(ROOT,f)) and f not in WL: fail('⑥',f'根目录白名单外文件: {f}')
@@ -184,7 +184,28 @@ def invariants():
             lv = r.get('证据等级','')
             if lv not in ('B','C','D'): fail('⑪',f"{r.get('row_id')} 证据等级{lv}非法(推断层封顶C,B仅直接披露,禁A)")
             if str(r.get('情景标记','')).startswith('scenario') and lv!='D': fail('⑪',f"{r.get('row_id')} 情景行必须为D级")
-            if r.get('单位','') not in ('只','颗','件','支','片','只/个','支/套','片/个','台','台/套','千克','千只','KK','万只','万颗','万个','万件','万支','万片','万平方米','万美元','-'): fail('⑪',f"{r.get('row_id')} 单位非法: {r.get('单位')}")
+            if r.get('单位','') not in ('只','颗','件','支','片','只/个','支/套','片/个','台','台/套','千克','千只','KK','万只','万颗','万个','万件','万支','万片','万平方米','万美元'): fail('⑪',f"{r.get('row_id')} 单位非法: {r.get('单位')}")
+            # 出货量必须为数值(收入事实不入本表,见⑫;2026-08-16评审R1/R2返修)
+            try: float(str(r.get('出货量','')).replace(',',''))
+            except ValueError: fail('⑪',f"{r.get('row_id')} 出货量非数值: {r.get('出货量')}")
+    # ⑫分部收入事实表(2026-08-16评审方案A): 收入事实独立成层,与出货量数量事实机器可分
+    if os.path.exists(os.path.join(ROOT,'company_segment_revenue.csv')):
+        for r in rows('company_segment_revenue.csv'):
+            rid=r.get('row_id','?')
+            if not re.fullmatch(r'SR\d{3}',rid): fail('⑫',f'row_id须为SR###: {rid}')
+            if r.get('evidence_grade','') not in ('B','C','D'): fail('⑫',f'{rid} 证据等级非法(禁A)')
+            scope=r.get('mapping_scope','')
+            if scope not in ('exact','mixed_scope','unmapped'): fail('⑫',f'{rid} mapping_scope非法: {scope}')
+            try:
+                if float(str(r.get('amount','')).replace(',',''))<=0: fail('⑫',f'{rid} amount非正数')
+            except ValueError: fail('⑫',f'{rid} amount非数值: {r.get("amount")}')
+            if r.get('currency','') not in ('CNY','USD'): fail('⑫',f'{rid} currency非法')
+            cs=[c.strip() for c in (r.get('cell_ids') or '').split(',') if c.strip()]
+            if scope=='exact':
+                if not cs: fail('⑫',f'{rid} exact但cell_ids为空')
+                for c in cs:
+                    if c not in cells: fail('⑫',f'{rid} cell_id {c} 不在tree.yaml')
+            elif cs: fail('⑫',f'{rid} {scope}不得挂cell_ids(混合/未映射口径)')
     # ⑩互动易qa车道: jsonl格式合法+必备键;点锚引用的qa快照必须存在且真含引语
     for qf in glob.glob(os.path.join(ROOT,'corpus/qa/*/qa.jsonl')):
         try:
