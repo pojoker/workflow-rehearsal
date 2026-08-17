@@ -85,13 +85,18 @@ def rescreen_due():
 
 def run_rescreen():
     """功能1-月度分母重筛(备选方案: 无全量行业接口, 仅复核存量+不新增)。
-    逐家查 p_stock2110, 与 _frozen 对比, 仅输出 diff 提示, 不改 _frozen.csv。"""
+    逐家查 p_stock2110, 与 _frozen 对比, 仅输出 diff 提示, 不改 _frozen.csv。
+    2026-08-17: p_stock2110 已需token(401 code_005_ipban_notoken), akshare三级成分接口/东财push2均不可用;
+    探测到401即短路返回, 不再空跑463次。"""
     os.makedirs('tmp/daily', exist_ok=True)
     month = TODAY[:7]
     checked = 0; moved_out = []; unresolved = 0
     for code, name in frozen.items():
         try:
             r = session.get(CNINFO_API, params={'scode': code, 'sdate': '1990-01-01', 'edate': TODAY}, timeout=30)
+            if '未经授权' in r.text or '"resultcode":401' in r.text:
+                log_lines.append('[重筛] p_stock2110 需token(401), 本月重筛跳过; 备选接口(akshare sw/东财push2)同日均不可用')
+                return {'month': month, 'checked': 0, 'moved_out': [], 'unresolved': len(frozen), 'blocked': True}
             ind = parse_sw_industry(r.text)
         except Exception as e:
             log_lines.append(f'[重筛] {code} p_stock2110 失败: {str(e)[:50]}')
