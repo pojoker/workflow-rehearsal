@@ -210,24 +210,39 @@ def fetch_irm(code,since):
     print(f'[{code} {name}] {len(out)}条(空回答{n_empty}) → {fp}')
     return len(out)
 
+_p5w_down = {'v': False}  # 熔断: p5w首个连接失败后本轮跳过(2026-08-21: p5w不可达×重试预算→日更60min超时事故)
+
+def _p5w_guarded(code, since):
+    """p5w调用带熔断; 失败置down并记日志, 本轮后续直接跳过。"""
+    if _p5w_down['v']:
+        print(f'[{code}] p5w已熔断,跳过')
+        return None
+    try:
+        return fetch_p5w(code, since)
+    except Exception as e:
+        _p5w_down['v'] = True
+        print(f'[{code}] p5w失败触发熔断,本轮后续跳过: {str(e)[:60]}')
+        return None
+
 def fetch(code,since):
     """主通道按市场分派；0条/失败时全景网兜底(全市场镜像,含沪深,纪律9双通道)。
     2026-08-15勘误: 主通道"部分返回"(非零但远低于历史)也会绕过兜底并覆盖写入丢历史;
-    故非零也按"缩水"判定走p5w, 且各通道改并集合并落盘(见_merge_write)。"""
+    故非零也按"缩水"判定走p5w, 且各通道改并集合并落盘(见_merge_write)。
+    2026-08-21: p5w调用改经_p5w_guarded熔断(连接失败一次本轮不再尝试)。"""
     if code.startswith('6'):
         n=fetch_sse(code,since)
     elif code.startswith('92') or code.startswith('8'):
-        return fetch_p5w(code,since)   # 勘误2026-07-28:北交所有平台=全景网ir.p5w.net(原生通道即此)
+        return _p5w_guarded(code,since)   # 勘误2026-07-28:北交所有平台=全景网ir.p5w.net(原生通道即此)
     else:
         n=fetch_irm(code,since)
     if not n:
-        m=fetch_p5w(code,since)
+        m=_p5w_guarded(code,since)
         if m: print(f'[{code}] 主通道{n},p5w兜底{m}条(前科:002792/600641/688079主通道假阴性)')
         return m if m is not None else n
     # 兜底加宽: 主通道非零但缩水(<现有快照50%且快照>20)也走p5w, 两通道并集合并落盘
     snap=_snapshot_count(code)
     if snap>20 and n<0.5*snap:
-        m=fetch_p5w(code,since)
+        m=_p5w_guarded(code,since)
         if m: print(f'[{code}] 主通道{n}条缩水触发p5w兜底{m}条(前科:002792/600641/688079主通道假阴性)')
     return n
 
