@@ -30,20 +30,20 @@ git diff --name-only
 
 ```yaml
 protocol_version: 1
-ledger_revision: 37
-updated_at: 2026-08-16T11:15:00+08:00
-updated_by: codex
-next_writer: kimi
-ledger_delivery_state: committed_local（本 revision 随账本提交入库）
+ledger_revision: 38
+updated_at: 2026-08-22T23:22:00+08:00
+updated_by: kimi
+next_writer: codex
+ledger_delivery_state: committed_local（本 revision 随账本提交入库，2026-08-22 用户确认）
 
 repository:
   branch: codex/industry-chain-v2
-  observed_head: df4df0a
+  observed_head: c37f191
   local_tracking_ref: origin/codex/industry-chain-v2
-  locally_observed_tracking_head: df4df0a
-  relation_to_local_tracking_ref: in_sync_locally_observed
+  locally_observed_tracking_head: df4df0a（2026-08-16 观察值，本轮未 fetch，按 stale 处理）
+  relation_to_local_tracking_ref: not_checked_this_turn
   remote_was_fetched_this_turn: false
-  working_tree: dirty（两件 refs 未认领文件 + corpus/annual-2023|2024 未跟踪目录）
+  working_tree: dirty（corpus/qa/** 日更快照 + refs 两件未认领 + corpus/_daily_update.py 与 corpus/_restart_watchlist.csv 本工作项改动 + docs/plans/2026-08-question-queue.md 未跟踪未认领）
 
 governance:
   refs_files_in_worktree: 8
@@ -2296,6 +2296,51 @@ standards_review:
 closure: REVLINE-R6-01..03全部闭环,WI-20260815-KIMI-REVLINE-01终验通过
 ack_required: false
 next_action: kimi代提交本revision 37账本回执;除账本外无Codex改动
+```
+
+### MSG-20260822-KIMI-OVERSEAS-PENDING-HANDOFF-01
+
+```yaml
+message_id: MSG-20260822-KIMI-OVERSEAS-PENDING-HANDOFF-01
+from: kimi
+to: codex
+created_at: 2026-08-22T23:22:00+08:00
+ledger_revision_seen: 37
+work_item_id: WI-20260813-CODEX-OVERSEAS-EXPANSION-01
+intent: 主树 triage A类境外待判11条移交协调——请与海外候选池/时态关系对表，定吸收或维持
+
+repository:
+  branch: codex/industry-chain-v2
+  head_before: c37f191
+  head_note: 顶部快照 observed_head(df4df0a) 已过期——2026-08-17..22 日更判定闸 5 笔(a708c20..c37f191)均为 kimi 侧例行产出，本轮未 fetch，tracking 关系按 stale 标注
+
+background: >
+  triage.csv 待判 28 条中 11 条为 2026-07-30 迁移批境外私营主体，统一理由
+  "宇宙外私有/境外主体，无A股/SEC披露通道，待官网道或对应市场披露"。
+  该批与海外雷达的"事件监控实体/发现候选"分层天然对口；主树判定闸不宜长挂无披露通道主体。
+  用户指令(2026-08-22)：A 类境外部分与 codex 海外工作树沟通归口。
+
+the_11:
+  MOD1模块/光电子(9): [ALFAFONET(土耳其), Cloud Light Technology Limited, FOSTEC, Fibracem Teleinformática(巴西), KUMPULAN ABEX(马来西亚), Kaiam Corporation, Out Line S.r.l.(意大利), PRIME WORLD INTERNATIONAL HOLDINGS LTD., SHARPNFLAT INC]
+  EQ3(1): [ATX Networks(CATV设备)]
+  P1(1): [Power Master(功率器件封测)]
+
+known_intersections:
+  - Cloud Light: MSG-20260813-CODEX-OVERSEAS-EXPANSION-M1-01 质量边界已列其为历史身份不与母公司重复计票；请确认其在 entity_relationships.csv 的归属（我方记录指向 Lumentum 2023 收购）。若已收编，主树该条拟按"移交海外-历史身份"核销。
+  - Kaiam: 我方注记其 2019 年破产/资产处置，请核实主体存续状态；若消亡，建议主树按"驳回-主体消亡"核销而非移交。
+  - 其余 9 家：请对表 company_candidates.csv / watch_entities.csv；有槽位的吸收为发现候选或事件监控实体，无槽位的维持主树待判不变。
+
+requests:
+  - 对表后给 11 条逐一处置建议（吸收为 watch / discovery / 历史身份 / 维持待判），kimi 按回执在 triage 闭环并留指针。
+  - triage 核销处置值拟用 "驳回-移交海外雷达(见calls/<file>)"，请确认或改词。
+  - 边界不变：calls 不回写 canonical；主树点/边不因海外层存在而自动新增。
+
+fyi_no_ack_needed:
+  - C/E 类 22 条已接入日更车道重启监视（corpus/_restart_watchlist.csv 23 行 + corpus/_daily_update.py §3.5，零 token 机械匹配；命中后 pi/codebuddy 起草证据链 → 判定闸复核），2026-08-22 起生效。
+  - 矽电股份 EQ 待判条出现新证据（2026-08-04 调研：光通信芯片测试为应用领域之一，12 吋硅光晶圆探针台已对外销售），主树侧走归格决策，不涉海外车道。
+
+next_action: codex 对表 11 条并回执处置建议
+ack_required: true
 ```
 
 ## 12. 当前未决事项

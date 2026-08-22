@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""日更脚本(纯脚本零token,纪律2): 投关表/互动易/公告流三增量 + scan召回差分 + 一页日报。
+"""日更脚本(纯脚本零token,纪律2): 投关表/互动易/公告流三增量 + scan召回差分 + 待判/待确认重启监视 + 一页日报。
 用法: python3 corpus/_daily_update.py   (产出 tmp/daily/YYYY-MM-DD.md + tmp/daily/queue-latest.txt)
+重启监视清单: corpus/_restart_watchlist.csv(2026-08-22起); 本脚本只做机械匹配, 命中后由pi/codebuddy起草证据链、判定闸复核。
 """
 import csv, datetime, glob, json, os, re, subprocess, sys, time
 import importlib.util
@@ -25,8 +26,20 @@ with open('corpus/_frozen.csv', encoding='utf-8-sig') as f:
     for r in csv.DictReader(f):
         frozen[r['代码']] = r['名称']
 
+# 功能3: 待判/待确认重启监视清单(2026-08-22起; C+E队列的重启条件机械化盯梢)
+WATCH = []
+if os.path.exists('corpus/_restart_watchlist.csv'):
+    with open('corpus/_restart_watchlist.csv', encoding='utf-8-sig') as f:
+        for r in csv.DictReader(f):
+            try:
+                r['_pat'] = re.compile(r['触发词'], re.I)
+            except re.error:
+                continue
+            WATCH.append(r)
+WATCH_DAILY = [w for w in WATCH if w['车道'] == '日更' and w['代码']]
+
 def watched_codes():
-    """待判行公司 ∪ 全部已入点公司(生产中+在建, 宇宙内)——2026-08-15起从在建/待判扩到全量已入点"""
+    """待判行公司 ∪ 全部已入点公司(生产中+在建, 宇宙内) ∪ 重启监视清单(日更车道)——2026-08-15起从在建/待判扩到全量已入点"""
     codes = set()
     for r in csv.DictReader(open('triage.csv', encoding='utf-8-sig')):
         if r['处置'] == '待判':
@@ -38,10 +51,13 @@ def watched_codes():
             for c, n in frozen.items():
                 if n == r['公司']:
                     codes.add(c)
+    for w in WATCH_DAILY:
+        codes.add(w['代码'])
     return sorted(codes)
 
 session = fetch.build_session()
 digest = {'ir_new': [], 'qa_new': [], 'ann': [], 'q_delta_new': [], 'q_delta_gone': []}
+new_ir_txt = []  # (code, 公司, title, txt路径)——供重启监视内容级匹配
 log_lines = []  # 静默降级: 网络/解析异常记一行, 不拖垮主流程
 FOUR = {'半导体', '光学光电子', '通信设备', '元件'}  # 申万四行业分母
 CNINFO_API = 'https://webapi.cninfo.com.cn/api/stock/p_stock2110'
@@ -179,6 +195,7 @@ for code, d, title, url in hits:
         open(dst, 'wb').write(r.content)
         subprocess.run(['pdftotext', '-layout', dst, dst + '.txt'], capture_output=True)
         digest['ir_new'].append((frozen[code], d, title))
+        new_ir_txt.append((code, frozen[code], title, dst + '.txt'))
     except Exception:
         pass
     time.sleep(1.3)
@@ -219,6 +236,31 @@ for c in watched_codes():
         pass
     time.sleep(1.3)
 
+# ---------- 3.5) 重启监视匹配(机械匹配,不做判定) ----------
+# 投关表新txt做内容级触发词匹配(带上下文);公告流标题已过ANN_PAT,监视公司全量提示;互动易只有增量计数,人工过内容
+restart_hits = []
+for code, nm, title, txt in new_ir_txt:
+    for w in WATCH_DAILY:
+        if w['代码'] != code:
+            continue
+        try:
+            body = open(txt, encoding='utf-8', errors='ignore').read()
+        except Exception:
+            continue
+        m = w['_pat'].search(body)
+        if m:
+            i = max(0, m.start() - 50)
+            ctx = re.sub(r'\s+', '', body[i:m.start() + 70])
+            restart_hits.append((w, f'投关表《{title[:30]}》', ctx))
+for n, d, t, u in digest['ann']:
+    for w in WATCH_DAILY:
+        if n == w['公司']:
+            restart_hits.append((w, f'公告流({d}): {t[:40]}', u))
+for n, k in digest['qa_new']:
+    for w in WATCH_DAILY:
+        if n == w['公司']:
+            restart_hits.append((w, f'互动易+{k}条', '增量内容未逐条匹配,需人工过内容'))
+
 # ---------- 4) scan 召回差分 ----------
 prev_file = 'tmp/daily/queue-latest.txt'
 prev = set()
@@ -256,6 +298,15 @@ for n, k in digest['qa_new']:
 out.append(f'\n## 公告流(关注公司) {len(digest["ann"])} 条')
 for n, d, t, u in digest['ann'][:15]:
     out.append(f'- {n} | {d} | [{t[:50]}]({u})')
+out.append(f'\n## 重启复核(待判/待确认监视) {len(restart_hits)} 条')
+if restart_hits:
+    out.append('> 触发后处置: pi/codebuddy 起草证据链 → 判定闸复核(本段为机械匹配,不构成判定)')
+    for w, src, ctx in restart_hits[:20]:
+        out.append(f'- ⚑ {w["公司"]} [{w["类别"]}|{w["cell_id"]}] {src}')
+        out.append(f'  重启条件: {w["重启条件"][:80]}')
+        out.append(f'  命中: {ctx[:80]}')
+else:
+    out.append('- 无触发')
 out.append(f'\n## 召回净队列差分: 新增{len(new_hits)} / 消失{len(gone)}')
 for x in digest['q_delta_new']:
     co, cell, w, seg = x.split('|', 3)
@@ -263,7 +314,7 @@ for x in digest['q_delta_new']:
 out.append(f'\n## 校验')
 for l in chk_line[:3]:
     out.append(f'- {l}')
-evidence_hint = bool(digest['ir_new'] or digest['qa_new'] or digest['ann'] or new_hits)
+evidence_hint = bool(digest['ir_new'] or digest['qa_new'] or digest['ann'] or new_hits or restart_hits)
 out.append(f'\n> 判定闸建议: {"有增量,值得开闸复核" if evidence_hint else "无实质增量,今日免开闸"}')
 # ---------- 功能2: 补录候选(宇宙外·光通信命中) ----------
 out.append(f'\n## 补录候选(宇宙外·光通信命中) {len(outlier_hits)} 条')
