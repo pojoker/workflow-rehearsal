@@ -1,25 +1,25 @@
 ﻿hit_id,公司,cell_id,来源,引语或线索摘要,处置,理由,会话日期
-ALFAFONET ENDUSTRIYEL TELEKOM URUNLERI A.S.+MOD1+迁移,ALFAFONET ENDUSTRIYEL TELEKOM URUNLERI A.S.,MOD1,人工,（类型）模块/光电子商,待判,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)",2026-07-30
-ATX Networks+EQ3+迁移,ATX Networks,EQ3,人工,（类型）CATV设备商,待判,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)",2026-07-30
+ALFAFONET ENDUSTRIYEL TELEKOM URUNLERI A.S.+MOD1+迁移,ALFAFONET ENDUSTRIYEL TELEKOM URUNLERI A.S.,MOD1,人工,（类型）模块/光电子商,驳回-移交海外,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)｜2026-08-23核销(codex对表rev39):discovery——无源光连接(跳线/配线/ODF),不外推为高速光模块厂;详见docs/research/2026-08-overseas-pending-handoff-11.md",2026-08-23
+ATX Networks+EQ3+迁移,ATX Networks,EQ3,人工,（类型）CATV设备商,驳回-移交海外,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)｜2026-08-23核销(codex对表rev39):discovery——CATV/HFC/FTTH宽带接入,与AI数通高速模块分开,未过watch闸门;详见docs/research/2026-08-overseas-pending-handoff-11.md",2026-08-23
 Acacia+C5+迁移,Acacia,C5,人工,（类型）相干光器件/DSP,驳回-非本格,"驳回-非本格(C5:实体归并:2021被Cisco收购;FY2025 Cisco 10-K中Acacia硅光/相干DSP完全不可见(仅摊销与诉讼脚注),电芯片自述缺失;待Acacia/Cisco硅光自述语料重启C4/C5评估)",2026-07-30
 Applied Optoelectronics(AAOI)+MOD1+迁移,Applied Optoelectronics(AAOI),MOD1,人工,（类型）光模块厂,已入点,已入点:P226@MOD1+P227@C1+P228@MOD3+P229@D12(800G量产+Sugar Land自有激光器芯片厂;1.6T客户认证阶段注记),2026-07-30
 Ciena+EQ3+迁移,Ciena,EQ3,人工,（类型）系统设备商,驳回-非本格,驳回-非本格(EQ3:Ciena为光传输系统商不造贴片固晶设备;相干可插拔已入MOD2=P218),2026-07-30
 Cisco+EQ3+迁移,Cisco,EQ3,人工,（类型）网络设备OEM,驳回-非本格,"驳回-非本格(EQ3:系统商不造贴片固晶设备;pluggable optics已入MOD3=P219;Acacia硅光10-K不可见,C4待Acacia自述语料)",2026-07-30
-Cloud Light Technology Limited+MOD1+迁移,Cloud Light Technology Limited,MOD1,人工,（类型）模块/光电子商,待判,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)",2026-07-30
+Cloud Light Technology Limited+MOD1+迁移,Cloud Light Technology Limited,MOD1,人工,（类型）模块/光电子商,驳回-移交海外,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)｜2026-08-23核销(codex对表rev39):历史身份——2023-11-07 Lumentum完成收购,海外层REL_CLOUDLIGHT_LITE已登记,不重复计票;详见docs/research/2026-08-overseas-pending-handoff-11.md",2026-08-23
 Coherent++迁移,Coherent,,人工,光器件/模块厂（类型跨层，本表暂归器件层）,已入点,"已入点:P218-P225九格(MOD1/MOD2/C1/C2/C3/C5/C6/D6/D13,垂直一体化,Networking分部$3,421M+49%)",2026-07-30
-FOSTEC+MOD1+迁移,FOSTEC,MOD1,人工,（类型）模块/光电子商,待判,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)",2026-07-30
-Fibracem Teleinformática Ltda.+MOD1+迁移,Fibracem Teleinformática Ltda.,MOD1,人工,（类型）模块/光电子商,待判,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)",2026-07-30
+FOSTEC+MOD1+迁移,FOSTEC,MOD1,人工,（类型）模块/光电子商,驳回-移交海外,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)｜2026-08-23核销(codex对表rev39):discovery——光连接/硅光发现候选,未过watch持续高价值事件闸门;详见docs/research/2026-08-overseas-pending-handoff-11.md",2026-08-23
+Fibracem Teleinformática Ltda.+MOD1+迁移,Fibracem Teleinformática Ltda.,MOD1,人工,（类型）模块/光电子商,驳回-移交海外,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)｜2026-08-23核销(codex对表rev39):discovery——光网络无源基础设施(光缆/接续/机架),非MOD1光模块厂;详见docs/research/2026-08-overseas-pending-handoff-11.md",2026-08-23
 Infinera+EQ3+迁移,Infinera,EQ3,人工,（类型）系统设备商,驳回-非本格,"驳回-非本格(EQ3:系统商不造贴片固晶设备;实体归并:2025-02-28被Nokia收购,相干业务已随Nokia入P240,不重复立点)",2026-07-30
 Intel(含其代工厂)++迁移,Intel(含其代工厂),,人工,（类型）光/电芯片,驳回-证据不足,"驳回-证据不足(FY2025 10-K全文零silicon photonics/optical/transceiver字样,网络产品为电侧以太网控制器;可重启:补IR/历史10-K硅光自述语料或自述文件)",2026-07-30
-KUMPULAN ABEX SDN BHD+MOD1+迁移,KUMPULAN ABEX SDN BHD,MOD1,人工,（类型）模块/光电子商,待判,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)",2026-07-30
-Kaiam Corporation+MOD1+迁移,Kaiam Corporation,MOD1,人工,（类型）模块/光电子商,待判,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)",2026-07-30
+KUMPULAN ABEX SDN BHD+MOD1+迁移,KUMPULAN ABEX SDN BHD,MOD1,人工,（类型）模块/光电子商,驳回-移交海外,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)｜2026-08-23核销(codex对表rev39):discovery——光纤测试仪器分销/服务与项目角色,非制造主体;详见docs/research/2026-08-overseas-pending-handoff-11.md",2026-08-23
+Kaiam Corporation+MOD1+迁移,Kaiam Corporation,MOD1,人工,（类型）模块/光电子商,驳回-主体退出,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)｜2026-08-23核销(codex对表rev39):主体退出经营/资产处置——母公司进入California ABC(非已证实Chapter11),英国两子公司已注销,PLC资产2019年售予博创;未取得Delaware最终注销文件,不宣称法人已注销;详见docs/research/2026-08-overseas-pending-handoff-11.md",2026-08-23
 Lumentum++迁移,Lumentum,,人工,（类型）光器件厂,已入点,已入点:P230-P236七格(C1/C2/C3/C6/MOD1/MOD2/MOD3;NeoPhotonics归并注记;C5自研DSP已终止驳回),2026-07-30
 NeoPhotonics++迁移,NeoPhotonics,,人工,（类型）光器件厂(已消亡),驳回-碰撞,"实体归并:2022-08被Lumentum收购($934.4M),相干能力已随Lumentum P233@C6/P235@MOD2归并,不重复立点",2026-07-30
 Nokia+EQ3+迁移,Nokia,EQ3,人工,（类型）系统设备商,驳回-非本格,驳回-非本格(EQ3:系统商不造贴片固晶设备;Infinera归并已入MOD2=P240),2026-07-30
-Out Line S.r.l.+MOD1+迁移,Out Line S.r.l.,MOD1,人工,（类型）模块/光电子商,待判,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)",2026-07-30
-PRIME WORLD INTERNATIONAL HOLDINGS LTD.+MOD1+迁移,PRIME WORLD INTERNATIONAL HOLDINGS LTD.,MOD1,人工,（类型）模块/光电子商,待判,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)",2026-07-30
-Power Master+P1+迁移,Power Master,P1,人工,（类型）功率器件封测(半导体),待判,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)",2026-07-30
-SHARPNFLAT INC+MOD1+迁移,SHARPNFLAT INC,MOD1,人工,（类型）模块/光电子商,待判,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)",2026-07-30
+Out Line S.r.l.+MOD1+迁移,Out Line S.r.l.,MOD1,人工,（类型）模块/光电子商,驳回-移交海外,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)｜2026-08-23核销(codex对表rev39):discovery——光缆/配线/数据中心无源基础设施,非有源MOD1;详见docs/research/2026-08-overseas-pending-handoff-11.md",2026-08-23
+PRIME WORLD INTERNATIONAL HOLDINGS LTD.+MOD1+迁移,PRIME WORLD INTERNATIONAL HOLDINGS LTD.,MOD1,人工,（类型）模块/光电子商,驳回-移交海外,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)｜2026-08-23核销(codex对表rev39):附属身份——AAOI 2026 SEC申报确认为当前全资附属(BVI),由AAOI覆盖不重复计票,非消亡主体;详见docs/research/2026-08-overseas-pending-handoff-11.md",2026-08-23
+Power Master+P1+迁移,Power Master,P1,人工,（类型）功率器件封测(半导体),驳回-移交海外,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)｜2026-08-23核销(codex对表rev39):discovery——实为Power Master Semiconductor,韩国integrated power device/foundry(非纯封测),与光通信核心相邻但未证光电子封测,不升watch;详见docs/research/2026-08-overseas-pending-handoff-11.md",2026-08-23
+SHARPNFLAT INC+MOD1+迁移,SHARPNFLAT INC,MOD1,人工,（类型）模块/光电子商,驳回-移交海外,"维持待判:宇宙外私有/境外主体,无A股/SEC披露通道,待官网道或对应市场披露;迁移行历史线索保留(2026-07-30核)｜2026-08-23核销(codex对表rev39):discovery——现行经营名S-MODUL Inc.,SHARPNFLAT作alias;法人连续性待韩国登记核实(legal rename pending registry verification),不建predecessor_of;详见docs/research/2026-08-overseas-pending-handoff-11.md",2026-08-23
 三安光电++迁移,三安光电,,人工,（类型）化合物半导体/光芯片,驳回-非本格,主营句为财务噪声;M2b线索另行待判,2026-07-25
 上海八界光电科技有限公司+MOD1+迁移,上海八界光电科技有限公司,MOD1,人工,（类型）模块/光电子商,驳回-非本格,"驳回-非本格:纯芯片贸易/分销中间商(源杰披露:2023年已暂停光纤接入转售,合作不具可持续性),无自有环节能力,无官网自述",2026-07-30
 上海宽捷光电科技有限公司++迁移,上海宽捷光电科技有限公司,,人工,（类型）光器件,驳回-非本格,"驳回-非本格:进口光电产品代理商(官网自述""代理商""),无自有制造能力;代理品归属境外原厂",2026-07-30
