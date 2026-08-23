@@ -27,7 +27,7 @@ canonical 一个账本，四个读者产品 + 一层知识。前三个产品共�
 
 HTML 保持单一读者页面：`route_bom.csv` 提供 800G DR8 / 1.6T DR8 / 400ZR 的正交轴与 BOM；`macro_evidence.csv` 管理首页量化结论的 A-D 证据等级；`edges.csv` 中少量已验证实边叠加到公司能力卡。后台可以扩 schema 和校验器，但不另造读者页面。
 
-**产品④ 海外电话会与官网技术情报**（`calls/*.csv` → `calls/out/`，由 `python3 -m calls all` 生成）
+**产品④ 海外电话会与官网技术情报**（`calls/*.csv` → `calls/out/`，由 `/Users/jowang/miniconda3/bin/python3 -m calls all` 生成）
 
 独立管理海外同业/下游电话会、公司官网署名技术博客、技术演示、动态卡点、承诺兑现和国内能力潜在匹配。管理层商业陈述、分析师问题与公司技术作者陈述机械隔离；只生成候选验证链，不回写 canonical。`calls/out/panorama-intelligence.csv` 可选投影到 WorkBuddy HTML 的“海外电话会与官网技术情报”章节，缺失时安全跳过。
 
@@ -38,13 +38,33 @@ HTML 保持单一读者页面：`route_bom.csv` 提供 800G DR8 / 1.6T DR8 / 400
 例：K001 讲清共晶固晶机为什么光模块用的和显示屏用的差一个数量级（±1~3µm vs ±50µm），
 并据此给出设备类公司的准入判断法；K002 讲清气密封装不是技术高低而是电信/数通两条路线的分野。
 
+**研究问题树（主研究入口）**（`research_questions.yaml` → `out/研究问题树.md`，由 `render.py` 生成）
+从“什么是光模块？”开始，按理解依赖逐层生长出一份稳定 ID 的研究导航，明确区分两套知识：
+**物理知识体系**（系统功能→组件→接口→制造→设备）与**技术路线体系**（需求/约束→瓶颈→正交轴→路线画像→能力→公司能力群）。
+两套体系之间不是第三棵树，而是一组 **Why 关联**（需求/瓶颈→工程选择→物理变化→公司能力），写入 `knowledge.yaml` 顶层 `why_links:`。
+研究答案仍是可追加到 `knowledge.yaml` 的 KN 条目（物理/路线）；问题树只保存导航与回填合同，不保存事实答案。
+路线能力群严格区分**候选能力群**（能力匹配，不是路线采用/供货证据）与**确认服务群**（须有路线级直接证据）。
+
+> 研究问题树是主研究入口；`out/问题队列.md` 是后台**维护问题队列**（QA–QE 维护欠账），二者不是一回事，也不互相替代。
+
+```bash
+# 重建研究问题树（与全景图/知识库/问题队列一同生成）
+/Users/jowang/miniconda3/bin/python3 render.py
+# 校验输出未被手改（含 研究问题树.md）
+/Users/jowang/miniconda3/bin/python3 render.py --verify
+# 不变量①-⑭（含研究问题树 v2 校验）
+/Users/jowang/miniconda3/bin/python3 scan.py --check
+```
+注意：所有 Python 命令统一用 Miniconda 解释器 `/Users/jowang/miniconda3/bin/python3`（自带 PyYAML），
+不要用系统 `python3`，否则可能报 yaml 模块缺失。
+
 ## 日常怎么用（全流程）
 1. 新年报/招股书 PDF 扔进 corpus/annual/<代码>/，在 corpus/_frozen.csv 记一行（带出处）
-2. `python3 scan.py` —— 关键词召回待办清单（`ANY` 词只召回"是否参与"，不预判格子；自动跳过已处置项）
-3. 判定闸会话：逐条判 入点/驳回/待判，写 points.csv 和 triage.csv，**会话末必跑 `python3 scan.py --check`**
+2. `/Users/jowang/miniconda3/bin/python3 scan.py` —— 关键词召回待办清单（`ANY` 词只召回"是否参与"，不预判格子；自动跳过已处置项）
+3. 判定闸会话：逐条判 入点/驳回/待判，写 points.csv 和 triage.csv，**会话末必跑 `/Users/jowang/miniconda3/bin/python3 scan.py --check`**
 4. 判定中若搞清了"这环节为什么难/怎么判够格"，写进 `knowledge.yaml`（须带证据引语+出处+锚）
-5. `python3 render.py` 重建全景图与知识库；`python3 participation.py` 重建参与识别名单（`--check` 校验分母、证据闭合与幂等）
-6. `python3 build_detailed_capability_report.py` 重建公司能力明细 CSV、PDF 与合并版 HTML
+5. `/Users/jowang/miniconda3/bin/python3 render.py` 重建全景图与知识库；`/Users/jowang/miniconda3/bin/python3 participation.py` 重建参与识别名单（`--check` 校验分母、证据闭合与幂等）
+6. `/Users/jowang/miniconda3/bin/python3 build_detailed_capability_report.py` 重建公司能力明细 CSV、PDF 与合并版 HTML
 7. 你只看 git diff 点头/摇头；commit 信息带"产出: +N点 +M边 空格A/B 驳回K"（空格数取 `render.py` 页脚，纪律第8条）
 
 年报季提示：A股年报4月末集中披露；美股10-K财年后60-90天。
