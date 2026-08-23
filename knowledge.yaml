@@ -340,3 +340,9 @@ knowledge:
     锚: {原URL: 'https://www.ficontec.com/technologies/', 存档路径: corpus/web/www.ficontec.com/2026-07-27/technologies.html, 抓取日期: '2026-07-27'}
     说明: 电/光两个世界的精度档位差由设备原厂直接说出——支撑KN001"同名设备不同档"的通用判断法
   录入日期: '2026-07-26'
+
+# 跨体系 Why 关联（ADR-0009）：连接技术路线体系与物理知识体系的有类型、有条件、有证据因果链。
+# 首版为空是允许状态；页面显示 4 个待研究桥问题和"尚无已验证 Why 关联"。
+# 新增条目须通过不变量⑭校验（研究问题只引用 WQ、因果链≥2步、顺序连续、主张类型/层级合法、
+# 条件/取舍/替代方案均非空、Investment 须晚于 CommercialAdoption 与 Economics）。
+why_links: []
