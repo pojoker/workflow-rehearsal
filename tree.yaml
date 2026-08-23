@@ -64,6 +64,7 @@ tree:
     - {cell_id: C4, 名称: 硅光PIC, 路线: 数通COB/硅光}
     - {cell_id: C5, 名称: 电芯片(DSP/Driver/TIA/CDR/主控MCU), 路线: 共用}
     - {cell_id: C6, 名称: 可调谐激光器/相干光组件, 路线: 相干}
+    - {cell_id: C7, 名称: 时钟/频控器件(差分晶振/温补/时钟发生器), 路线: 共用}   # 2026-08-23闸主裁决:紫光国微差分晶振案开格(开格标准ADR-0010首案)
 - id: P
   名称: 芯片封装/委外
   children:
@@ -136,6 +137,7 @@ flows:
   - {from: C3, to: [P1, D2, D12]}
   - {from: C4, to: [D12]}
   - {from: C5, to: [D12, MOD1, MOD2, MOD3]}
+  - {from: C7, to: [MOD1, MOD2, MOD3]}   # 参考时钟供模块板级DSP/SerDes
   - {from: P1, to: [D1, D2, D3]}
   - {from: D4, to: [D1, D2, D3]}
   - {from: D6, to: [D1, C6, MOD3]}
