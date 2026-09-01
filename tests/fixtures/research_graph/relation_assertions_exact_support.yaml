@@ -1,0 +1,18 @@
+schema_version: relation_assertions_v1
+fixture_only: true
+assertions:
+  - assertion_id: RA-TEST-LITE-EXACT-SERVICE
+    relation_type: company_serves_route
+    subject_ref: company:Lumentum
+    object_ref: route_profile:RPF-800G-DR8-LPO-SIPH-FPP-V1
+    scope:
+      route_profile_id: RPF-800G-DR8-LPO-SIPH-FPP-V1
+    valid_time:
+      start: "2026-04-30"
+      end: null
+    modality: actual
+    polarity: supporting
+    origin_group: OG-TEST-LITE-EXACT-SERVICE
+    source_refs: [test_fixture:exact_reviewed_service]
+    metadata:
+      fixture_only: true

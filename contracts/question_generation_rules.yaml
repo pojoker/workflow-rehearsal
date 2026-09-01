@@ -1,0 +1,30 @@
+schema_version: question_generation_rules_v1
+workflow_status_enum: [candidate, formalized, archived]
+resolution_status_enum: [open, partial, blocked, satisfied, reopened, conflicted]
+
+rules:
+  - rule_id: QGR-CAPABILITY-WITHOUT-EXACT-SERVICE-V1
+    question_class: diagnostic_relation_gap
+    generated_by_reason: missing_relation
+    trigger_relation_type: capability_matches_route
+    target_relation_type: company_serves_route
+    route_profile_ids: [RPF-800G-DR8-LPO-SIPH-FPP-V1]
+    display_parent: TQ013
+    depends_on: [TQ009, TQ013]
+    question_template: >-
+      {company} 具备 {route_label} 路线所需能力，但是否有服务该 exact route profile 的直接证据？
+    acceptance:
+      relation_type: company_serves_route
+      epistemic_status: explicit_reviewed
+      polarity: supporting
+      modality: actual
+      minimum_independent_origin_groups: 1
+      exact_route_profile_required: true
+      kn_reference_is_sufficient: false
+      component_product_evidence_is_sufficient: false
+    reopen_on:
+      - last_qualified_support_withdrawn
+      - same_scope_time_modality_conflict
+      - adapter_or_contract_change
+    initial_workflow_status: candidate
+    initial_resolution_status: open

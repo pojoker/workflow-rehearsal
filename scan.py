@@ -415,7 +415,7 @@ def invariants():
         'scan.py','render.py','participation.py','make_participation_pdf.py',
         'build_detailed_capability_report.py','capability_details.csv',
         'route_bom.csv','macro_evidence.csv','shipments.csv','company_segment_revenue.csv',
-        'research_questions.yaml','questions_manual.csv',
+        'research_questions.yaml','questions_manual.csv','relation_assertions.yaml',
         'RESTART-v2.md','CONTEXT.md','.gitignore','.gitattributes','.git','.DS_Store'}
     for f in os.listdir(ROOT):
         if os.path.isfile(os.path.join(ROOT,f)) and f not in WL: fail('⑥',f'根目录白名单外文件: {f}')

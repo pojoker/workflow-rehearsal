@@ -1,0 +1,51 @@
+schema_version: relation_types_v1
+assertion_contract:
+  required_fields:
+    - assertion_id
+    - slot_id
+    - relation_type
+    - subject_ref
+    - object_ref
+    - scope
+    - valid_time
+    - modality
+    - polarity
+    - epistemic_status
+    - origin_group
+    - adapter_version
+    - source_refs
+  polarity_enum: [supporting, limiting, contradicting, withdrawn]
+  epistemic_status_enum: [source_encoded, explicit_reviewed, derived_candidate]
+  modality_enum: [actual, planned, conditional, unknown]
+  valid_time_fields: [start, end]
+  generated_output_is_canonical: false
+
+relation_types:
+  company_has_capability_at:
+    subject_type: company
+    object_type: capability_cell
+    allowed_epistemic_status: [source_encoded]
+    canonical_source: points.csv
+  route_requires_capability:
+    subject_type: route_profile
+    object_type: capability_cell
+    allowed_epistemic_status: [source_encoded]
+    canonical_source: route_bom.csv
+  capability_matches_route:
+    subject_type: company
+    object_type: route_profile
+    allowed_epistemic_status: [derived_candidate]
+    canonical_source: null
+    derived_is_canonical: false
+    does_not_imply: [company_serves_route, supply_relationship, shipment]
+  company_serves_route:
+    subject_type: company
+    object_type: route_profile
+    allowed_epistemic_status: [explicit_reviewed]
+    canonical_source: relation_assertions.yaml
+    automatic_derivation_forbidden: true
+  product_has_lifecycle_stage:
+    subject_type: product_or_program
+    object_type: lifecycle_stage
+    allowed_epistemic_status: [source_encoded, explicit_reviewed]
+    canonical_source: calls/events.csv

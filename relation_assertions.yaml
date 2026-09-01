@@ -1,0 +1,4 @@
+schema_version: relation_assertions_v1
+canonical_scope: explicit_reviewed_semantic_relations_only
+generated_output_is_source: false
+assertions: []

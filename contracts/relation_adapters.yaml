@@ -1,0 +1,63 @@
+schema_version: relation_adapters_v1
+
+route_profiles:
+  - route_profile_id: RPF-800G-DR8-LPO-SIPH-FPP-V1
+    label: 800G DR8 / LPO / SiPh / front-panel pluggable
+    identity_status: frozen_pilot_profile
+    identity_axes:
+      product_standard: 800GBASE-DR8
+      electrical_architecture: LPO
+      placement: front_panel_pluggable
+      photonic_platform: silicon_photonics
+    source_route_item_ids: [RB001, RB002, RB003, RB004, RB005]
+    capability_route_item_ids: [RB002, RB003, RB004, RB005]
+    canonical_fact_created: false
+    notes: >-
+      This frozen identity prevents DR4/DR8 text drift. It selects one pilot
+      profile over legacy requirement rows; it does not assert adoption or service.
+  - route_profile_id: RPF-800G-DR8-FRO-DISCRETE-FPP-V1
+    label: 800G DR8 / FRO / discrete optics / front-panel pluggable
+    identity_status: frozen_pilot_profile
+    identity_axes:
+      product_standard: 800GBASE-DR8
+      electrical_architecture: FRO
+      placement: front_panel_pluggable
+      photonic_platform: discrete_optics
+    source_route_item_ids: [RB001, RB002, RB003, RB004, RB005]
+    capability_route_item_ids: [RB002, RB003, RB004, RB005]
+    canonical_fact_created: false
+    notes: >-
+      A second exact identity exists only to prove that service assertions do
+      not cross-close a question for another route profile.
+
+adapters:
+  points_company_capability:
+    adapter_version: points_company_capability_v1
+    input: points.csv
+    relation_type: company_has_capability_at
+    epistemic_status: source_encoded
+  route_bom_profile_requirements:
+    adapter_version: route_bom_profile_requirements_v1
+    input: route_bom.csv
+    relation_type: route_requires_capability
+    epistemic_status: source_encoded
+  capability_match_join:
+    adapter_version: capability_match_join_v1
+    inputs: [company_has_capability_at, route_requires_capability]
+    relation_type: capability_matches_route
+    epistemic_status: derived_candidate
+    canonical_write_allowed: false
+    forbidden_outputs: [company_serves_route]
+  calls_product_lifecycle:
+    adapter_version: calls_product_lifecycle_v1
+    inputs:
+      - calls/events.csv
+      - calls/event_claims.csv
+      - calls/event_evidence.csv
+    relation_type: product_has_lifecycle_stage
+    epistemic_status: source_encoded
+  explicit_relation_assertions:
+    adapter_version: explicit_relation_assertions_v1
+    input: relation_assertions.yaml
+    allowed_relation_types: [company_serves_route, product_has_lifecycle_stage]
+    epistemic_status: explicit_reviewed
