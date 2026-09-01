@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""scan.py — 扫描+不变量①-⑭。用法: python3 scan.py [--check]
+"""scan.py — 扫描+不变量①-⑮。用法: python3 scan.py [--check]
 --check: 只跑不变量(<10s)。扫描分母=corpus/annual(_frozen登记);legacy-input=证据库不参与扫描。"""
-import sys,os,csv,re,glob,time,subprocess
+import sys,os,csv,re,glob,time,subprocess,yaml
+from pathlib import Path
 
 ROOT=os.path.dirname(os.path.abspath(__file__))
 ERR=[]
@@ -359,6 +360,65 @@ def _validate_research(rq, why_links, kb, rb_rows, pts, tree_cells, failfn):
             if not isinstance(v,list) or len(v)==0 or not all(str(x).strip() for x in v):
                 failfn('⑭',f'{i} {key}须为非空列表(且元素非空)')
 
+def _validate_relation_assertions_gate():
+    """⑮ relation reviewed-write gate (contract A/F): 独立 validator 接入总闸。
+
+    校验 relation_assertions.yaml 中每条 explicit_reviewed 断言的写入门：
+    review_receipt_id / reviewer / 严格 ISO reviewed_at / 非空且可解析的
+    evidence_claim_refs 与 source_refs / supports 与 does_not_support / origin_group
+    与已解析来源一致；以及 withdrawal/corrects 完整性。空 sidecar 直接通过。"""
+    try:
+        sys.path.insert(0, ROOT)
+        from tools.research.build_relation_index import (
+            RelationIndexError, build_receipt_registry, build_reference_registry, load_yaml,
+            validate_explicit_reviewed, validate_relation_contract, validate_withdrawals,
+        )
+    except Exception as e:
+        fail('⑮', f'无法加载 relation 校验模块: {e}')
+        return
+    contracts = os.path.join(ROOT, 'contracts')
+    try:
+        rc = yaml.safe_load(open(os.path.join(contracts, 'relation_types.yaml'), encoding='utf-8'))
+        ac = yaml.safe_load(open(os.path.join(contracts, 'relation_adapters.yaml'), encoding='utf-8'))
+        validate_relation_contract(rc)
+    except Exception as e:
+        fail('⑮', f'relation 合同不可解析: {e}')
+        return
+    registry = build_reference_registry(Path(ROOT))
+    # 1. the reviewed gate must see the real review-receipt registry: a receipt
+    # that is not registered (or a reviewer that is not the registered one) is a
+    # fake receipt and must be rejected here.
+    receipts = build_receipt_registry(ac)
+    ap = os.path.join(ROOT, 'relation_assertions.yaml')
+    if not os.path.exists(ap):
+        return
+    try:
+        data = yaml.safe_load(open(ap, encoding='utf-8'))
+    except Exception as e:
+        fail('⑮', f'relation_assertions.yaml 不可解析: {e}')
+        return
+    for i, item in enumerate(data.get('assertions') or [], 1):
+        if not isinstance(item, dict):
+            fail('⑮', f'显式断言 {i} 必须为映射')
+            continue
+        try:
+            validate_explicit_reviewed(item, registry, rc, receipts)
+        except RelationIndexError as e:
+            fail('⑮', str(e))
+    try:
+        # 9. raw sidecar entries need not carry projected slot_id; the validator
+        # derives identity from relation/subject/object/scope and must never
+        # raise KeyError here.  Malformed identity still produces a controlled
+        # relation-gate failure.
+        validate_withdrawals(
+            [x for x in (data.get('assertions') or []) if isinstance(x, dict)], rc
+        )
+    except RelationIndexError as e:
+        fail('⑮', str(e))
+    except KeyError as e:
+        fail('⑮', f'withdrawal 校验缺少投影字段(KeyError): {e}')
+
+
 def invariants():
     pts,egs,trg=rows('points.csv'),rows('edges.csv'),rows('triage.csv')
     # ①分母: annual/<code> 必在_frozen
@@ -416,6 +476,7 @@ def invariants():
         'build_detailed_capability_report.py','capability_details.csv',
         'route_bom.csv','macro_evidence.csv','shipments.csv','company_segment_revenue.csv',
         'research_questions.yaml','questions_manual.csv','relation_assertions.yaml',
+        'CODEBUDDY-FIX-CONTRACT.md',
         'RESTART-v2.md','CONTEXT.md','.gitignore','.gitattributes','.git','.DS_Store'}
     for f in os.listdir(ROOT):
         if os.path.isfile(os.path.join(ROOT,f)) and f not in WL: fail('⑥',f'根目录白名单外文件: {f}')
@@ -423,7 +484,7 @@ def invariants():
     if len(refs)>8: fail('⑥',f'refs/文件数{len(refs)}>8(2026-08-04由6放宽,纪律4)')
     for m in glob.glob(os.path.join(ROOT,'**/*.md'),recursive=True):
         rel=os.path.relpath(m,ROOT)
-        if not rel.startswith(('archive/','refs/','out/','corpus/','calls/','docs/')) and rel not in ('README.md','CLAUDE.md','RESTART-v2.md','CONTEXT.md'):
+        if not rel.startswith(('archive/','refs/','out/','corpus/','calls/','docs/')) and rel not in ('README.md','CLAUDE.md','RESTART-v2.md','CONTEXT.md','CODEBUDDY-FIX-CONTRACT.md'):
             fail('⑥',f'越位md: {rel}')
     # ⑦triage一致性
     pnames={p['公司'] for p in pts}
@@ -552,6 +613,8 @@ def invariants():
             tree_text=open(os.path.join(ROOT,'tree.yaml'),encoding='utf-8').read()
             tree_cells=set(re.findall(r'cell_id:\s*([A-Za-z0-9]+)',tree_text))
             _validate_research(rq, why_links, kb2, rb_rows, pts2, tree_cells, fail)
+    # ⑮ relation reviewed-write gate (contract A/F)
+    _validate_relation_assertions_gate()
 
 
 

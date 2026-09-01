@@ -1,0 +1,71 @@
+# Dedicated, resolvable test reference registry (contract A).
+# Explicit reviewed assertions in tests must cite ONLY references that resolve
+# here (or to a real ledger object). Free-text refs like "test_fixture:foo"
+# are intentionally NOT present and therefore must be rejected by the gate.
+schema_version: research_reference_registry_v1
+registry_id: test-research-graph-v1
+references:
+  - ref: point:TEST-POINT-001
+    kind: point
+    company: company:Lumentum
+    origin_group: OG-TEST-REGISTRY
+  - ref: claim:TEST-CLAIM-001
+    kind: claim
+    company: company:Lumentum
+    origin_group: OG-TEST-REGISTRY
+    linked_refs: [source:TEST-SRC-001, disclosure:TEST-DISC-001]
+  - ref: claim:TEST-CLAIM-002
+    kind: claim
+    company: company:Lumentum
+    origin_group: OG-TEST-REGISTRY
+    linked_refs: [source:TEST-SRC-002]
+  - ref: source:TEST-SRC-001
+    kind: source
+    company: company:Lumentum
+    origin_group: OG-TEST-REGISTRY
+    linked_refs: [claim:TEST-CLAIM-001, disclosure:TEST-DISC-001]
+  - ref: source:TEST-SRC-002
+    kind: source
+    company: company:Lumentum
+    origin_group: OG-TEST-REGISTRY
+    linked_refs: [claim:TEST-CLAIM-001]
+  - ref: disclosure:TEST-DISC-001
+    kind: disclosure
+    company: company:Lumentum
+    origin_group: OG-TEST-REGISTRY
+    linked_refs: [source:TEST-SRC-001, claim:TEST-CLAIM-001]
+  - ref: event:TEST-EV-001
+    kind: event
+    company: company:Lumentum
+    origin_group: OG-TEST-REGISTRY
+    linked_refs: [claim:TEST-CLAIM-001]
+  - ref: product:TEST-PRODUCT-001
+    kind: product
+    company: company:Lumentum
+    origin_group: OG-TEST-REGISTRY
+    source_refs: [source:TEST-SRC-001]
+  - ref: product:TEST-PRODUCT-002
+    kind: product
+    company: company:Lumentum
+    origin_group: OG-TEST-REGISTRY
+    source_refs: [source:TEST-SRC-002]
+  # 1. evidence that belongs to a different company: usable in a fixture only to
+  # prove the gate rejects semantically unrelated evidence.
+  - ref: claim:OTHER-CO-CLAIM-001
+    kind: claim
+    company: company:Coherent
+    origin_group: OG-TEST-OTHER-CO
+  - ref: source:OTHER-CO-SRC-001
+    kind: source
+    company: company:Coherent
+    origin_group: OG-TEST-OTHER-CO
+    linked_refs: [claim:OTHER-CO-CLAIM-001]
+
+# A. safe review receipt registry (contract A). A reviewed assertion's
+# review_receipt_id must resolve here, the reviewer must match the registered
+# reviewer, and the registered subject_ref must match the assertion's subject.
+review_receipts:
+  - receipt_id: RR-TEST-LITE-001
+    receipt_kind: explicit_review
+    reviewer: reviewer:TEST-001
+    subject_ref: company:Lumentum

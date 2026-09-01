@@ -1,4 +1,4 @@
-schema_version: relation_types_v1
+schema_version: relation_types_v2
 assertion_contract:
   required_fields:
     - assertion_id
@@ -18,7 +18,52 @@ assertion_contract:
   epistemic_status_enum: [source_encoded, explicit_reviewed, derived_candidate]
   modality_enum: [actual, planned, conditional, unknown]
   valid_time_fields: [start, end]
+  # A. reviewed assertion write gate: explicit_reviewed relations must also carry
+  # the following provenance fields and every reference must resolve to a known
+  # claim/source/disclosure/point/event object in the reference registry.
+  reviewed_write_gate_fields:
+    - review_receipt_id
+    - review_receipt_kind
+    - reviewer
+    - reviewed_at
+    - evidence_claim_refs
+    - source_refs
+    - supports
+    - does_not_support
+  # A. kind allowed for an evidence_claim_ref. A bare source ref is NOT evidence.
+  evidence_claim_ref_kinds: [claim, disclosure, event]
+  # A. a review_receipt_id must resolve in the review_receipts registry and the
+  # reviewer must be the registered one; the registered subject must match.
+  review_receipt_registry_required: true
+  # F. revision integrity. `corrects` cannot be implemented safely in this pilot:
+  # it is refused through the real adapter path instead of being coerced to limiting.
+  revision_kind_enum: [withdraws, supersedes, corrects]
+  unsupported_revision_kinds: [corrects]
+  # E. time policy: an assertion whose valid_time has no boundary at all is
+  # "unknown time" and stays active at every as_of (it can never be retired by a
+  # query instant). A boundary that is present is compared strictly.
+  unknown_time_policy: always_active
+  # E. Omitting a query modality means all declared modalities are retained,
+  # but effects only apply on the same modality/comparison surface; a planned
+  # withdrawal or limit can never mutate an actual state by default.
+  query_modality_policy:
+    null_means_all_declared_modalities: true
+    cross_modality_effects: forbidden
   generated_output_is_canonical: false
+
+# G. company_serves_route identity scope must force an exact product_ref and a
+# controlled service_kind. Kinds cannot upgrade across stages.
+service_kind_enum: [demonstrated, listed, qualifying, shipping, deployed]
+
+# D/8. every relation MUST declare slot_identity_fields, comparison_fields and
+# context_fields. slot_identity_fields must be a subset of comparison_fields
+# (you cannot compare on less than you identify). Machine-checked at build time.
+identity_contract:
+  required_declarations: [slot_identity_fields, comparison_fields, context_fields]
+  slot_identity_subset_of_comparison: true
+  # context fields never mint a slot identity of their own; any wider/narrower
+  # roll-up must be declared explicitly here, never fuzzy-matched.
+  rollup_policies: []
 
 relation_types:
   company_has_capability_at:
@@ -26,11 +71,18 @@ relation_types:
     object_type: capability_cell
     allowed_epistemic_status: [source_encoded]
     canonical_source: points.csv
+    slot_identity_fields: [subject_ref, object_ref, capability_cell_id]
+    comparison_fields: [subject_ref, object_ref, capability_cell_id, modality]
+    context_fields: []
   route_requires_capability:
     subject_type: route_profile
     object_type: capability_cell
-    allowed_epistemic_status: [source_encoded]
+    allowed_epistemic_status: [source_encoded, derived_candidate]
     canonical_source: route_bom.csv
+    slot_identity_fields: [subject_ref, object_ref, route_profile_id, capability_cell_id]
+    comparison_fields: [subject_ref, object_ref, route_profile_id, capability_cell_id, modality]
+    context_fields: [requirement_source_rb_item]
+    non_comparable_context_fields: [requirement_source_rb_item]
   capability_matches_route:
     subject_type: company
     object_type: route_profile
@@ -38,14 +90,37 @@ relation_types:
     canonical_source: null
     derived_is_canonical: false
     does_not_imply: [company_serves_route, supply_relationship, shipment]
+    slot_identity_fields: [subject_ref, object_ref, route_profile_id, capability_cell_id]
+    comparison_fields: [subject_ref, object_ref, route_profile_id, capability_cell_id, modality]
+    context_fields: []
   company_serves_route:
     subject_type: company
     object_type: route_profile
     allowed_epistemic_status: [explicit_reviewed]
     canonical_source: relation_assertions.yaml
     automatic_derivation_forbidden: true
+    slot_identity_fields: [subject_ref, object_ref, route_profile_id, product_ref, service_kind]
+    # Geography/customer/program are part of the comparison surface even though
+    # they do not mint a new slot.  A US assertion and an EU assertion therefore
+    # cannot be treated as a same-surface contradiction by accident.
+    comparison_fields: [subject_ref, object_ref, route_profile_id, product_ref, service_kind, geography, customer, program_id, modality]
+    context_fields: [geography, customer, program_id]
+    non_comparable_context_fields: []
+    # identity scope MUST contain an exact product and a controlled service_kind
+    requires_product_ref: true
+    requires_service_kind: true
   product_has_lifecycle_stage:
     subject_type: product_or_program
     object_type: lifecycle_stage
     allowed_epistemic_status: [source_encoded, explicit_reviewed]
     canonical_source: calls/events.csv
+    # D. the lifecycle stage is NOT part of slot identity: a planned ramp and a
+    # current demonstrated stage share one slot so the conflict/non-conflict
+    # decision is driven by modality+time policy, not by slot short-circuiting.
+    slot_identity_fields: [subject_ref, program_id, primary_subject_id]
+    # Lifecycle stage remains context (and therefore does not mint a slot), but
+    # it is still compared when deciding whether two assertions conflict.
+    comparison_fields: [subject_ref, program_id, primary_subject_id, lifecycle_stage, modality]
+    context_fields: [lifecycle_stage, event_id]
+    non_comparable_context_fields: [event_id]
+    allowed_event_category: [product_stage]

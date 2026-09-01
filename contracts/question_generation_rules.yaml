@@ -12,7 +12,29 @@ rules:
     display_parent: TQ013
     depends_on: [TQ009, TQ013]
     question_template: >-
-      {company} 具备 {route_label} 路线所需能力，但是否有服务该 exact route profile 的直接证据？
+      {company} 已具备 {route_label} exact profile 全部能力组的 ACTUAL 覆盖，但 {product_ref}
+      是否有 {service_kind} 级直接服务该 exact route profile 的证据？
+    # 3. the gap candidate is only generated when the COMPLETE actual coverage
+    # satisfies every all_of and one_of group of the exact profile. A single
+    # cell, a partial coverage or a planned match never licenses the claim that
+    # the company has the route capability.
+    coverage_gate:
+      require_complete_actual_coverage: true
+      coverage_modality: actual
+      planned_counts_as_coverage: false
+      unknown_requirement_semantics_forbidden: true
+    # 4. the question target must be a REAL, fully bound slot. A synthetic
+    # route-level slot (route_profile_id only) or an aggregate over
+    # products/service kinds is forbidden. If nothing binds, no question is
+    # generated and the deferral is reported instead.
+    target_binding:
+      product_ref_required: true
+      product_ref_kind: product
+      forbid_synthetic_route_slot: true
+      forbid_cross_slot_aggregation: true
+      # listed / qualifying never count as serving the route and never close a
+      # demonstrated / shipping / deployed question: they are different slots.
+      target_service_kinds: [demonstrated, shipping, deployed]
     acceptance:
       relation_type: company_serves_route
       epistemic_status: explicit_reviewed
@@ -22,6 +44,8 @@ rules:
       exact_route_profile_required: true
       kn_reference_is_sufficient: false
       component_product_evidence_is_sufficient: false
+      # service_kind is pinned to the target slot's kind. No cross-close.
+      service_kind_acceptance: [demonstrated, shipping, deployed]
     reopen_on:
       - last_qualified_support_withdrawn
       - same_scope_time_modality_conflict

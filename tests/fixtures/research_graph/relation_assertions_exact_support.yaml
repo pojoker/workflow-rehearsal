@@ -7,12 +7,21 @@ assertions:
     object_ref: route_profile:RPF-800G-DR8-LPO-SIPH-FPP-V1
     scope:
       route_profile_id: RPF-800G-DR8-LPO-SIPH-FPP-V1
+      product_ref: product:TEST-PRODUCT-001
+      service_kind: demonstrated
     valid_time:
       start: "2026-04-30"
       end: null
     modality: actual
     polarity: supporting
-    origin_group: OG-TEST-LITE-EXACT-SERVICE
-    source_refs: [test_fixture:exact_reviewed_service]
+    origin_group: OG-TEST-REGISTRY
+    source_refs: [source:TEST-SRC-001, disclosure:TEST-DISC-001]
+    evidence_claim_refs: [claim:TEST-CLAIM-001]
+    supports: [claim:TEST-CLAIM-001]
+    does_not_support: []
+    review_receipt_id: RR-TEST-LITE-001
+    reviewer: reviewer:TEST-001
+    reviewed_at: "2026-08-09"
+    review_receipt_kind: explicit_review
     metadata:
       fixture_only: true

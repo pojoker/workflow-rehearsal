@@ -1,9 +1,23 @@
-schema_version: relation_adapters_v1
+schema_version: relation_adapters_v2
+
+# A. safe review receipt registry (production). An explicit_reviewed assertion's
+# review_receipt_id must resolve here and its reviewer must match the registered
+# reviewer; the registered subject_ref must match the assertion's subject_ref
+# (semantic linkage: the receipt is for the reviewed company). Empty in pilot
+# because relation_assertions.yaml carries no explicit assertions yet; any future
+# explicit assertion MUST register its receipt here (or in a test registry).
+review_receipts: []
 
 route_profiles:
   - route_profile_id: RPF-800G-DR8-LPO-SIPH-FPP-V1
     label: 800G DR8 / LPO / SiPh / front-panel pluggable
     identity_status: frozen_pilot_profile
+    # B. profile identity is versioned; identity_hash is the machine-checked hash
+    # of the frozen identity axes. Any change to identity_axes MUST change the
+    # hash (enforced at build time) or the build fails.
+    revision: 1
+    requirement_contract_version: rca-lpo-siph-v1
+    identity_hash: fdf6c1c8969a97ee754c4c456de1572b42da1451d40b88be0f73c8d6479fbfd0
     identity_axes:
       product_standard: 800GBASE-DR8
       electrical_architecture: LPO
@@ -12,12 +26,41 @@ route_profiles:
     source_route_item_ids: [RB001, RB002, RB003, RB004, RB005]
     capability_route_item_ids: [RB002, RB003, RB004, RB005]
     canonical_fact_created: false
+    # B. requirement semantics for exact profile. Alternative cells are expressed
+    # as one_of so they are NOT all treated as required. The groups are declared
+    # (not guessed), but the projection from the broad route_bom.csv stays a
+    # derived_candidate and never becomes a canonical fact.
+    requirement_group_policy: derived_candidate
+    requirement_semantics: declared_groups
+    requirement_groups:
+      # These are canonical profile semantics, not a blind expansion of the
+      # broad route_bom rows.  C1/C4 are alternatives for the emitter, while
+      # P1/D12 and the remaining receiver/package cells are necessary groups.
+      - group_id: RG-LPO-EMITTER-ALTERNATIVE
+        kind: one_of
+        source_route_item_ids: [RB002]
+        capability_cell_ids: [C1, C4]
+      - group_id: RG-LPO-EMITTER-INTEGRATION
+        kind: all_of
+        source_route_item_ids: [RB002]
+        capability_cell_ids: [P1, D12]
+      - group_id: RG-LPO-RECEIVER
+        kind: all_of
+        source_route_item_ids: [RB003, RB004]
+        capability_cell_ids: [C3, C5, D12]
+      - group_id: RG-LPO-PACKAGE
+        kind: all_of
+        source_route_item_ids: [RB005]
+        capability_cell_ids: [D7, D9, B1, B2]
     notes: >-
       This frozen identity prevents DR4/DR8 text drift. It selects one pilot
       profile over legacy requirement rows; it does not assert adoption or service.
   - route_profile_id: RPF-800G-DR8-FRO-DISCRETE-FPP-V1
     label: 800G DR8 / FRO / discrete optics / front-panel pluggable
     identity_status: frozen_pilot_profile
+    revision: 1
+    requirement_contract_version: rca-fro-discrete-v1
+    identity_hash: 162ffec4311f8dc4410383ab751c7d81c85ac06b215a27252f7fe9bd6515d898
     identity_axes:
       product_standard: 800GBASE-DR8
       electrical_architecture: FRO
@@ -26,9 +69,21 @@ route_profiles:
     source_route_item_ids: [RB001, RB002, RB003, RB004, RB005]
     capability_route_item_ids: [RB002, RB003, RB004, RB005]
     canonical_fact_created: false
+    # B. honesty: the ledger does not prove that FRO/discrete has a different
+    # requirement semantics from LPO/SiPh, so the exact-profile requirement
+    # semantics are kept UNKNOWN rather than guessed.
+    # B/2. UNKNOWN exact requirement semantics: the profile MUST NOT declare any
+    # exact requirement group. The builder therefore emits no exact requirements,
+    # no capability matches and no route-service questions for this profile, and
+    # the build fails if a group is declared anyway.
+    requirement_group_policy: derived_candidate
+    requirement_semantics: UNKNOWN
+    requirement_groups: []
     notes: >-
       A second exact identity exists only to prove that service assertions do
-      not cross-close a question for another route profile.
+      not cross-close a question for another route profile. Its exact-profile
+      requirement semantics are UNKNOWN because the ledger cannot prove a
+      difference from the LPO/SiPh profile.
 
 adapters:
   points_company_capability:
@@ -40,7 +95,13 @@ adapters:
     adapter_version: route_bom_profile_requirements_v1
     input: route_bom.csv
     relation_type: route_requires_capability
-    epistemic_status: source_encoded
+    # B/2. broad route_bom.csv rows are NOT an exact-profile fact. The projection
+    # from the broad BOM onto a frozen exact profile is a derived candidate and
+    # must never be declared (or emitted as) source_encoded. Machine-checked.
+    epistemic_status: derived_candidate
+    source_encoded_forbidden: true
+    requirement_source_kinds: [all_of, one_of]
+    allowed_epistemic_status: [derived_candidate]
   capability_match_join:
     adapter_version: capability_match_join_v1
     inputs: [company_has_capability_at, route_requires_capability]
@@ -56,6 +117,9 @@ adapters:
       - calls/event_evidence.csv
     relation_type: product_has_lifecycle_stage
     epistemic_status: source_encoded
+    # I. only true product_stage events may enter product_has_lifecycle_stage.
+    allowed_event_category: [product_stage]
+    forbidden_event_categories: [capital_relationship, supply_chain_arrangement, capacity_constraint, commercial_adoption, policy_market_access]
   explicit_relation_assertions:
     adapter_version: explicit_relation_assertions_v1
     input: relation_assertions.yaml
