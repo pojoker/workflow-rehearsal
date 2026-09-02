@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from daily_intelligence import combine_daily_reports
+from daily_intelligence import combine_daily_reports, publish_daily_artifacts
 
 
 def _sha256(path: Path) -> str:
@@ -173,6 +173,53 @@ class CombinedDailyIntelligenceTest(unittest.TestCase):
                 domestic_state_root=self.domestic,
                 overseas_state_root=self.overseas,
                 output_root=self.domestic / "combined",
+            )
+
+    def test_publishes_original_txt_and_html_without_rewriting_them(self) -> None:
+        domestic_txt = self.root / "2026-08-22.txt"
+        overseas_html = self.root / "海外情报更新_2026-08-23.html"
+        domestic_txt.write_text(
+            "# 日报 2026-08-22\n\n## 语料\n- 原始国内日报\n",
+            encoding="utf-8",
+        )
+        overseas_html.write_text(
+            "<!doctype html><html><head><title>光模块行业产业链全景图 · 公司能力细化版</title></head>"
+            "<body><h1>海外电话会与官网技术情报</h1><a href=\"#events\">本期公司事件</a></body></html>",
+            encoding="utf-8",
+        )
+        source_hashes = {_sha256(domestic_txt), _sha256(overseas_html)}
+
+        result = publish_daily_artifacts(
+            run_date="2026-09-02",
+            domestic_txt=domestic_txt,
+            overseas_html=overseas_html,
+            output_root=self.output,
+        )
+
+        published_txt = Path(result["domestic_path"])
+        published_html = Path(result["overseas_path"])
+        self.assertEqual(source_hashes, {_sha256(published_txt), _sha256(published_html)})
+        index = Path(result["index_path"]).read_text(encoding="utf-8")
+        self.assertIn("国内增量日报（原始 TXT）", index)
+        self.assertIn("海外情报全景（原始 HTML）", index)
+        self.assertIn("domestic.txt", index)
+        self.assertIn("overseas.html", index)
+        self.assertNotIn("海外事件增量", published_txt.read_text(encoding="utf-8"))
+
+    def test_publish_rejects_output_that_contains_a_source(self) -> None:
+        source_root = self.root / "source"
+        source_root.mkdir()
+        domestic_txt = source_root / "daily.txt"
+        overseas_html = source_root / "overseas.html"
+        domestic_txt.write_text("daily", encoding="utf-8")
+        overseas_html.write_text("<html></html>", encoding="utf-8")
+
+        with self.assertRaisesRegex(ValueError, "disjoint"):
+            publish_daily_artifacts(
+                run_date="2026-09-02",
+                domestic_txt=domestic_txt,
+                overseas_html=overseas_html,
+                output_root=source_root,
             )
 
 

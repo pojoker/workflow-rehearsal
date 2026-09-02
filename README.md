@@ -62,16 +62,16 @@ python3 -m domestic_daily run --source-root . --state-root /path/to/domestic-dai
 
 实现通过 state-root 锁、临时 staging 目录和原子替换保证重复运行幂等；网络由 `RequestsClient` 提供，互动问答直接在临时隔离根中复用原 `_fetch_qa.py` 的深交所、上证 e 互动、全景网兜底与熔断逻辑，测试使用 `FixtureClient`，不依赖公网。手工调度可在未来使用同一 CLI，例如 `30 18 * * * cd /repo && python3 -m domestic_daily run --source-root . --state-root /var/lib/domestic-daily --date $(date +\%F)`；本项目不会安装或启动 scheduler。离线测试：`python3 -m unittest discover -s tests -p 'test_domestic_daily.py'`。源基线扫描仍须单独运行 `python3 scan.py --check`；缺失 gitignored 年报文本时，其召回结果仅代表当前基线，不能视为完整语料覆盖。
 
-## 国内与海外合并日报
+## 国内与海外原样发布
 
-两套镜像完成后，`daily_intelligence` 只读取它们的日报与运行清单。Markdown **逐字保留原国内日报作为主体**，仅在末尾追加中文化的“海外事件增量”与采集状态；不会另造首页、重排原章节或暴露内部英文枚举。JSON 保存机器可读摘要。任一输入缺失时仍会生成 `partial` 结果并显式列出缺失项；合并过程不执行 promote，也不写国内 canonical 或海外 `calls/*.csv`。fixture 演练会在读者层醒目标注，不得冒充真实采集；国内首次运行只初始化召回基线，不把存量队列计为当日新增。
+两套镜像完成后，推荐用 `daily_intelligence publish` 无损发布已经验收的两种读者产物：国内保持 `tmp/daily/YYYY-MM-DD.txt` 的一页增量审计日报，海外保持“公司能力细化版 · 海外情报更新”的完整 HTML。发布器按字节复制两份输入并校验 SHA-256，不拼接、不摘要、不重排正文；统一 `index.html` 只负责在原始 TXT 与原始 HTML 之间切换。输出必须与两套输入物理隔离，也不会执行 promote、修改 canonical 或写海外 `calls/*.csv`。
 
 ```bash
-python3 -m daily_intelligence combine \
+python3 -m daily_intelligence publish \
   --date 2026-09-02 \
-  --domestic-state-root /path/to/domestic-state \
-  --overseas-state-root /path/to/overseas-state \
-  --output-root /path/to/combined-state
+  --domestic-txt /path/to/tmp/daily/2026-09-02.txt \
+  --overseas-html /path/to/out/光模块产业链全景图_公司能力细化版_海外情报更新_2026-09-02.html \
+  --output-root /path/to/published-state
 ```
 
-最终入口是 `<combined-state>/daily/YYYY-MM-DD.md`，同目录的 `.json` 保存摘要计数、覆盖率、输入路径与异常。测试：`python3 -m unittest discover -s tests -p 'test_daily_intelligence.py' -v`。
+最终入口是 `<published-state>/daily/YYYY-MM-DD/index.html`；同目录保留 `domestic.txt`、`overseas.html` 和带源路径及哈希的 `manifest.json`。旧的 `combine` 子命令仍为兼容保留，但不再作为面向用户的最终产物。测试：`python3 -m unittest discover -s tests -p 'test_daily_intelligence.py' -v`。

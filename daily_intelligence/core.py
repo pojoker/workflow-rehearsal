@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import tempfile
@@ -60,6 +61,37 @@ def _atomic_write(path: Path, content: str) -> None:
     finally:
         if temporary:
             Path(temporary).unlink(missing_ok=True)
+
+
+def _atomic_copy(source: Path, destination: Path) -> None:
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    temporary: str | None = None
+    try:
+        with source.open("rb") as source_handle, tempfile.NamedTemporaryFile(
+            mode="wb",
+            dir=destination.parent,
+            prefix=f".{destination.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as destination_handle:
+            temporary = destination_handle.name
+            while chunk := source_handle.read(1024 * 1024):
+                destination_handle.write(chunk)
+            destination_handle.flush()
+            os.fsync(destination_handle.fileno())
+        os.replace(temporary, destination)
+        temporary = None
+    finally:
+        if temporary:
+            Path(temporary).unlink(missing_ok=True)
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        while chunk := handle.read(1024 * 1024):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _validate_date(run_date: str) -> None:
@@ -283,4 +315,128 @@ def combine_daily_reports(
         **payload,
         "markdown_path": str(markdown_path),
         "json_path": str(json_path),
+    }
+
+
+def _render_original_artifact_index(run_date: str) -> str:
+    return f"""<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>国内与海外每日更新 · {run_date}</title>
+  <style>
+    :root {{ color-scheme: light; font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }}
+    * {{ box-sizing: border-box; }}
+    body {{ margin: 0; background: #f5f7fb; color: #17233d; }}
+    header {{ padding: 18px 24px 12px; background: white; border-bottom: 1px solid #dfe5ef; }}
+    h1 {{ margin: 0 0 6px; font-size: 20px; }}
+    p {{ margin: 0; color: #667085; font-size: 13px; }}
+    nav {{ display: flex; gap: 10px; padding: 14px 24px; }}
+    button,a.open {{ border: 1px solid #cbd5e1; border-radius: 999px; background: white; color: #213a75; padding: 8px 13px; cursor: pointer; text-decoration: none; font-size: 14px; }}
+    button.active {{ background: #213a75; color: white; border-color: #213a75; }}
+    main {{ padding: 0 18px 18px; }}
+    section {{ display: none; height: calc(100vh - 126px); background: white; border: 1px solid #dfe5ef; border-radius: 12px; overflow: hidden; }}
+    section.active {{ display: block; }}
+    iframe {{ width: 100%; height: 100%; border: 0; background: white; }}
+    pre {{ height: 100%; margin: 0; padding: 24px; overflow: auto; white-space: pre-wrap; font: 14px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace; color: #16213a; }}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>国内与海外每日更新 · {run_date}</h1>
+    <p>统一入口只负责导航；国内 TXT 与海外 HTML 均保持原始内容，不做重写或摘要。</p>
+  </header>
+  <nav>
+    <button class="active" data-target="domestic">国内增量日报（原始 TXT）</button>
+    <button data-target="overseas">海外情报全景（原始 HTML）</button>
+    <a class="open" href="domestic.txt" target="_blank">单独打开 TXT</a>
+    <a class="open" href="overseas.html" target="_blank">单独打开海外网页</a>
+  </nav>
+  <main>
+    <section id="domestic" class="active"><pre id="domestic-content">正在读取原始 TXT…</pre></section>
+    <section id="overseas"><iframe src="overseas.html" title="海外情报全景"></iframe></section>
+  </main>
+  <script>
+    fetch('domestic.txt')
+      .then((response) => {{ if (!response.ok) throw new Error(response.status); return response.text(); }})
+      .then((text) => {{ document.getElementById('domestic-content').textContent = text; }})
+      .catch((error) => {{ document.getElementById('domestic-content').textContent = '国内 TXT 读取失败：' + error; }});
+    for (const button of document.querySelectorAll('button[data-target]')) {{
+      button.addEventListener('click', () => {{
+        document.querySelectorAll('button[data-target], main section').forEach((node) => node.classList.remove('active'));
+        button.classList.add('active');
+        document.getElementById(button.dataset.target).classList.add('active');
+      }});
+    }}
+  </script>
+</body>
+</html>
+"""
+
+
+def publish_daily_artifacts(
+    *,
+    run_date: str,
+    domestic_txt: str | Path,
+    overseas_html: str | Path,
+    output_root: str | Path,
+) -> dict[str, Any]:
+    """Publish both accepted reader artifacts without rewriting either source."""
+    _validate_date(run_date)
+    domestic_txt = Path(domestic_txt).resolve()
+    overseas_html = Path(overseas_html).resolve()
+    output_root = Path(output_root).resolve()
+    for source, suffix in ((domestic_txt, ".txt"), (overseas_html, ".html")):
+        if not source.is_file():
+            raise FileNotFoundError(source)
+        if source.suffix.lower() != suffix:
+            raise ValueError(f"expected {suffix} source, got {source}")
+        if source == output_root or source.is_relative_to(output_root):
+            raise ValueError(
+                "output_root must be disjoint from domestic and overseas sources: "
+                f"output={output_root}, source={source}"
+            )
+
+    artifact_root = output_root / "daily" / run_date
+    domestic_path = artifact_root / "domestic.txt"
+    overseas_path = artifact_root / "overseas.html"
+    index_path = artifact_root / "index.html"
+    manifest_path = artifact_root / "manifest.json"
+    source_hashes = {
+        "domestic": _sha256(domestic_txt),
+        "overseas": _sha256(overseas_html),
+    }
+    _atomic_copy(domestic_txt, domestic_path)
+    _atomic_copy(overseas_html, overseas_path)
+    _atomic_write(index_path, _render_original_artifact_index(run_date))
+    published_hashes = {
+        "domestic": _sha256(domestic_path),
+        "overseas": _sha256(overseas_path),
+    }
+    if published_hashes != source_hashes:
+        raise OSError("published artifact hash mismatch")
+    manifest = {
+        "run_date": run_date,
+        "content_policy": "verbatim",
+        "sources": {
+            "domestic": {"path": str(domestic_txt), "sha256": source_hashes["domestic"]},
+            "overseas": {"path": str(overseas_html), "sha256": source_hashes["overseas"]},
+        },
+        "published": {
+            "domestic": str(domestic_path),
+            "overseas": str(overseas_path),
+            "index": str(index_path),
+        },
+    }
+    _atomic_write(
+        manifest_path,
+        json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+    )
+    return {
+        "run_date": run_date,
+        "domestic_path": str(domestic_path),
+        "overseas_path": str(overseas_path),
+        "index_path": str(index_path),
+        "manifest_path": str(manifest_path),
     }
