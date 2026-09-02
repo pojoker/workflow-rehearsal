@@ -18,7 +18,7 @@
 - `contracts/question_generation_rules.yaml`：冻结 route-service rule 为 lead-only，并加入唯一获准的窄 lifecycle pilot rule。
 - `tools/research/build_relation_index.py`：修正 reached-stage 时间语义，增加显式 temporal/raw CLI 边界、lead 输出和跨构建兼容摘要。
 - `tools/research/recompute_question_state.py`：生成 lead/funnel 与真实 lifecycle question，并验证跨构建 snapshot、目标身份、规则版本、parent 链、as-of 和 transition cause。
-- `tests/research/test_relation_graph_closure_latest.py`：真实 calls lifecycle 的 CLI A/B/C、raw/temporal CLI 边界、跨投影历史篡改、规则语义偷改、悬空/异 slot/未来 cause 负例。
+- `tests/research/test_relation_graph_closure_latest.py`：真实 calls lifecycle 的 CLI A/B/C、raw/temporal CLI 边界、跨投影身份/合同/lineage 篡改、悬空/异 slot/未来 cause 负例。
 - `tests/research/test_relation_graph_closure.py`：把旧 route-question 断言改为冻结后的 lead-only 语义，并删除手写 satisfied snapshot 的伪历史测试。
 
 `contracts/relation_adapters.yaml`、`relation_assertions.yaml`、reviewed gate、`scan.py` 及 canonical CSV/YAML 本轮均未修改。为让人工审阅不必先运行代码，本提交保存一次显式 `as_of=2026-09-02` 的 disposable projection：`out/relation_assertion_index.jsonl`、`out/relation_slot_states.jsonl`、`out/relation_leads.jsonl`、`out/relation_lead_funnel.json` 与 `out/generated_diagnostic_questions.jsonl`。这些文件可由合同和 canonical 账本重建，不是事实源。
@@ -113,4 +113,4 @@ git diff --check
 exit 0
 ```
 
-专用测试还覆盖跨 worktree 的确定性输出、raw-only/no-as-of 边界、未来 cause、悬空/异 slot cause、伪造 root satisfied 快照，以及只改规则语义但不升级版本时的兼容性拒绝。报告中的生成文件是可复现审阅快照，不改变其 disposable projection 身份。
+专用测试还覆盖跨 worktree 的确定性输出、raw-only/no-as-of 边界、未来 cause、悬空/异 slot cause，以及 projection 身份、合同和 lineage 篡改。独立定向复核另外验证：自洽重写 root snapshot 为 `satisfied` 会被 reducer replay 拒绝；只改 acceptance 语义但不升级 `rule_version` 会被兼容性校验拒绝。报告中的生成文件是可复现审阅快照，不改变其 disposable projection 身份。
