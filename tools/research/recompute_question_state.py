@@ -48,6 +48,7 @@ from tools.research.build_relation_index import (
     is_active_at_as_of,
     load_yaml,
     parse_iso_datetime,
+    reducer_contract_compatibility,
     relation_slot_identity,
     stable_id,
     validate_relation_contract,
@@ -131,6 +132,17 @@ def _contract_ref(path: Path, base: Path | None = None) -> dict[str, str]:
     return {"path": relative.as_posix(), "sha256": _file_hash(resolved)}
 
 
+def target_identity_hash(target: dict[str, Any]) -> str:
+    """Content hash of the exact target identity, excluding resolution state."""
+    identity = {
+        "relation_type": target.get("relation_type"),
+        "subject_ref": target.get("subject_ref"),
+        "object_ref": target.get("object_ref"),
+        "identity_scope": target.get("identity_scope") or {},
+    }
+    return hashlib.sha256(canonical_json(identity).encode("utf-8")).hexdigest()
+
+
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
@@ -147,6 +159,12 @@ def _validate_manifest_shape(manifest: dict[str, Any], label: str) -> None:
     for key in ("data_hash", "assertion_data_hash", "slot_data_hash"):
         if not _SHA256_RE.fullmatch(manifest[key]):
             raise QuestionStateError(f"{label} manifest {key} is not a SHA-256 hash")
+    if manifest.get("projection_query_hash") is not None and not _SHA256_RE.fullmatch(
+        manifest["projection_query_hash"]
+    ):
+        raise QuestionStateError(
+            f"{label} manifest projection_query_hash is not a SHA-256 hash"
+        )
     for key in ("assertion_count", "slot_count"):
         if not isinstance(manifest.get(key), int) or manifest[key] < 0:
             raise QuestionStateError(f"{label} manifest {key} must be a non-negative integer")
@@ -191,6 +209,41 @@ def _validate_manifest_shape(manifest: dict[str, Any], label: str) -> None:
         if not isinstance(entry["sha256"], str) or not _SHA256_RE.fullmatch(entry["sha256"]):
             raise QuestionStateError(f"{label} manifest registry hash is malformed")
 
+    relation_artifacts = manifest.get("relation_artifacts")
+    if relation_artifacts is not None:
+        if not isinstance(relation_artifacts, dict) or not set(relation_artifacts) <= {
+            "assertion_index",
+            "slot_states",
+        }:
+            raise QuestionStateError(
+                f"{label} manifest relation_artifacts has unsupported names"
+            )
+        for name, ref in relation_artifacts.items():
+            if not isinstance(ref, dict) or set(ref) != {"path", "sha256", "row_count"}:
+                raise QuestionStateError(
+                    f"{label} manifest relation artifact {name} is malformed"
+                )
+            path = ref["path"]
+            if (
+                not isinstance(path, str)
+                or not path
+                or Path(path).is_absolute()
+                or ".." in Path(path).parts
+            ):
+                raise QuestionStateError(
+                    f"{label} manifest relation artifact {name} path must be relative"
+                )
+            if not isinstance(ref["sha256"], str) or not _SHA256_RE.fullmatch(
+                ref["sha256"]
+            ):
+                raise QuestionStateError(
+                    f"{label} manifest relation artifact {name} hash is malformed"
+                )
+            if not isinstance(ref["row_count"], int) or ref["row_count"] < 0:
+                raise QuestionStateError(
+                    f"{label} manifest relation artifact {name} row_count is malformed"
+                )
+
 
 def _require_same_build(
     assertion_manifest: dict[str, Any] | None,
@@ -218,6 +271,7 @@ def _require_same_build(
         "slot_count",
         "as_of",
         "modality",
+        "projection_query_hash",
     ):
         if assertion_manifest.get(key) != slot_manifest.get(key):
             raise QuestionStateError(
@@ -286,7 +340,193 @@ def _require_same_build(
             "extra registry content/path does not match the build manifest; "
             "unlisted product identities are not allowed"
         )
+    if rules_path is not None and adapters_path is not None and relation_types_path is not None:
+        try:
+            computed_compatibility = reducer_contract_compatibility(
+                load_yaml(relation_types_path),
+                load_yaml(adapters_path),
+                load_yaml(rules_path),
+            )
+        except (OSError, RelationIndexError) as exc:
+            raise QuestionStateError(
+                "reducer contract compatibility cannot be computed from current files"
+            ) from exc
+        for label, candidate in (
+            ("assertion index", assertion_manifest),
+            ("slot state", slot_manifest),
+        ):
+            if candidate.get("contract_compatibility") != computed_compatibility:
+                raise QuestionStateError(
+                    f"{label} manifest reducer contract compatibility is stale or forged"
+                )
     return assertion_manifest
+
+
+def _resolve_relative_ref(
+    ref: dict[str, Any], *, path: Path, history_base: Path | None
+) -> Path:
+    """Resolve a content reference without allowing absolute/path-traversal refs."""
+    if not isinstance(ref, dict) or set(ref) - {"path", "sha256", "row_count"}:
+        raise QuestionStateError(f"{path}: malformed relation artifact reference")
+    ref_path = ref.get("path")
+    if (
+        not isinstance(ref_path, str)
+        or not ref_path
+        or Path(ref_path).is_absolute()
+        or ".." in Path(ref_path).parts
+    ):
+        raise QuestionStateError(f"{path}: relation artifact reference path must be relative")
+    candidates: list[Path] = []
+    for base in (
+        history_base,
+        path.resolve().parent.parent,
+        path.resolve().parent,
+    ):
+        if base is None:
+            continue
+        candidate = base / ref_path
+        if candidate not in candidates:
+            candidates.append(candidate)
+    existing = next((candidate for candidate in candidates if candidate.is_file()), None)
+    if existing is None:
+        raise QuestionStateError(
+            f"{path}: referenced relation artifact {ref_path!r} is unavailable"
+        )
+    return existing
+
+
+def _validate_relation_artifacts(
+    manifest: dict[str, Any],
+    *,
+    snapshot_path: Path,
+    rules_path: Path | None,
+    adapters_path: Path | None,
+    relation_types_path: Path | None,
+    extra_registry_paths: Iterable[Path],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
+    """Load and content-check the relation artifacts that produced a snapshot.
+
+    A question row is a projection, not evidence of how it was computed.  The
+    snapshot therefore binds the exact assertion/slot row sets used to derive
+    it.  Their own manifests and hashes are checked before any state replay.
+    """
+    refs = manifest.get("relation_artifacts")
+    if not isinstance(refs, dict) or set(refs) != {"assertion_index", "slot_states"}:
+        raise QuestionStateError(
+            f"{snapshot_path}: snapshot must bind assertion_index and slot_states artifacts"
+        )
+    for name, ref in refs.items():
+        if not isinstance(ref, dict) or set(ref) != {"path", "sha256", "row_count"}:
+            raise QuestionStateError(
+                f"{snapshot_path}: relation artifact {name} ref must contain path, sha256, row_count"
+            )
+        if not isinstance(ref["sha256"], str) or not _SHA256_RE.fullmatch(ref["sha256"]):
+            raise QuestionStateError(
+                f"{snapshot_path}: relation artifact {name} row hash is malformed"
+            )
+        if not isinstance(ref["row_count"], int) or ref["row_count"] < 0:
+            raise QuestionStateError(
+                f"{snapshot_path}: relation artifact {name} row_count is malformed"
+            )
+
+    history_base = (
+        relation_types_path.resolve().parent.parent
+        if relation_types_path is not None
+        else rules_path.resolve().parent.parent
+        if rules_path is not None
+        else None
+    )
+    loaded: dict[str, tuple[dict[str, Any], list[dict[str, Any]], Path]] = {}
+    for name in ("assertion_index", "slot_states"):
+        artifact_path = _resolve_relative_ref(
+            refs[name], path=snapshot_path, history_base=history_base
+        )
+        artifact_manifest, rows = read_index_with_manifest(artifact_path)
+        if artifact_manifest is None:
+            raise QuestionStateError(
+                f"{snapshot_path}: relation artifact {name} has no build manifest"
+            )
+        _validate_manifest_shape(artifact_manifest, f"relation artifact {name}")
+        expected_hash = hashlib.sha256(canonical_json(rows).encode("utf-8")).hexdigest()
+        if (
+            refs[name]["row_count"] != len(rows)
+            or refs[name]["sha256"] != expected_hash
+        ):
+            raise QuestionStateError(
+                f"{snapshot_path}: relation artifact {name} rows do not match its bound ref"
+            )
+        loaded[name] = (artifact_manifest, rows, artifact_path)
+
+    assertion_manifest, assertions, _ = loaded["assertion_index"]
+    slot_manifest, states, _ = loaded["slot_states"]
+    _require_same_build(
+        assertion_manifest,
+        slot_manifest,
+        rules_path,
+        adapters_path,
+        assertion_rows=assertions,
+        slot_rows=states,
+        relation_types_path=relation_types_path,
+        extra_registry_paths=extra_registry_paths,
+    )
+    comparable_keys = (
+        "build_id",
+        "data_hash",
+        "assertion_data_hash",
+        "slot_data_hash",
+        "assertion_count",
+        "slot_count",
+        "as_of",
+        "modality",
+        "projection_query_hash",
+        "contracts",
+        "registries",
+        "contract_compatibility",
+    )
+    for key in comparable_keys:
+        if assertion_manifest.get(key) != manifest.get(key):
+            raise QuestionStateError(
+                f"{snapshot_path}: snapshot relation artifact binding disagrees on {key}"
+            )
+        if slot_manifest.get(key) != manifest.get(key):
+            raise QuestionStateError(
+                f"{snapshot_path}: snapshot relation artifact binding disagrees on {key}"
+            )
+    return assertions, states, assertion_manifest
+
+
+def _assert_replayed_snapshot_matches(
+    snapshot_path: Path,
+    stored_rows: list[dict[str, Any]],
+    replayed_rows: list[dict[str, Any]],
+) -> None:
+    """Compare the semantic output of the reducer with a stored snapshot."""
+    stored_by_id = {row.get("question_id"): row for row in stored_rows}
+    replayed_by_id = {row.get("question_id"): row for row in replayed_rows}
+    if set(stored_by_id) != set(replayed_by_id):
+        raise QuestionStateError(
+            f"{snapshot_path}: snapshot question set does not match reducer replay"
+        )
+    fields = (
+        "question_id",
+        "dedupe_fingerprint",
+        "target_identity_hash",
+        "target",
+        "rule_id",
+        "rule_version",
+        "question_class",
+        "workflow_status",
+        "resolution_status",
+        "transition_cause_assertion_ids",
+    )
+    for question_id, stored in stored_by_id.items():
+        replayed = replayed_by_id[question_id]
+        for field in fields:
+            if stored.get(field) != replayed.get(field):
+                raise QuestionStateError(
+                    f"{snapshot_path}: snapshot question {question_id!r} field {field!r} "
+                    "does not match reducer replay"
+                )
 
 
 def _require_query_matches_manifest(
@@ -323,6 +563,7 @@ class PriorQuestionState:
         sources: list[str] | None = None,
         known_questions: Iterable[str] | None = None,
         metadata: dict[str, Any] | None = None,
+        records: dict[str, dict[str, Any]] | None = None,
         _validated: bool = False,
     ) -> None:
         if (statuses or transitions) and not _validated:
@@ -335,6 +576,10 @@ class PriorQuestionState:
         self.sources: list[str] = list(sources or [])
         self._known_questions: set[str] = set(known_questions or self._statuses)
         self.metadata: dict[str, Any] = dict(metadata or {})
+        # Full validated question rows are retained for cross-build identity
+        # and transition checks; status-only compatibility callers continue to
+        # work through _statuses/_known_questions.
+        self._records: dict[str, dict[str, Any]] = dict(records or {})
 
     @property
     def empty(self) -> bool:
@@ -355,6 +600,8 @@ class PriorQuestionState:
         expected_as_of: str | None | object,
         expected_modality: str | None | object,
         kind: str,
+        expected_parent_snapshot_hash: str | None = None,
+        current_contract_compatibility: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         if manifest is None:
             raise QuestionStateError(
@@ -365,6 +612,75 @@ class PriorQuestionState:
                 f"{path}: previous {kind} must be checked against the current build manifest"
             )
         _validate_manifest_shape(manifest, f"previous {kind}")
+        # Snapshot lineage is part of the trusted input, not decorative
+        # metadata.  A question snapshot is portable, but whenever its parent
+        # is present the parent reference/hash pair must remain internally
+        # consistent.  The actual parent file is verified below when it is
+        # available beside the snapshot.
+        current_build_id = manifest.get("current_build_id")
+        if kind == "snapshot":
+            if not isinstance(current_build_id, str) or not re.fullmatch(
+                r"[0-9A-F]{24}", current_build_id
+            ):
+                raise QuestionStateError(
+                    f"{path}: previous snapshot current_build_id is missing or malformed"
+                )
+            if current_build_id != manifest.get("build_id"):
+                raise QuestionStateError(
+                    f"{path}: previous snapshot current_build_id does not match build_id"
+                )
+        parent_hash = manifest.get("parent_snapshot_hash")
+        previous_build_id = manifest.get("previous_build_id")
+        if parent_hash is not None and not _SHA256_RE.fullmatch(str(parent_hash)):
+            raise QuestionStateError(
+                f"{path}: previous {kind} parent_snapshot_hash is malformed"
+            )
+        if previous_build_id is not None and parent_hash is None:
+            raise QuestionStateError(
+                f"{path}: previous {kind} previous_build_id requires parent_snapshot_hash"
+            )
+        parent_rows_hash = manifest.get("parent_snapshot_questions_data_hash")
+        if parent_rows_hash is not None and not _SHA256_RE.fullmatch(str(parent_rows_hash)):
+            raise QuestionStateError(
+                f"{path}: previous {kind} parent snapshot rows hash is malformed"
+            )
+        prior_state = manifest.get("prior_state")
+        parent_ref = prior_state.get("snapshot") if isinstance(prior_state, dict) else None
+        if parent_hash is None:
+            if previous_build_id is not None or parent_rows_hash is not None or parent_ref is not None:
+                raise QuestionStateError(
+                    f"{path}: previous {kind} has parent lineage fields without a parent snapshot"
+                )
+        else:
+            if previous_build_id is None or parent_rows_hash is None:
+                raise QuestionStateError(
+                    f"{path}: previous {kind} parent_snapshot_hash requires previous_build_id "
+                    "and parent_snapshot_questions_data_hash"
+                )
+            if not isinstance(parent_ref, dict) or set(parent_ref) != {"path", "sha256"}:
+                raise QuestionStateError(
+                    f"{path}: previous {kind} prior_state.snapshot must be a content reference"
+                )
+            ref_path = parent_ref.get("path")
+            ref_hash = parent_ref.get("sha256")
+            if (
+                not isinstance(ref_path, str)
+                or not ref_path
+                or Path(ref_path).is_absolute()
+                or ".." in Path(ref_path).parts
+                or not isinstance(ref_hash, str)
+                or not _SHA256_RE.fullmatch(ref_hash)
+                or ref_hash != parent_hash
+            ):
+                raise QuestionStateError(
+                    f"{path}: previous {kind} parent snapshot reference does not match "
+                    "parent_snapshot_hash"
+                )
+        if expected_parent_snapshot_hash is not None:
+            if manifest.get("parent_snapshot_hash") != expected_parent_snapshot_hash:
+                raise QuestionStateError(
+                    f"{path}: previous {kind} parent_snapshot_hash does not match expected history"
+                )
         history_base = (
             relation_types_path.resolve().parent.parent
             if relation_types_path is not None
@@ -372,6 +688,58 @@ class PriorQuestionState:
             if rules_path is not None
             else None
         )
+        if parent_hash is not None and isinstance(parent_ref, dict):
+            # Resolve a relative parent reference against the common projection
+            # root first (the normal CLI layout), then the snapshot's parents.
+            # If an artifact was copied without its parent, metadata validation
+            # above still protects the chain; when the parent is present, verify
+            # the recorded file hash and its row hash as well.
+            candidate_paths: list[Path] = []
+            for base in (
+                history_base,
+                path.resolve().parent.parent,
+                path.resolve().parent,
+            ):
+                if base is None:
+                    continue
+                candidate = base / parent_ref["path"]
+                if candidate not in candidate_paths:
+                    candidate_paths.append(candidate)
+            existing_parent = next(
+                (candidate for candidate in candidate_paths if candidate.is_file()), None
+            )
+            if existing_parent is None:
+                raise QuestionStateError(
+                    f"{path}: previous {kind} parent snapshot file is unavailable; "
+                    "history cannot be verified"
+                )
+            if _file_hash(existing_parent) != parent_hash:
+                raise QuestionStateError(
+                    f"{path}: previous {kind} parent snapshot file hash does not match"
+                )
+            parent_manifest, parent_rows = read_index_with_manifest(existing_parent)
+            if (
+                parent_manifest is None
+                or parent_manifest.get("questions_data_hash") != parent_rows_hash
+            ):
+                raise QuestionStateError(
+                    f"{path}: previous {kind} parent snapshot rows hash does not match"
+                )
+            if kind == "snapshot" and parent_manifest.get("current_build_id") != previous_build_id:
+                raise QuestionStateError(
+                    f"{path}: previous snapshot previous_build_id does not match its parent snapshot"
+                )
+            if kind == "snapshot":
+                parent_as_of = parent_manifest.get("as_of")
+                current_as_of = manifest.get("as_of")
+                if (
+                    isinstance(parent_as_of, str)
+                    and isinstance(current_as_of, str)
+                    and parse_iso_datetime(parent_as_of) > parse_iso_datetime(current_as_of)
+                ):
+                    raise QuestionStateError(
+                        f"{path}: previous snapshot as_of is later than its child snapshot"
+                    )
         extra_registry_paths = tuple(extra_registry_paths)
         expected_registries = sorted(
             (
@@ -403,22 +771,68 @@ class PriorQuestionState:
                     f"{path}: previous {kind} registry manifest does not match the "
                     "validated reference registry"
                 )
+        same_relation_build = (
+            expected_manifest is not None
+            and manifest.get("build_id") == expected_manifest.get("build_id")
+            and manifest.get("projection_query_hash")
+            == expected_manifest.get("projection_query_hash")
+        )
         if expected_as_of is not _UNSET:
             expected_time = (
                 parse_iso_datetime(expected_as_of)
                 if expected_as_of is not None
                 else None
             )
-            if manifest.get("as_of") != expected_time:
+            previous_time = manifest.get("as_of")
+            if same_relation_build:
+                if previous_time != expected_time:
+                    raise QuestionStateError(
+                        f"{path}: previous {kind} as_of does not match the requested query"
+                    )
+            elif expected_time is None or previous_time is None:
+                # Temporal history is only comparable when both builds have an
+                # explicit query boundary.  None is never interpreted as now.
                 raise QuestionStateError(
-                    f"{path}: previous {kind} as_of does not match the requested query"
+                    f"{path}: cross-build temporal history requires explicit as_of on both builds"
+                )
+            elif parse_iso_datetime(previous_time) > expected_time:
+                raise QuestionStateError(
+                    f"{path}: previous {kind} as_of is later than the current query"
                 )
         if expected_modality is not _UNSET:
             if manifest.get("modality") != expected_modality:
                 raise QuestionStateError(
                     f"{path}: previous {kind} modality does not match the requested query"
                 )
-        if expected_manifest is not None:
+        computed_current_compatibility: dict[str, Any] | None = None
+        if rules_path is not None and adapters_path is not None and relation_types_path is not None:
+            try:
+                computed_current_compatibility = reducer_contract_compatibility(
+                    load_yaml(relation_types_path),
+                    load_yaml(adapters_path),
+                    load_yaml(rules_path),
+                )
+            except (OSError, RelationIndexError) as exc:
+                raise QuestionStateError(
+                    f"{path}: current reducer contract compatibility cannot be computed"
+                ) from exc
+            if manifest.get("contract_compatibility") != computed_current_compatibility:
+                raise QuestionStateError(
+                    f"{path}: previous {kind} reducer contract compatibility is stale or forged"
+                )
+            if (
+                expected_manifest is not None
+                and expected_manifest.get("contract_compatibility")
+                != computed_current_compatibility
+            ):
+                raise QuestionStateError(
+                    f"{path}: current relation build reducer contract compatibility is stale or forged"
+                )
+        elif current_contract_compatibility is not None:
+            computed_current_compatibility = current_contract_compatibility
+        if expected_manifest is not None and same_relation_build:
+            # A same-build replay is still strict: the snapshot must describe
+            # the exact projection it was generated from.
             for key in (
                 "build_id",
                 "data_hash",
@@ -428,16 +842,41 @@ class PriorQuestionState:
                 "slot_count",
                 "as_of",
                 "modality",
+                "projection_query_hash",
                 "contracts",
                 "registries",
+                "contract_compatibility",
             ):
                 if manifest.get(key) != expected_manifest.get(key):
                     raise QuestionStateError(
                         f"{path}: previous {kind} belongs to a different relation build ({key})"
                     )
+        elif expected_manifest is not None:
+            # A legitimate historical snapshot is allowed to come from a
+            # different data build.  Bind its lineage and reducer contract,
+            # rather than comparing data hashes that are expected to change.
+            if manifest.get("current_build_id") not in (None, manifest.get("build_id")):
+                raise QuestionStateError(
+                    f"{path}: previous {kind} current_build_id does not match its relation build"
+                )
+            previous_compatibility = manifest.get("contract_compatibility")
+            if not isinstance(previous_compatibility, dict) or not isinstance(
+                computed_current_compatibility, dict
+            ):
+                raise QuestionStateError(
+                    f"{path}: cross-build {kind} is missing reducer contract compatibility"
+                )
+            if previous_compatibility != computed_current_compatibility:
+                raise QuestionStateError(
+                    f"{path}: cross-build {kind} reducer contract is incompatible"
+                )
 
         def verify(name: str, candidate: Path | None) -> None:
-            if candidate is not None and manifest["contracts"][name]["sha256"] != _file_hash(candidate):
+            if (
+                candidate is not None
+                and same_relation_build
+                and manifest["contracts"][name]["sha256"] != _file_hash(candidate)
+            ):
                 raise QuestionStateError(f"{path}: previous {kind} contract {name} hash is stale")
 
         verify("question_generation_rules.yaml", rules_path)
@@ -458,6 +897,10 @@ class PriorQuestionState:
         registry: dict[str, dict[str, Any]] | None = None,
         expected_as_of: str | None | object = _UNSET,
         expected_modality: str | None | object = _UNSET,
+        expected_parent_snapshot_hash: str | None = None,
+        current_contract_compatibility: dict[str, Any] | None = None,
+        current_assertions: list[dict[str, Any]] | None = None,
+        _replay_stack: tuple[str, ...] = (),
     ) -> "PriorQuestionState":
         """A previous generated-questions projection (question_id -> status).
 
@@ -465,6 +908,13 @@ class PriorQuestionState:
         snapshot must be a real generated projection with a manifest, matching
         build/query/contract hashes, and complete target identities.
         """
+        extra_registry_paths = tuple(extra_registry_paths)
+        resolved_snapshot = path.resolve()
+        if str(resolved_snapshot) in _replay_stack:
+            raise QuestionStateError(
+                f"{path}: snapshot parent lineage contains a cycle"
+            )
+        replay_stack = (*_replay_stack, str(resolved_snapshot))
         manifest, rows = read_index_with_manifest(path)
         manifest = cls._validate_history_manifest(
             manifest,
@@ -478,6 +928,8 @@ class PriorQuestionState:
             expected_as_of=expected_as_of,
             expected_modality=expected_modality,
             kind="snapshot",
+            expected_parent_snapshot_hash=expected_parent_snapshot_hash,
+            current_contract_compatibility=current_contract_compatibility,
         )
         if manifest.get("snapshot_schema_version") != "question_state_snapshot_v1":
             raise QuestionStateError(f"{path}: snapshot_schema_version is missing or unsupported")
@@ -485,16 +937,146 @@ class PriorQuestionState:
             raise QuestionStateError(
                 f"{path}: previous snapshot validation requires the current reference registry"
             )
+        if not isinstance(manifest.get("as_of"), str):
+            raise QuestionStateError(
+                f"{path}: previous snapshot replay requires an explicit as_of"
+            )
         if manifest.get("question_count") != len(rows):
             raise QuestionStateError(f"{path}: question_count does not match snapshot rows")
+        # A relation build can keep the same data-derived build_id while its
+        # temporal projection changes (for example T1 -> T2).  Such a snapshot
+        # is still a different historical projection and must receive the
+        # cross-build identity/lineage checks below.
+        cross_build = (
+            expected_manifest is not None
+            and (
+                manifest.get("build_id") != expected_manifest.get("build_id")
+                or manifest.get("projection_query_hash")
+                != expected_manifest.get("projection_query_hash")
+            )
+        )
         expected_rows_hash = hashlib.sha256(canonical_json(rows).encode("utf-8")).hexdigest()
         if manifest.get("questions_data_hash") != expected_rows_hash:
             raise QuestionStateError(f"{path}: snapshot rows do not match questions_data_hash")
+        snapshot_content_hash = manifest.get("snapshot_content_hash")
+        if snapshot_content_hash is not None and snapshot_content_hash != expected_rows_hash:
+            raise QuestionStateError(
+                f"{path}: snapshot_content_hash does not match snapshot rows"
+            )
+        if cross_build and snapshot_content_hash is None:
+            raise QuestionStateError(
+                f"{path}: cross-build snapshot needs snapshot_content_hash"
+            )
         allowed = {"open", "partial", "blocked", "satisfied", "reopened", "conflicted"}
         statuses: dict[str, str] = {}
+        records: dict[str, dict[str, Any]] = {}
         known: set[str] = set()
         fingerprints: set[str] = set()
-        relation_contract = load_yaml(relation_types_path or DEFAULT_ADAPTERS.parent / "relation_types.yaml")
+        relation_contract = load_yaml(
+            relation_types_path or DEFAULT_ADAPTERS.parent / "relation_types.yaml"
+        )
+        current_assertions_by_id: dict[str, dict[str, Any]] | None = None
+        if current_assertions is not None:
+            current_assertions_by_id = {}
+            for assertion in current_assertions:
+                if not isinstance(assertion, dict):
+                    raise QuestionStateError(
+                        f"{path}: current assertion index contains a non-object row"
+                    )
+                assertion_id = assertion.get("assertion_id")
+                if not isinstance(assertion_id, str) or not assertion_id:
+                    raise QuestionStateError(
+                        f"{path}: current assertion index contains an assertion without an ID"
+                    )
+                if assertion_id in current_assertions_by_id:
+                    raise QuestionStateError(
+                        f"{path}: current assertion index contains duplicate assertion ID "
+                        f"{assertion_id!r}"
+                    )
+                current_assertions_by_id[assertion_id] = assertion
+        rule_map: dict[str, dict[str, Any]] = {}
+        if rules_path is not None and rules_path.is_file():
+            rule_map = {
+                rule.get("rule_id"): rule
+                for rule in (load_yaml(rules_path).get("rules") or [])
+                if rule.get("rule_id")
+            }
+
+        # The stored question rows are not trusted as evidence of their own
+        # resolution.  Re-load the exact relation artifacts named by this
+        # snapshot and replay the reducer against them before accepting the
+        # predecessor state.
+        replay_assertions, replay_states, replay_relation_manifest = (
+            _validate_relation_artifacts(
+                manifest,
+                snapshot_path=path,
+                rules_path=rules_path,
+                adapters_path=adapters_path,
+                relation_types_path=relation_types_path,
+                extra_registry_paths=extra_registry_paths,
+            )
+        )
+        replay_prior: PriorQuestionState | None = None
+        prior_state_manifest = manifest.get("prior_state")
+        prior_snapshot_ref = (
+            prior_state_manifest.get("snapshot")
+            if isinstance(prior_state_manifest, dict)
+            else None
+        )
+        if prior_snapshot_ref is not None:
+            history_base = (
+                relation_types_path.resolve().parent.parent
+                if relation_types_path is not None
+                else rules_path.resolve().parent.parent
+                if rules_path is not None
+                else None
+            )
+            parent_path = _resolve_relative_ref(
+                prior_snapshot_ref, path=path, history_base=history_base
+            )
+            parent_manifest, _parent_rows = read_index_with_manifest(parent_path)
+            if parent_manifest is None:
+                raise QuestionStateError(
+                    f"{path}: parent snapshot has no build manifest"
+                )
+            parent_assertions, _parent_states, parent_relation_manifest = (
+                _validate_relation_artifacts(
+                    parent_manifest,
+                    snapshot_path=parent_path,
+                    rules_path=rules_path,
+                    adapters_path=adapters_path,
+                    relation_types_path=relation_types_path,
+                    extra_registry_paths=extra_registry_paths,
+                )
+            )
+            replay_prior = cls.from_snapshot(
+                parent_path,
+                expected_manifest=parent_relation_manifest,
+                rules_path=rules_path,
+                adapters_path=adapters_path,
+                relation_types_path=relation_types_path,
+                extra_registry_paths=extra_registry_paths,
+                registry=registry,
+                expected_as_of=parent_manifest.get("as_of"),
+                expected_modality=parent_manifest.get("modality"),
+                current_contract_compatibility=parent_manifest.get(
+                    "contract_compatibility"
+                ),
+                current_assertions=parent_assertions,
+                _replay_stack=replay_stack,
+            )
+        replayed_questions, _replay_deferred = generate_diagnostic_questions(
+            replay_assertions,
+            replay_states,
+            load_yaml(rules_path),
+            load_yaml(adapters_path),
+            relation_contract=load_yaml(relation_types_path),
+            registry=registry,
+            prior_state=replay_prior,
+            return_deferred=True,
+            as_of=manifest["as_of"],
+        )
+        _assert_replayed_snapshot_matches(path, rows, replayed_questions)
         for index, row in enumerate(rows, start=1):
             required = {"question_id", "target", "dedupe_fingerprint", "resolution_status"}
             if not required <= set(row):
@@ -506,64 +1088,110 @@ class PriorQuestionState:
             target = row["target"]
             if not isinstance(target, dict):
                 raise QuestionStateError(f"{path}:{index}: question target must be an object")
-            for field in ("slot_id", "relation_type", "subject_ref", "object_ref", "route_profile_id", "product_ref", "service_kind"):
+            for field in ("slot_id", "relation_type", "subject_ref", "object_ref"):
                 if not target.get(field):
                     raise QuestionStateError(f"{path}:{index}: target is missing {field}")
-            if target["relation_type"] != "company_serves_route" or target["service_kind"] not in SERVICE_KIND_ENUM:
-                raise QuestionStateError(f"{path}:{index}: target relation/service identity is invalid")
-            if not target["subject_ref"].startswith("company:"):
+            relation_type = target["relation_type"]
+            if relation_type == "company_serves_route":
+                for field in ("route_profile_id", "product_ref", "service_kind"):
+                    if not target.get(field):
+                        raise QuestionStateError(f"{path}:{index}: target is missing {field}")
+                if target["service_kind"] not in SERVICE_KIND_ENUM:
+                    raise QuestionStateError(
+                        f"{path}:{index}: target relation/service identity is invalid"
+                    )
+                if not target["subject_ref"].startswith("company:"):
+                    raise QuestionStateError(
+                        f"{path}:{index}: target subject must use canonical company:<name> identity"
+                    )
+                if target["object_ref"] != f"route_profile:{target['route_profile_id']}":
+                    raise QuestionStateError(
+                        f"{path}:{index}: target object_ref and route_profile_id disagree"
+                    )
+                if not target["product_ref"].startswith("product:"):
+                    raise QuestionStateError(
+                        f"{path}:{index}: target product_ref must use product:<id> identity"
+                    )
+                product = registry.get(target["product_ref"])
+                if (
+                    not product
+                    or product.get("kind") != "product"
+                    or product.get("company") != target["subject_ref"]
+                    or not product.get("registry_id")
+                    or product.get("registry_id")
+                    not in set(getattr(registry, "bound_registry_ids", set()))
+                ):
+                    raise QuestionStateError(
+                        f"{path}:{index}: target product is not present in the "
+                        "validated current product registry"
+                    )
+                expected_identity_scope = {
+                    "route_profile_id": target["route_profile_id"],
+                    "product_ref": target["product_ref"],
+                    "service_kind": target["service_kind"],
+                }
+                expected_fp = {
+                    "target_relation_type": "company_serves_route",
+                    "subject_ref": target["subject_ref"],
+                    "route_profile_id": target["route_profile_id"],
+                    "product_ref": target["product_ref"],
+                    "service_kind": target["service_kind"],
+                }
+                identity_scope = expected_identity_scope
+                identity_scope_input = {
+                    "route_profile_id": target["route_profile_id"],
+                    "product_ref": target["product_ref"],
+                    "service_kind": target["service_kind"],
+                }
+            elif relation_type == "product_has_lifecycle_stage":
+                for field in (
+                    "program_id",
+                    "primary_subject_id",
+                    "lifecycle_stage",
+                ):
+                    if not target.get(field):
+                        raise QuestionStateError(f"{path}:{index}: lifecycle target is missing {field}")
+                if target["object_ref"] != f"lifecycle_stage:{target['lifecycle_stage']}":
+                    raise QuestionStateError(
+                        f"{path}:{index}: lifecycle object_ref and lifecycle_stage disagree"
+                    )
+                expected_identity_scope = {
+                    "program_id": target["program_id"],
+                    "primary_subject_id": target["primary_subject_id"],
+                    "lifecycle_stage": target["lifecycle_stage"],
+                }
+                expected_fp = {
+                    "target_relation_type": "product_has_lifecycle_stage",
+                    "subject_ref": target["subject_ref"],
+                    "program_id": target["program_id"],
+                    "object_ref": target["object_ref"],
+                }
+                identity_scope = expected_identity_scope
+                identity_scope_input = {
+                    "program_id": target["program_id"],
+                    "primary_subject_id": target["primary_subject_id"],
+                    "lifecycle_stage": target["lifecycle_stage"],
+                }
+            else:
                 raise QuestionStateError(
-                    f"{path}:{index}: target subject must use canonical company:<name> identity"
+                    f"{path}:{index}: unsupported snapshot target relation {relation_type!r}"
                 )
-            if target["object_ref"] != f"route_profile:{target['route_profile_id']}":
-                raise QuestionStateError(
-                    f"{path}:{index}: target object_ref and route_profile_id disagree"
-                )
-            if not target["product_ref"].startswith("product:"):
-                raise QuestionStateError(
-                    f"{path}:{index}: target product_ref must use product:<id> identity"
-                )
-            product = registry.get(target["product_ref"])
-            if (
-                not product
-                or product.get("kind") != "product"
-                or product.get("company") != target["subject_ref"]
-                or not product.get("registry_id")
-                or product.get("registry_id") not in set(
-                    getattr(registry, "bound_registry_ids", set())
-                )
-            ):
-                raise QuestionStateError(
-                    f"{path}:{index}: target product is not present in the "
-                    "validated current product registry"
-                )
-            target_identity_scope = target.get("identity_scope")
-            expected_identity_scope = {
-                "route_profile_id": target["route_profile_id"],
-                "product_ref": target["product_ref"],
-                "service_kind": target["service_kind"],
-            }
-            if target_identity_scope != expected_identity_scope:
+            if target.get("identity_scope") != identity_scope:
                 raise QuestionStateError(
                     f"{path}:{index}: target identity_scope is incomplete or inconsistent"
                 )
             identity = relation_slot_identity(
-                "company_serves_route",
+                relation_type,
                 target["subject_ref"],
                 target["object_ref"],
-                {
-                    "route_profile_id": target["route_profile_id"],
-                    "product_ref": target["product_ref"],
-                    "service_kind": target["service_kind"],
-                },
+                identity_scope_input,
                 relation_contract,
             )
             if target["slot_id"] != stable_id("RS", identity):
-                raise QuestionStateError(f"{path}:{index}: target slot_id is not identity-derived")
-            if question_id in known:
-                raise QuestionStateError(f"{path}:{index}: duplicate question_id")
-            known.add(question_id)
-            statuses[question_id] = status
+                raise QuestionStateError(
+                    f"{path}:{index}: target slot_id is not identity-derived"
+                )
+
             fingerprint = row["dedupe_fingerprint"]
             if not isinstance(fingerprint, str) or not fingerprint:
                 raise QuestionStateError(f"{path}:{index}: empty dedupe_fingerprint")
@@ -578,13 +1206,7 @@ class PriorQuestionState:
                 ) from exc
             if not isinstance(fingerprint_value, dict) or any(
                 fingerprint_value.get(field) != expected
-                for field, expected in (
-                    ("target_relation_type", "company_serves_route"),
-                    ("subject_ref", target["subject_ref"]),
-                    ("route_profile_id", target["route_profile_id"]),
-                    ("product_ref", target["product_ref"]),
-                    ("service_kind", target["service_kind"]),
-                )
+                for field, expected in expected_fp.items()
             ):
                 raise QuestionStateError(
                     f"{path}:{index}: dedupe_fingerprint does not bind the target identity"
@@ -594,12 +1216,98 @@ class PriorQuestionState:
                 raise QuestionStateError(
                     f"{path}:{index}: question_id is not derived from dedupe_fingerprint"
                 )
+            if question_id in known:
+                raise QuestionStateError(f"{path}:{index}: duplicate question_id")
+            known.add(question_id)
+            statuses[question_id] = status
             statuses[fingerprint] = status
+
+            current_target_hash = target_identity_hash(target)
+            if row.get("target_identity_hash") is not None and row["target_identity_hash"] != current_target_hash:
+                raise QuestionStateError(
+                    f"{path}:{index}: target_identity_hash does not bind the target"
+                )
+            if cross_build and not row.get("target_identity_hash"):
+                raise QuestionStateError(
+                    f"{path}:{index}: cross-build snapshot needs target_identity_hash"
+                )
+            rule_id = row.get("rule_id") or (row.get("generated_by") or {}).get("rule_id")
+            rule_version = row.get("rule_version")
+            if cross_build:
+                if not isinstance(rule_id, str) or not rule_id or rule_version is None:
+                    raise QuestionStateError(
+                        f"{path}:{index}: cross-build snapshot needs rule_id and rule_version"
+                    )
+                current_rule = rule_map.get(rule_id)
+                if current_rule is None or current_rule.get("rule_version") != rule_version:
+                    raise QuestionStateError(
+                        f"{path}:{index}: question rule version is incompatible across builds"
+                    )
+            causes = row.get("transition_cause_assertion_ids", [])
+            if not isinstance(causes, list) or any(
+                not isinstance(value, str) or not value for value in causes
+            ):
+                raise QuestionStateError(
+                    f"{path}:{index}: transition_cause_assertion_ids must be a list of IDs"
+                )
+            if cross_build and "transition_cause_assertion_ids" not in row:
+                raise QuestionStateError(
+                    f"{path}:{index}: cross-build snapshot needs transition cause assertion IDs"
+                )
+            if current_assertions_by_id is not None:
+                for cause_id in causes:
+                    cause = current_assertions_by_id.get(cause_id)
+                    if cause is None:
+                        raise QuestionStateError(
+                            f"{path}:{index}: transition cause assertion {cause_id!r} "
+                            "is not present in the current assertion index"
+                        )
+                    previous_as_of = manifest.get("as_of")
+                    if not isinstance(previous_as_of, str) or not is_active_at_as_of(
+                        cause, previous_as_of
+                    ):
+                        raise QuestionStateError(
+                            f"{path}:{index}: transition cause assertion {cause_id!r} "
+                            "was not effective at the previous snapshot as_of"
+                        )
+                    previous_modality = manifest.get("modality")
+                    if previous_modality is not None and cause.get("modality") != previous_modality:
+                        raise QuestionStateError(
+                            f"{path}:{index}: transition cause assertion {cause_id!r} "
+                            "does not match the previous snapshot modality"
+                        )
+                    # An assertion from another relation, slot, or exact target
+                    # is not a valid explanation for this question's transition.
+                    # Checking both slot_id and the endpoints prevents a stale
+                    # or hand-edited slot identifier from laundering an unrelated
+                    # assertion into the history chain.
+                    if any(
+                        (
+                            cause.get("slot_id") != target["slot_id"],
+                            cause.get("relation_type") != relation_type,
+                            cause.get("subject_ref") != target["subject_ref"],
+                            cause.get("object_ref") != target["object_ref"],
+                        )
+                    ):
+                        raise QuestionStateError(
+                            f"{path}:{index}: transition cause assertion {cause_id!r} "
+                            "does not belong to the question target slot"
+                        )
+            records[question_id] = {
+                "question_id": question_id,
+                "fingerprint": fingerprint,
+                "status": status,
+                "target_identity_hash": current_target_hash,
+                "rule_id": rule_id,
+                "rule_version": rule_version,
+                "transition_cause_assertion_ids": list(causes),
+            }
         return cls(
             statuses=statuses,
             known_questions=known | set(statuses),
             sources=[f"snapshot:{path.name}"],
             metadata=manifest,
+            records=records,
             _validated=True,
         )
 
@@ -616,6 +1324,9 @@ class PriorQuestionState:
         registry: dict[str, dict[str, Any]] | None = None,
         expected_as_of: str | None | object = _UNSET,
         expected_modality: str | None | object = _UNSET,
+        expected_parent_snapshot_hash: str | None = None,
+        current_contract_compatibility: dict[str, Any] | None = None,
+        current_assertions: list[dict[str, Any]] | None = None,
     ) -> "PriorQuestionState":
         """An append-only question state event log.
 
@@ -637,6 +1348,8 @@ class PriorQuestionState:
             expected_as_of=expected_as_of,
             expected_modality=expected_modality,
             kind="state event log",
+            expected_parent_snapshot_hash=expected_parent_snapshot_hash,
+            current_contract_compatibility=current_contract_compatibility,
         )
         if manifest.get("state_event_schema_version") != "question_state_events_v1":
             raise QuestionStateError(f"{path}: state_event_schema_version is missing or unsupported")
@@ -721,6 +1434,12 @@ class PriorQuestionState:
     def has_question(self, question_id: str, fingerprint: str | None = None) -> bool:
         return question_id in self._known_questions or bool(
             fingerprint and fingerprint in self._known_questions
+        )
+
+    def status_for(self, question_id: str, fingerprint: str | None = None) -> str | None:
+        """Return the validated predecessor status for transition recording."""
+        return self._statuses.get(question_id) or (
+            self._statuses.get(fingerprint) if fingerprint else None
         )
 
     def was_satisfied(self, question_id: str, fingerprint: str | None = None) -> bool:
@@ -935,6 +1654,203 @@ def candidate_product_refs(registry: dict[str, dict[str, Any]], subject_ref: str
 
 
 # ---------------------------------------------------------------------------
+# Capability overlap leads (the route-service rule is deliberately lead-only)
+# ---------------------------------------------------------------------------
+def _profile_required_cells(
+    profile: dict[str, Any],
+    assertions: list[dict[str, Any]],
+) -> set[str]:
+    """Return the exact cells declared by a frozen profile.
+
+    This is a reporting surface only.  It deliberately does not turn a cell
+    intersection into a route-capability assertion or a company-serves-route
+    assertion.  Keeping this helper separate from ``evaluate_coverage`` makes
+    that boundary visible to callers and to the production CLI.
+    """
+    declared = {
+        cell
+        for group in profile.get("requirement_groups") or []
+        for cell in group.get("capability_cell_ids") or []
+    }
+    if declared:
+        return declared
+    # UNKNOWN profiles have no exact requirement semantics and therefore have
+    # no honest unmatched-cell denominator.
+    return set()
+
+
+def _profile_unmatched_cells(
+    profile: dict[str, Any], matched_cells: set[str]
+) -> set[str]:
+    """Return deficits using the profile's declared all_of/one_of semantics.
+
+    A raw union of declared cells is misleading for an alternative group: if
+    C1 satisfies ``one_of(C1, C4)``, C4 is not an outstanding requirement.  The
+    lead reports only cells that still block the frozen profile's declared
+    coverage, while remaining explicitly non-assertive about route service.
+    """
+    unmatched: set[str] = set()
+    for group in profile.get("requirement_groups") or []:
+        cells = set(group.get("capability_cell_ids") or [])
+        kind = group.get("kind")
+        if kind == "all_of":
+            unmatched.update(cells - matched_cells)
+        elif kind == "one_of":
+            if not cells & matched_cells:
+                unmatched.update(cells)
+        else:
+            # The route-profile contract validator rejects unknown group kinds;
+            # keep this conservative for direct API callers.
+            unmatched.update(cells - matched_cells)
+    return unmatched
+
+
+def generate_relation_leads(
+    assertions: list[dict[str, Any]],
+    slot_states: list[dict[str, Any]] | None,
+    rules_contract: dict[str, Any],
+    adapters_contract: dict[str, Any],
+    relation_contract: dict[str, Any] | None = None,
+    *,
+    as_of: str | None = None,
+) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    """Aggregate capability-cell overlaps into observable, non-assertive leads.
+
+    The old route rule used the same overlap as a predicate for a formal
+    ``company_serves_route`` question.  The pilot now exposes the overlap as a
+    lead, retaining actual/planned coverage and the cells still unmatched.  A
+    lead is not a claim that the company has the route capability, and this
+    function never emits a formal route-service question.
+    """
+    if as_of is not None:
+        as_of = parse_iso_datetime(as_of)
+    if relation_contract is None:
+        relation_contract = load_yaml(ROOT / "contracts/relation_types.yaml")
+    profiles = {
+        item["route_profile_id"]: item
+        for item in adapters_contract.get("route_profiles") or []
+        if item.get("route_profile_id")
+    }
+    # State projections are authoritative where supplied.  A direct caller can
+    # still pass no projection, in which case the defensive time filter is
+    # applied below.
+    states_by_id = {row["slot_id"]: row for row in (slot_states or [])}
+    has_projection = slot_states is not None
+    active_by_slot = {
+        slot_id: set(row.get("active_assertion_ids") or [])
+        for slot_id, row in states_by_id.items()
+    }
+    grouped: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    for item in assertions:
+        if (
+            item.get("relation_type") != "capability_matches_route"
+            or item.get("epistemic_status") != "derived_candidate"
+            or item.get("polarity") != "supporting"
+        ):
+            continue
+        profile_id = item.get("scope", {}).get("route_profile_id")
+        if not profile_id or profile_id not in profiles:
+            continue
+        if has_projection:
+            if item["assertion_id"] not in active_by_slot.get(item["slot_id"], set()):
+                continue
+        elif as_of is not None and not is_active_at_as_of(item, as_of):
+            continue
+        grouped[(item["subject_ref"], profile_id)].append(item)
+
+    experimental_rule = next(
+        (
+            rule
+            for rule in rules_contract.get("rules") or []
+            if rule.get("rule_id") == "QGR-CAPABILITY-WITHOUT-EXACT-SERVICE-V1"
+        ),
+        {},
+    )
+    admission_status = experimental_rule.get("admission_status", "not_admitted")
+    rule_status = experimental_rule.get("status", "experimental")
+    if admission_status != "not_admitted" or rule_status != "experimental":
+        raise QuestionStateError(
+            "QGR-CAPABILITY-WITHOUT-EXACT-SERVICE-V1 must remain experimental/not_admitted"
+        )
+
+    leads: list[dict[str, Any]] = []
+    for (subject_ref, profile_id), matches in sorted(grouped.items()):
+        profile = profiles[profile_id]
+        actual_cells = sorted(
+            {
+                item["scope"]["capability_cell_id"]
+                for item in matches
+                if item.get("modality") == "actual"
+            }
+        )
+        planned_cells = sorted(
+            {
+                item["scope"]["capability_cell_id"]
+                for item in matches
+                if item.get("modality") == "planned"
+            }
+        )
+        matched_cells = set(actual_cells) | set(planned_cells)
+        unmatched_cells = sorted(_profile_unmatched_cells(profile, matched_cells))
+        if not actual_cells and planned_cells:
+            coverage_kind = "planned_cell_overlap"
+        elif actual_cells and planned_cells:
+            coverage_kind = "actual_and_planned_cell_overlap"
+        else:
+            coverage_kind = "actual_cell_overlap"
+        # These leads are intentionally deferred even if a future data set
+        # happens to cover every declared cell: the experimental rule is not an
+        # admission gate, and full BOM coverage is not a company question gate.
+        deferred_reason = "experimental_rule_not_admitted"
+        # These are the IDs of the derived match assertions that caused the
+        # lead.  Raw CSV anchors remain available through each assertion's
+        # source_refs in the relation index; they must not be mislabeled as
+        # assertion IDs here.
+        source_assertion_ids = sorted(
+            {item["assertion_id"] for item in matches}
+        )
+        lead = {
+            "lead_id": stable_id(
+                "RL", ["QGR-CAPABILITY-WITHOUT-EXACT-SERVICE-V1", subject_ref, profile_id]
+            ),
+            "output_kind": "relation_lead",
+            "admission_status": admission_status,
+            "subject_ref": subject_ref,
+            "route_profile_id": profile_id,
+            # This names the role represented by the observed edge; it does not
+            # imply that the company is a module maker or route service owner.
+            "actor_role": "capability_holder",
+            "matched_actual_cells": actual_cells,
+            "matched_planned_cells": planned_cells,
+            "unmatched_cells": unmatched_cells,
+            "coverage_kind": coverage_kind,
+            "deferred_reason": deferred_reason,
+            "source_assertion_ids": source_assertion_ids,
+        }
+        leads.append(lead)
+
+    reviewed_assertions = sum(
+        item.get("epistemic_status") == "explicit_reviewed" for item in assertions
+    )
+    # The named funnel is deliberately about route leads.  The five requested
+    # counters are the only canonical vocabulary; a route lead never enters
+    # formal_question_candidates under this experimental rule.
+    funnel = {
+        "rule_id": "QGR-CAPABILITY-WITHOUT-EXACT-SERVICE-V1",
+        "rule_status": rule_status,
+        "admission_status": admission_status,
+        "counts": {
+            "overlap_leads": len(leads),
+            "role_eligible_leads": len(leads),
+            "product_bound_leads": 0,
+            "formal_question_candidates": 0,
+            "reviewed_assertions": reviewed_assertions,
+        },
+    }
+    return leads, funnel
+
+
+# ---------------------------------------------------------------------------
 # resolution
 # ---------------------------------------------------------------------------
 def question_fingerprint(
@@ -948,6 +1864,24 @@ def question_fingerprint(
             "route_profile_id": route_profile_id,
             "product_ref": product_ref,
             "service_kind": service_kind,
+        }
+    )
+
+
+def lifecycle_question_fingerprint(
+    rule_id: str,
+    subject_ref: str,
+    program_id: str,
+    object_ref: str,
+) -> str:
+    """Stable identity for the narrow production lifecycle question."""
+    return canonical_json(
+        {
+            "rule_id": rule_id,
+            "subject_ref": subject_ref,
+            "target_relation_type": "product_has_lifecycle_stage",
+            "program_id": program_id,
+            "object_ref": object_ref,
         }
     )
 
@@ -1031,7 +1965,14 @@ def compute_resolution(
         "independent_support_count": len(origin_groups),
         "target_slot_effective_status": slot_state.get("effective_status"),
         "conflict_pairs": slot_state.get("conflict_pairs") or [],
+        "limiting_assertion_ids": slot_state.get("limiting_assertion_ids") or [],
+        # Keep the revision assertion IDs distinct from the support assertion
+        # IDs they affect.  ``withdrawn_assertion_ids`` names the historical
+        # support target, while ``withdrawal_assertion_ids`` names the newly
+        # observed withdrawal assertion that caused the state transition.
+        "withdrawal_assertion_ids": slot_state.get("withdrawal_assertion_ids") or [],
         "withdrawn_assertion_ids": slot_state.get("withdrawn_assertion_ids") or [],
+        "contradicting_assertion_ids": slot_state.get("contradicting_assertion_ids") or [],
         "target_service_kind": service_kind,
     }
     if slot_state.get("effective_status") == "conflicted":
@@ -1060,6 +2001,32 @@ def compute_resolution(
     return "open", basis
 
 
+def transition_cause_assertion_ids(
+    previous_status: str | None,
+    current_status: str,
+    basis: dict[str, Any],
+) -> list[str]:
+    """Derive transition causes only from reducer evidence, never hand input."""
+    if previous_status is None or previous_status == current_status:
+        return []
+    causes: set[str] = set()
+    if current_status == "satisfied":
+        causes.update(basis.get("qualified_assertion_ids") or [])
+    if current_status in {"reopened", "conflicted", "blocked", "partial"}:
+        # A transition is caused by the new revision/contradiction, not by the
+        # older support row that it withdraws or challenges.  Keep the old IDs
+        # in the state basis for auditability, but expose the new assertion IDs
+        # as the machine-readable cause.
+        causes.update(basis.get("withdrawal_assertion_ids") or [])
+        causes.update(basis.get("contradicting_assertion_ids") or [])
+        if current_status == "partial":
+            causes.update(basis.get("limiting_assertion_ids") or [])
+        for pair in basis.get("conflict_pairs") or []:
+            if isinstance(pair, list):
+                causes.update(value for value in pair if isinstance(value, str))
+    return sorted(causes)
+
+
 def generate_diagnostic_questions(
     assertions: list[dict[str, Any]],
     slot_states: list[dict[str, Any]],
@@ -1069,6 +2036,7 @@ def generate_diagnostic_questions(
     registry: dict[str, dict[str, Any]] | None = None,
     prior_state: PriorQuestionState | None = None,
     return_deferred: bool | None = None,
+    as_of: str | None = None,
 ) -> list[dict[str, Any]] | tuple[list[dict[str, Any]], dict[str, int]]:
     """Return questions, or (questions, deferred_counts) when requested.
 
@@ -1080,6 +2048,8 @@ def generate_diagnostic_questions(
     # with return_deferred=True; passing a relation contract or registry alone
     # must not silently change the return type.
     return_tuple = bool(return_deferred)
+    if as_of is not None:
+        as_of = parse_iso_datetime(as_of)
     if relation_contract is None:
         relation_contract = load_yaml(ROOT / "contracts/relation_types.yaml")
     profiles = {
@@ -1106,7 +2076,177 @@ def generate_diagnostic_questions(
     deferred: dict[str, int] = defaultdict(int)
 
     for rule in rules_contract.get("rules") or []:
-        if rule.get("trigger_relation_type") != "capability_matches_route":
+        trigger_relation_type = rule.get("trigger_relation_type")
+
+        # Narrow production lifecycle pilot.  The target is an exact
+        # program/stage slot from calls; no product registry or synthetic
+        # route target is involved.  We retain the row even when already
+        # satisfied so a later build can prove a real transition.
+        if trigger_relation_type == "product_has_lifecycle_stage":
+            if rule.get("target_relation_type") != "product_has_lifecycle_stage":
+                raise QuestionStateError(
+                    f"{rule.get('rule_id')}: lifecycle rule must target "
+                    "product_has_lifecycle_stage"
+                )
+            allowed_programs = set(rule.get("program_ids") or [])
+            allowed_stages = set(rule.get("lifecycle_stages") or [])
+            lifecycle_targets: dict[str, list[dict[str, Any]]] = defaultdict(list)
+            for item in assertions:
+                if item.get("relation_type") != "product_has_lifecycle_stage":
+                    continue
+                program_id = item.get("scope", {}).get("program_id")
+                stage = item.get("scope", {}).get("lifecycle_stage")
+                if allowed_programs and program_id not in allowed_programs:
+                    continue
+                if allowed_stages and stage not in allowed_stages:
+                    continue
+                # The production adapter puts a dated event in valid_time.  A
+                # caller cannot manufacture this question from an unrelated
+                # relation by merely naming a program: source_encoded or
+                # explicit_reviewed lifecycle evidence is required.
+                if item.get("epistemic_status") not in {"source_encoded", "explicit_reviewed"}:
+                    continue
+                slot_id = item.get("slot_id")
+                if not slot_id:
+                    slot_id = stable_id(
+                        "RS",
+                        relation_slot_identity(
+                            item["relation_type"],
+                            item["subject_ref"],
+                            item["object_ref"],
+                            item.get("scope") or {},
+                            relation_contract,
+                        ),
+                    )
+                lifecycle_targets[slot_id].append(item)
+
+            for slot_id, trigger_items in sorted(lifecycle_targets.items()):
+                representative = sorted(
+                    trigger_items, key=lambda item: item["assertion_id"]
+                )[0]
+                scope = representative.get("scope") or {}
+                program_id = scope.get("program_id")
+                stage = scope.get("lifecycle_stage")
+                if not program_id or not stage:
+                    deferred["unbound_lifecycle_target"] += 1
+                    continue
+                object_ref = representative["object_ref"]
+                target_identity = relation_slot_identity(
+                    "product_has_lifecycle_stage",
+                    representative["subject_ref"],
+                    object_ref,
+                    scope,
+                    relation_contract,
+                )
+                # Make sure the representative's exact target identity agrees
+                # with the slot identity emitted by the production adapter.
+                expected_slot_id = stable_id("RS", target_identity)
+                if slot_id != expected_slot_id:
+                    raise QuestionStateError(
+                        f"{representative['assertion_id']}: lifecycle target slot_id "
+                        "does not match exact program/stage identity"
+                    )
+                fingerprint = lifecycle_question_fingerprint(
+                    rule["rule_id"],
+                    representative["subject_ref"],
+                    program_id,
+                    object_ref,
+                )
+                question_id = stable_id("GQ", fingerprint, length=12)
+                target_assertions = list(assertions_by_slot.get(slot_id) or [])
+                slot_state = states_by_id.get(slot_id)
+                resolution_status, basis = compute_resolution(
+                    target_assertions,
+                    slot_state,
+                    rule["acceptance"],
+                    None,
+                    prior_state,
+                    question_id,
+                    fingerprint,
+                )
+                previous_status = (
+                    prior_state.status_for(question_id, fingerprint)
+                    if prior_state is not None
+                    else None
+                )
+                transition_causes = transition_cause_assertion_ids(
+                    previous_status, resolution_status, basis
+                )
+                question = {
+                    "question_id": question_id,
+                    "rule_id": rule["rule_id"],
+                    "rule_version": rule.get("rule_version"),
+                    "question_class": rule["question_class"],
+                    "question_text": rule["question_template"].format(
+                        as_of=as_of or "as_of",
+                        program_id=program_id,
+                        lifecycle_stage=stage,
+                    ),
+                    "display_parent": rule["display_parent"],
+                    "depends_on": list(rule.get("depends_on") or []),
+                    "generated_by": {
+                        "rule_id": rule["rule_id"],
+                        "rule_version": rule.get("rule_version"),
+                        "reason": rule["generated_by_reason"],
+                    },
+                    "trigger_refs": sorted(
+                        item["assertion_id"] for item in trigger_items
+                    ),
+                    "target": {
+                        "slot_id": slot_id,
+                        "relation_type": "product_has_lifecycle_stage",
+                        "subject_ref": representative["subject_ref"],
+                        "object_ref": object_ref,
+                        "program_id": program_id,
+                        "primary_subject_id": scope.get("primary_subject_id"),
+                        "lifecycle_stage": stage,
+                        "identity_scope": _identity_scope(
+                            relation_contract,
+                            "product_has_lifecycle_stage",
+                            scope,
+                        ),
+                    },
+                    "acceptance": rule["acceptance"],
+                    "reopen_on": list(rule.get("reopen_on") or []),
+                    "workflow_status": rule["initial_workflow_status"],
+                    "resolution_status": resolution_status,
+                    "dedupe_fingerprint": fingerprint,
+                    "target_identity_hash": target_identity_hash(
+                        {
+                            "relation_type": "product_has_lifecycle_stage",
+                            "subject_ref": representative["subject_ref"],
+                            "object_ref": object_ref,
+                            "identity_scope": _identity_scope(
+                                relation_contract,
+                                "product_has_lifecycle_stage",
+                                scope,
+                            ),
+                        }
+                    ),
+                    "previous_resolution_status": previous_status,
+                    "transition_cause_assertion_ids": transition_causes,
+                    "state_basis": basis,
+                    "requirement_groups": [],
+                }
+                if fingerprint in questions and questions[fingerprint] != question:
+                    raise QuestionStateError(
+                        f"non-deterministic duplicate question: {fingerprint}"
+                    )
+                questions[fingerprint] = question
+            continue
+
+        if trigger_relation_type != "capability_matches_route":
+            continue
+        # Frozen route-service rule: it remains an experimental lead rule and
+        # is intentionally not admitted to the formal question stream.
+        if (
+            rule.get("rule_id") == "QGR-CAPABILITY-WITHOUT-EXACT-SERVICE-V1"
+            and (
+                rule.get("status") == "experimental"
+                or rule.get("admission_status") == "not_admitted"
+                or rule.get("output_kind") == "relation_lead"
+            )
+        ):
             continue
         target_relation_type = rule["target_relation_type"]
         binding = rule.get("target_binding") or {}
@@ -1192,11 +2332,19 @@ def generate_diagnostic_questions(
                         question_id,
                         fingerprint,
                     )
+                    previous_status = (
+                        prior_state.status_for(question_id, fingerprint)
+                        if prior_state is not None
+                        else None
+                    )
+                    transition_causes = transition_cause_assertion_ids(
+                        previous_status, resolution_status, basis
+                    )
                     # H. On an initial run, an already satisfied target is not a
                     # missing-relation candidate.  Once a real prior snapshot
                     # knows the question, retain its satisfied row so the next
                     # snapshot can prove the lifecycle instead of deleting it.
-                    if resolution_status == "satisfied" and not (
+                    if resolution_status == "satisfied" and not rule.get("retain_satisfied", False) and not (
                         prior_state is not None
                         and prior_state.has_question(question_id, fingerprint)
                     ):
@@ -1208,6 +2356,8 @@ def generate_diagnostic_questions(
                     }
                     question = {
                         "question_id": question_id,
+                        "rule_id": rule["rule_id"],
+                        "rule_version": rule.get("rule_version"),
                         "question_class": rule["question_class"],
                         "question_text": rule["question_template"].format(
                             company=company,
@@ -1219,6 +2369,7 @@ def generate_diagnostic_questions(
                         "depends_on": list(rule.get("depends_on") or []),
                         "generated_by": {
                             "rule_id": rule["rule_id"],
+                            "rule_version": rule.get("rule_version"),
                             "reason": rule["generated_by_reason"],
                         },
                         "trigger_refs": sorted(item["assertion_id"] for item in trigger_items),
@@ -1236,6 +2387,20 @@ def generate_diagnostic_questions(
                         "workflow_status": rule["initial_workflow_status"],
                         "resolution_status": resolution_status,
                         "dedupe_fingerprint": fingerprint,
+                        "target_identity_hash": target_identity_hash(
+                            {
+                                "relation_type": target_relation_type,
+                                "subject_ref": subject_ref,
+                                "object_ref": object_ref,
+                                "identity_scope": _identity_scope(
+                                    relation_contract,
+                                    target_relation_type,
+                                    scope,
+                                ),
+                            }
+                        ),
+                        "previous_resolution_status": previous_status,
+                        "transition_cause_assertion_ids": transition_causes,
                         "state_basis": basis,
                         "requirement_groups": requirement_groups,
                     }
@@ -1303,6 +2468,11 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    if not args.as_of:
+        raise QuestionStateError(
+            "temporal question recompute requires explicit --as-of; "
+            "as_of=None is not interpreted as current"
+        )
     assertion_manifest, assertions = read_index_with_manifest(args.assertion_index)
     slot_manifest, slot_states = read_index_with_manifest(args.slot_states)
     contracts_dir = (args.contracts_dir or args.rules.resolve().parent).resolve()
@@ -1333,6 +2503,8 @@ def main() -> int:
         registry=registry,
         expected_as_of=as_of,
         expected_modality=args.modality,
+        current_contract_compatibility=manifest.get("contract_compatibility"),
+        current_assertions=assertions,
     )
     questions, deferred = generate_diagnostic_questions(
         assertions,
@@ -1343,9 +2515,32 @@ def main() -> int:
         registry=registry,
         prior_state=prior_state,
         return_deferred=True,
+        as_of=as_of,
     )
     # the projection root (parent of the directory holding the index)
     projection_root = args.assertion_index.resolve().parent.parent
+    question_rows_hash = hashlib.sha256(
+        canonical_json(questions).encode("utf-8")
+    ).hexdigest()
+    previous_manifest = prior_state.metadata if prior_state is not None else None
+    transition_causes = {
+        item["question_id"]: list(item.get("transition_cause_assertion_ids") or [])
+        for item in questions
+        if item.get("transition_cause_assertion_ids")
+    }
+
+    def relation_artifact_ref(
+        path: Path, *, rows_hash: str, row_count: int
+    ) -> dict[str, Any]:
+        # The relation artifact file contains its own build manifest, so the
+        # snapshot binds the canonical JSONL rows rather than a self-referential
+        # whole-file hash.  The loader verifies this row hash/count and then
+        # checks the artifact's own manifest against the snapshot build fields.
+        ref = _contract_ref(path, projection_root)
+        ref["sha256"] = rows_hash
+        ref["row_count"] = row_count
+        return ref
+
     questions_manifest = {
         "snapshot_schema_version": "question_state_snapshot_v1",
         "build_id": manifest["build_id"],
@@ -1356,9 +2551,40 @@ def main() -> int:
         "slot_count": manifest["slot_count"],
         "as_of": manifest.get("as_of"),
         "modality": manifest.get("modality"),
+        "projection_query_hash": manifest.get("projection_query_hash"),
         "question_count": len(questions),
-        "questions_data_hash": hashlib.sha256(canonical_json(questions).encode("utf-8")).hexdigest(),
+        "questions_data_hash": question_rows_hash,
+        # Alias the row digest as an explicit snapshot-content identity.  It is
+        # checked when this file becomes a parent so history cannot be made to
+        # appear continuous by editing only its lineage metadata.
+        "snapshot_content_hash": question_rows_hash,
         "registries": list(manifest.get("registries") or []),
+        "contract_compatibility": manifest.get("contract_compatibility"),
+        "relation_artifacts": {
+            "assertion_index": relation_artifact_ref(
+                args.assertion_index,
+                rows_hash=manifest["assertion_data_hash"],
+                row_count=manifest["assertion_count"],
+            ),
+            "slot_states": relation_artifact_ref(
+                args.slot_states,
+                rows_hash=manifest["slot_data_hash"],
+                row_count=manifest["slot_count"],
+            ),
+        },
+        "current_build_id": manifest["build_id"],
+        "previous_build_id": (
+            previous_manifest.get("current_build_id", previous_manifest.get("build_id"))
+            if previous_manifest
+            else None
+        ),
+        "parent_snapshot_hash": (
+            _file_hash(args.previous_snapshot) if args.previous_snapshot else None
+        ),
+        "parent_snapshot_questions_data_hash": (
+            previous_manifest.get("questions_data_hash") if previous_manifest else None
+        ),
+        "transition_cause_assertion_ids": transition_causes,
         # 10. relative, content-addressed contract references only.
         "contracts": {
             "question_generation_rules.yaml": _contract_ref(args.rules, projection_root),

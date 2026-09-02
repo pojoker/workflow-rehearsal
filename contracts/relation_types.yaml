@@ -114,13 +114,13 @@ relation_types:
     object_type: lifecycle_stage
     allowed_epistemic_status: [source_encoded, explicit_reviewed]
     canonical_source: calls/events.csv
-    # D. the lifecycle stage is NOT part of slot identity: a planned ramp and a
-    # current demonstrated stage share one slot so the conflict/non-conflict
-    # decision is driven by modality+time policy, not by slot short-circuiting.
-    slot_identity_fields: [subject_ref, program_id, primary_subject_id]
-    # Lifecycle stage remains context (and therefore does not mint a slot), but
-    # it is still compared when deciding whether two assertions conflict.
-    comparison_fields: [subject_ref, program_id, primary_subject_id, lifecycle_stage, modality]
-    context_fields: [lifecycle_stage, event_id]
+    # The question asks about an exact stage.  Stage/object identity therefore
+    # belongs to the slot, rather than being inferred later from assertion
+    # context.  This prevents evidence for `scaled` from closing a `sampling`
+    # target.  A planned assertion and an actual assertion for the same exact
+    # stage may still share a slot; modality remains on the comparison surface.
+    slot_identity_fields: [subject_ref, object_ref, program_id, primary_subject_id, lifecycle_stage]
+    comparison_fields: [subject_ref, object_ref, program_id, primary_subject_id, lifecycle_stage, modality]
+    context_fields: [event_id]
     non_comparable_context_fields: [event_id]
     allowed_event_category: [product_stage]

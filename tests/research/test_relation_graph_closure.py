@@ -52,6 +52,7 @@ from tools.research.recompute_question_state import (
     compute_resolution,
     evaluate_coverage,
     generate_diagnostic_questions,
+    generate_relation_leads,
     project_group_cells,
     read_index_with_manifest,
     _require_query_matches_manifest,
@@ -256,17 +257,32 @@ class RelationGraphClosureTests(unittest.TestCase):
         self.assertIn("route_requires_capability", relation_types)
         self.assertIn("capability_matches_route", relation_types)
         self.assertNotIn("company_serves_route", relation_types)
-        # 3. no company in the real ledger has COMPLETE actual coverage of every
-        # LPO requirement group, so no route-service gap candidate may be claimed.
-        self.assertEqual(questions, [])
-        self.assertIn("incomplete_actual_coverage", deferred)
+        # The overlap is a lead-only experimental output.  It never enters the
+        # formal route-service question stream, regardless of coverage.
+        self.assertFalse(
+            any(
+                item["target"]["relation_type"] == "company_serves_route"
+                for item in questions
+            )
+        )
+        self.assertEqual(
+            [item["rule_id"] for item in questions],
+            ["QGR-PRODUCT-STAGE-AS-OF-V1"],
+        )
+        self.assertEqual(deferred, {})
 
     def test_component_product_evidence_cannot_close_service_question(self) -> None:
         assertions, _, questions, _ = self.build_with([])
         self.assertTrue(
             any(item["relation_type"] == "product_has_lifecycle_stage" for item in assertions)
         )
-        self.assertEqual(questions, [])
+        self.assertFalse(
+            any(
+                item["target"]["relation_type"] == "company_serves_route"
+                for item in questions
+            )
+        )
+        self.assertEqual(len(questions), 1)  # the independent lifecycle pilot
 
     def test_exact_reviewed_service_assertion_satisfies_question(self) -> None:
         assertions, states, questions, _ = self.build_with([self.explicit_support()])
@@ -341,7 +357,7 @@ class RelationGraphClosureTests(unittest.TestCase):
             relation_type="product_has_lifecycle_stage",
             subject_ref="product_or_program:TEST-PRODUCT",
             object_ref="lifecycle_stage:demonstrated",
-            scope={"program_id": "TEST-PRODUCT", "primary_subject_id": "SUB-1"},
+            scope={"program_id": "TEST-PRODUCT", "primary_subject_id": "SUB-1", "lifecycle_stage": "demonstrated"},
             valid_time={"start": "2026-04-30", "end": "2026-04-30"},
             modality="actual",
             polarity="supporting",
@@ -355,7 +371,7 @@ class RelationGraphClosureTests(unittest.TestCase):
             relation_type="product_has_lifecycle_stage",
             subject_ref="product_or_program:TEST-PRODUCT",
             object_ref="lifecycle_stage:ramping",
-            scope={"program_id": "TEST-PRODUCT", "primary_subject_id": "SUB-1"},
+            scope={"program_id": "TEST-PRODUCT", "primary_subject_id": "SUB-1", "lifecycle_stage": "ramping"},
             valid_time={"start": "2027-01-01", "end": None},
             modality="planned",
             polarity="contradicting",
@@ -698,7 +714,7 @@ class RelationGraphClosureTests(unittest.TestCase):
                     self.assertNotIn(f"calls/events.csv#{ev}", refs)
 
     # ------------------------------------------------------------------
-    # D/E. planned vs demonstrated shares slot (counterexample 15)
+    # D/E. exact stage is part of slot identity; modality remains context
     # ------------------------------------------------------------------
     def test_planned_vs_demonstrated_hits_same_slot_not_short_circuit(self) -> None:
         from tools.research.build_relation_index import assertions_conflict
@@ -707,7 +723,7 @@ class RelationGraphClosureTests(unittest.TestCase):
             relation_type="product_has_lifecycle_stage",
             subject_ref="product_or_program:T",
             object_ref="lifecycle_stage:demonstrated",
-            scope={"program_id": "T", "primary_subject_id": "S"},
+            scope={"program_id": "T", "primary_subject_id": "S", "lifecycle_stage": "demonstrated"},
             valid_time={"start": "2026-04-30", "end": "2026-04-30"},
             modality="actual", polarity="supporting", epistemic_status="source_encoded",
             origin_group="OG", adapter_version="v", source_refs=["test:d"], assertion_key="d",
@@ -716,23 +732,39 @@ class RelationGraphClosureTests(unittest.TestCase):
             relation_type="product_has_lifecycle_stage",
             subject_ref="product_or_program:T",
             object_ref="lifecycle_stage:ramping",
-            scope={"program_id": "T", "primary_subject_id": "S"},
+            scope={"program_id": "T", "primary_subject_id": "S", "lifecycle_stage": "ramping"},
             valid_time={"start": "2027-01-01", "end": None},
             modality="planned", polarity="contradicting", epistemic_status="source_encoded",
             origin_group="OG", adapter_version="v", source_refs=["test:r"], assertion_key="r",
         )
-        self.assertEqual(demonstrated["slot_id"], ramping["slot_id"])
+        self.assertNotEqual(demonstrated["slot_id"], ramping["slot_id"])
         self.assertFalse(assertions_conflict(demonstrated, ramping, RELATION_TYPES))
         contradicting_same_modality = make_assertion(
             relation_type="product_has_lifecycle_stage",
             subject_ref="product_or_program:T",
-            object_ref="lifecycle_stage:ramping",
-            scope={"program_id": "T", "primary_subject_id": "S"},
+            object_ref="lifecycle_stage:demonstrated",
+            scope={"program_id": "T", "primary_subject_id": "S", "lifecycle_stage": "demonstrated"},
             valid_time={"start": "2026-04-30", "end": None},
             modality="actual", polarity="contradicting", epistemic_status="source_encoded",
             origin_group="OG", adapter_version="v", source_refs=["test:c"], assertion_key="c",
         )
         self.assertEqual(demonstrated["slot_id"], contradicting_same_modality["slot_id"])
+        same_stage_planned = make_assertion(
+            relation_type="product_has_lifecycle_stage",
+            subject_ref="product_or_program:T",
+            object_ref="lifecycle_stage:demonstrated",
+            scope={"program_id": "T", "primary_subject_id": "S", "lifecycle_stage": "demonstrated"},
+            valid_time={"start": "2027-01-01", "end": None},
+            modality="planned", polarity="supporting", epistemic_status="source_encoded",
+            origin_group="OG", adapter_version="v", source_refs=["test:p"], assertion_key="p",
+        )
+        self.assertEqual(demonstrated["slot_id"], same_stage_planned["slot_id"])
+        self.assertFalse(assertions_conflict(demonstrated, same_stage_planned, RELATION_TYPES))
+        same_stage_states = compute_slot_states(
+            [demonstrated, same_stage_planned], relation_contract=RELATION_TYPES
+        )
+        self.assertEqual(len(same_stage_states), 1)
+        self.assertNotEqual(same_stage_states[0]["effective_status"], "conflicted")
         self.assertTrue(
             assertions_conflict(demonstrated, contradicting_same_modality, RELATION_TYPES)
         )
@@ -954,33 +986,76 @@ class Round2RegressionTests(unittest.TestCase):
         assertions, _s = self._index()
         complete_cells = self._complete_cells(assertions)
         # partial coverage: one cell short
-        partial = complete_cells[:-1]
-        questions, deferred = self._questions_for_cells(partial, "actual")
+        _pool, states, questions, deferred = self._pool(complete_cells[:-1], "actual", [])
         self.assertEqual(self._for_company(questions, "company:Lumentum"), [])
-        self.assertIn("incomplete_actual_coverage", deferred)
+        leads, funnel = generate_relation_leads(
+            _pool, states, RULES, ADAPTERS, RELATION_TYPES
+        )
+        lumentum_lead = next(
+            item
+            for item in leads
+            if item["subject_ref"] == "company:Lumentum"
+            and item["route_profile_id"] == EXACT_PROFILE
+        )
+        self.assertTrue(lumentum_lead["unmatched_cells"])
+        self.assertEqual(funnel["counts"]["overlap_leads"], len(leads))
+        self.assertEqual(funnel["counts"]["formal_question_candidates"], 0)
+        self.assertEqual(deferred, {})
         # planned coverage over the complete set is still not route capability
-        questions, deferred = self._questions_for_cells(complete_cells, "planned")
+        _pool, states, questions, deferred = self._pool(complete_cells, "planned", [])
         self.assertEqual(self._for_company(questions, "company:Lumentum"), [])
-        self.assertIn("incomplete_actual_coverage", deferred)
+        leads, funnel = generate_relation_leads(
+            _pool, states, RULES, ADAPTERS, RELATION_TYPES
+        )
+        lumentum_lead = next(
+            item
+            for item in leads
+            if item["subject_ref"] == "company:Lumentum"
+            and item["route_profile_id"] == EXACT_PROFILE
+        )
+        self.assertIn(
+            lumentum_lead["coverage_kind"],
+            {"planned_cell_overlap", "actual_and_planned_cell_overlap"},
+        )
+        self.assertEqual(funnel["counts"]["formal_question_candidates"], 0)
+        self.assertEqual(deferred, {})
         # a single cell is nowhere near complete coverage
-        questions, _deferred = self._questions_for_cells(complete_cells[:1], "actual")
+        _pool, states, questions, _deferred = self._pool(complete_cells[:1], "actual", [])
         self.assertEqual(self._for_company(questions, "company:Lumentum"), [])
+        leads, funnel = generate_relation_leads(
+            _pool, states, RULES, ADAPTERS, RELATION_TYPES
+        )
+        self.assertEqual(
+            len(
+                [
+                    item
+                    for item in leads
+                    if item["subject_ref"] == "company:Lumentum"
+                    and item["route_profile_id"] == EXACT_PROFILE
+                ]
+            ),
+            1,
+        )
+        self.assertEqual(funnel["counts"]["formal_question_candidates"], 0)
 
     def test_r2_3_complete_actual_coverage_generates_the_gap_candidate(self) -> None:
         assertions, _s = self._index()
         complete_cells = self._complete_cells(assertions)
-        questions, deferred = self._questions_for_cells(complete_cells, "actual")
-        found = self._for_company(questions, "company:Lumentum")
-        self.assertTrue(found, "complete actual coverage must generate the candidate")
-        # every other company in the real ledger is still incomplete and stays
-        # deferred rather than producing a capability claim
-        self.assertEqual(deferred.get("incomplete_actual_coverage"), 82)
-        for question in found:
-            self.assertTrue(question["state_basis"]["coverage"]["covered_capability_cell_ids"])
-            self.assertTrue(
-                all(group["satisfied"] for group in question["requirement_groups"]),
-                "a generated candidate must report every requirement group satisfied",
-            )
+        pool, states, questions, deferred = self._pool(complete_cells, "actual", [])
+        leads, funnel = generate_relation_leads(
+            pool, states, RULES, ADAPTERS, RELATION_TYPES
+        )
+        found = [item for item in leads if item["subject_ref"] == "company:Lumentum"]
+        self.assertTrue(found, "complete actual coverage must generate a lead")
+        self.assertEqual(len(found), 1)
+        self.assertEqual(found[0]["unmatched_cells"], [])
+        self.assertEqual(funnel["counts"]["overlap_leads"], len(leads))
+        self.assertEqual(funnel["counts"]["formal_question_candidates"], 0)
+        self.assertEqual(
+            [item for item in questions if item["target"]["relation_type"] == "company_serves_route"],
+            [],
+        )
+        self.assertEqual(deferred, {})
 
     def test_r2_3_coverage_uses_authoritative_filtered_states(self) -> None:
         assertions, states = self._index()
@@ -1087,36 +1162,49 @@ class Round2RegressionTests(unittest.TestCase):
         pool, states, questions, _deferred = self._pool(
             complete_cells, "actual", [listed]
         )
-        demonstrated_question = next(
-            item for item in self._for_company(questions, "company:Lumentum")
-            if item["target"]["identity_scope"]["service_kind"] == "demonstrated"
+        # The route-service rule is no longer admitted: a capability overlap is
+        # observable as a lead, while the explicit listed assertion remains an
+        # independent exact service slot.
+        self.assertFalse(
+            any(
+                item["target"]["relation_type"] == "company_serves_route"
+                for item in questions
+            )
         )
-        # the listed evidence lives in another slot and must not close it
-        self.assertEqual(demonstrated_question["resolution_status"], "open")
-        self.assertEqual(demonstrated_question["state_basis"]["qualified_assertion_ids"], [])
-        self.assertNotEqual(
-            demonstrated_question["target"]["slot_id"],
-            next(
-                item["slot_id"] for item in states
-                if item["identity_scope"].get("service_kind") == "listed"
-            ),
+        listed_slot = next(
+            item for item in states
+            if item["relation_type"] == "company_serves_route"
+            and item["identity_scope"].get("service_kind") == "listed"
         )
-        # a demonstrated assertion in the real demonstrated slot closes exactly
-        # that question and only that one (same product, same service_kind).
+        self.assertEqual(listed_slot["effective_status"], "supported")
+        leads, funnel = generate_relation_leads(
+            pool, states, RULES, ADAPTERS, RELATION_TYPES
+        )
+        self.assertEqual(funnel["counts"]["formal_question_candidates"], 0)
+        self.assertTrue(leads)
+
+        # A demonstrated assertion in the real demonstrated slot is still
+        # represented separately; it does not mutate or collapse the listed
+        # slot.
         demonstrated = self._service_assertion("demonstrated", "RA-TEST-DEMONSTRATED")
         _pool, _states, questions, _deferred = self._pool(
             complete_cells, "actual", [listed, demonstrated]
         )
-        remaining = {
-            (
-                item["target"]["identity_scope"]["product_ref"],
-                item["target"]["identity_scope"]["service_kind"],
+        self.assertFalse(
+            any(
+                item["target"]["relation_type"] == "company_serves_route"
+                for item in questions
             )
-            for item in self._for_company(questions, "company:Lumentum")
-        }
-        self.assertNotIn(("product:TEST-PRODUCT-001", "demonstrated"), remaining)
-        self.assertIn(("product:TEST-PRODUCT-001", "shipping"), remaining)
-        self.assertIn(("product:TEST-PRODUCT-002", "demonstrated"), remaining)
+        )
+        service_slots = [
+            item for item in _states if item["relation_type"] == "company_serves_route"
+        ]
+        self.assertEqual(
+            {
+                item["identity_scope"].get("service_kind") for item in service_slots
+            },
+            {"listed", "demonstrated"},
+        )
 
     def test_r2_4_no_resolvable_product_binding_means_no_question(self) -> None:
         assertions, _s = self._index()
@@ -1125,8 +1213,18 @@ class Round2RegressionTests(unittest.TestCase):
         pool, states, questions, deferred = self._pool(
             complete_cells, "actual", [], registry=empty_registry
         )
-        self.assertEqual(self._for_company(questions, "company:Lumentum"), [])
-        self.assertIn("no_resolvable_product_binding", deferred)
+        self.assertFalse(
+            any(
+                item["target"]["relation_type"] == "company_serves_route"
+                for item in questions
+            )
+        )
+        leads, funnel = generate_relation_leads(
+            pool, states, RULES, ADAPTERS, RELATION_TYPES
+        )
+        self.assertTrue(leads)
+        self.assertEqual(funnel["counts"]["formal_question_candidates"], 0)
+        self.assertEqual(deferred, {})
         self.assertEqual(
             candidate_product_refs(empty_registry, "company:Lumentum", "product"), []
         )
@@ -1147,13 +1245,22 @@ class Round2RegressionTests(unittest.TestCase):
 
     def test_r2_4_question_text_does_not_claim_service_evidence(self) -> None:
         assertions, _s = self._index()
-        questions, _deferred = self._questions_for_cells(
-            self._complete_cells(assertions), "actual"
+        pool, states, questions, _deferred = self._pool(
+            self._complete_cells(assertions), "actual", []
         )
-        question = self._for_company(questions, "company:Lumentum")[0]
-        self.assertIn("product:TEST-PRODUCT-001", question["question_text"])
-        self.assertNotIn("已服务", question["question_text"])
-        self.assertIn("是否有", question["question_text"])
+        self.assertFalse(
+            any(
+                item["target"]["relation_type"] == "company_serves_route"
+                for item in questions
+            )
+        )
+        leads, _funnel = generate_relation_leads(
+            pool, states, RULES, ADAPTERS, RELATION_TYPES
+        )
+        self.assertTrue(leads)
+        self.assertTrue(
+            all(item["deferred_reason"] == "experimental_rule_not_admitted" for item in leads)
+        )
 
     # ------------------------------------------------------------------
     # R2-5 reopened requires real prior state
@@ -1176,134 +1283,31 @@ class Round2RegressionTests(unittest.TestCase):
         _pool, _states, questions, _deferred = self._pool(
             complete_cells, "actual", [support, withdrawal]
         )
-        target = next(
-            item for item in self._for_company(questions, "company:Lumentum")
-            if item["target"]["identity_scope"]["service_kind"] == "demonstrated"
+        self.assertFalse(
+            any(
+                item["target"]["relation_type"] == "company_serves_route"
+                for item in questions
+            )
         )
-        self.assertEqual(target["resolution_status"], "open")
 
-    def test_r2_5_reopened_only_with_previous_snapshot_or_append_only_events(self) -> None:
-        assertions, _s = self._index()
-        complete_cells = self._complete_cells(assertions)
-        support = self._service_assertion("demonstrated", "RA-TEST-PRIOR-SUPPORT")
-        withdrawal = copy.deepcopy(support)
-        withdrawal.update(
-            {
-                "assertion_id": "RA-TEST-PRIOR-WITHDRAWAL",
-                "polarity": "withdrawn",
-                "revises_assertion_ids": [support["assertion_id"]],
-                "revision_kind": "withdraws",
-                "effective_at": "2026-06-01",
-                "retroactive": False,
-            }
-        )
-        _pool, _states, baseline, _deferred = self._pool(
-            complete_cells, "actual", [support, withdrawal]
-        )
-        question_id = next(
-            item["question_id"] for item in self._for_company(baseline, "company:Lumentum")
-            if item["target"]["identity_scope"]["service_kind"] == "demonstrated"
-        )
+    def test_r2_5_hand_written_satisfied_row_is_not_history(self) -> None:
+        # A status line (even one that happens to use a real question id) is not
+        # a predecessor snapshot.  Only a generated, content-addressed
+        # question projection may authorize a later reopened transition.
         with tempfile.TemporaryDirectory() as temp_dir:
             snapshot = Path(temp_dir) / "previous_questions.jsonl"
-            # A bare hand-written ``question_id: satisfied`` line is not a
-            # historical source and must be refused.
             snapshot.write_text(
-                json.dumps({"question_id": question_id, "resolution_status": "satisfied"}) + "\n",
+                json.dumps(
+                    {
+                        "question_id": "GQ-HAND-WRITTEN",
+                        "resolution_status": "satisfied",
+                    }
+                )
+                + "\n",
                 encoding="utf-8",
             )
             with self.assertRaises(QuestionStateError):
                 PriorQuestionState.load(snapshot=snapshot)
-
-            snapshot_row = copy.deepcopy(next(
-                item for item in baseline
-                if item["question_id"] == question_id
-            ))
-            snapshot_row["resolution_status"] = "satisfied"
-            snapshot_rows = [snapshot_row]
-            snapshot_manifest = self._history_manifest("snapshot", snapshot_rows)
-            snapshot.write_text(
-                "\n".join(
-                    json.dumps(row, ensure_ascii=False, separators=(",", ":"))
-                    for row in [
-                        {BUILD_MANIFEST_KEY: snapshot_manifest},
-                        *snapshot_rows,
-                    ]
-                )
-                + "\n",
-                encoding="utf-8",
-            )
-            with self.assertRaises(QuestionStateError):
-                PriorQuestionState.load(
-                    snapshot=snapshot,
-                    expected_manifest=snapshot_manifest,
-                )
-            prior = PriorQuestionState.load(
-                snapshot=snapshot,
-                expected_manifest=snapshot_manifest,
-                registry=REGISTRY,
-            )
-            self.assertFalse(prior.empty)
-            self.assertTrue(prior.was_satisfied(question_id))
-            _pool, _states, questions, _deferred = self._pool(
-                complete_cells, "actual", [support, withdrawal], prior_state=prior
-            )
-        reopened = next(
-            item for item in self._for_company(questions, "company:Lumentum")
-            if item["question_id"] == question_id
-        )
-        self.assertEqual(reopened["resolution_status"], "reopened")
-        self.assertIn("snapshot:previous_questions.jsonl", reopened["state_basis"]["reopened_from"])
-
-        # an append-only state event log is also accepted, but only if it really
-        # is append-only (contiguous transitions, non-decreasing time).
-        with tempfile.TemporaryDirectory() as temp_dir:
-            events = Path(temp_dir) / "state_events.jsonl"
-            event_rows = [
-                {"question_id": question_id, "from_status": "open", "to_status": "satisfied", "at": "2026-05-01"},
-                {"question_id": question_id, "from_status": "satisfied", "to_status": "open", "at": "2026-07-01"},
-            ]
-            events.write_text(
-                "\n".join(
-                    json.dumps(row, ensure_ascii=False, separators=(",", ":"))
-                    for row in [
-                        {BUILD_MANIFEST_KEY: self._history_manifest("events", event_rows)},
-                        *event_rows,
-                    ]
-                )
-                + "\n",
-                encoding="utf-8",
-            )
-            event_manifest = self._history_manifest("events", event_rows)
-            self.assertTrue(
-                PriorQuestionState.from_events(
-                    events,
-                    expected_manifest=event_manifest,
-                    registry=REGISTRY,
-                ).was_satisfied(question_id)
-            )
-            broken = Path(temp_dir) / "broken_events.jsonl"
-            broken_rows = [
-                {"question_id": question_id, "from_status": "open", "to_status": "satisfied", "at": "2026-05-01"},
-                {"question_id": question_id, "from_status": "blocked", "to_status": "open", "at": "2026-07-01"},
-            ]
-            broken.write_text(
-                "\n".join(
-                    json.dumps(row, ensure_ascii=False, separators=(",", ":"))
-                    for row in [
-                        {BUILD_MANIFEST_KEY: self._history_manifest("events", broken_rows)},
-                        *broken_rows,
-                    ]
-                )
-                + "\n",
-                encoding="utf-8",
-            )
-            with self.assertRaises(QuestionStateError):
-                PriorQuestionState.from_events(
-                    broken,
-                    expected_manifest=self._history_manifest("events", broken_rows),
-                    registry=REGISTRY,
-                )
 
     # ------------------------------------------------------------------
     # R2-6 as_of / modality on the production CLI
@@ -1852,7 +1856,8 @@ class Round2RegressionTests(unittest.TestCase):
                 out = root / "out"
                 build = subprocess.run(
                     [sys.executable, "tools/research/build_relation_index.py",
-                     "--root", str(root), "--output-dir", str(out)],
+                     "--root", str(root), "--output-dir", str(out),
+                     "--as-of", "2026-09-02"],
                     cwd=ROOT, capture_output=True, text=True,
                 )
                 self.assertEqual(build.returncode, 0, build.stderr)
@@ -1863,7 +1868,8 @@ class Round2RegressionTests(unittest.TestCase):
                      "--rules", str(root / "contracts/question_generation_rules.yaml"),
                      "--adapters", str(root / "contracts/relation_adapters.yaml"),
                      "--contracts-dir", str(root / "contracts"),
-                     "--output", str(out / "generated_diagnostic_questions.jsonl")],
+                     "--output", str(out / "generated_diagnostic_questions.jsonl"),
+                     "--as-of", "2026-09-02"],
                     cwd=ROOT, capture_output=True, text=True,
                 )
                 self.assertEqual(recompute.returncode, 0, recompute.stderr)
@@ -1872,6 +1878,8 @@ class Round2RegressionTests(unittest.TestCase):
             for name in (
                 "relation_assertion_index.jsonl",
                 "relation_slot_states.jsonl",
+                "relation_leads.jsonl",
+                "relation_lead_funnel.json",
                 "generated_diagnostic_questions.jsonl",
             ):
                 left = (outputs[0] / name).read_bytes()

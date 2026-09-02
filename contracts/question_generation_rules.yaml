@@ -4,6 +4,10 @@ resolution_status_enum: [open, partial, blocked, satisfied, reopened, conflicted
 
 rules:
   - rule_id: QGR-CAPABILITY-WITHOUT-EXACT-SERVICE-V1
+    rule_version: 1
+    status: experimental
+    admission_status: not_admitted
+    output_kind: relation_lead
     question_class: diagnostic_relation_gap
     generated_by_reason: missing_relation
     trigger_relation_type: capability_matches_route
@@ -52,3 +56,37 @@ rules:
       - adapter_or_contract_change
     initial_workflow_status: candidate
     initial_resolution_status: open
+
+  # Narrow production-data lifecycle pilot.  It reuses the existing diagnostic
+  # question class; this is not an expansion into stale/new-event/WHY queues.
+  - rule_id: QGR-PRODUCT-STAGE-AS-OF-V1
+    rule_version: 1
+    status: admitted
+    admission_status: formalized
+    question_class: diagnostic_relation_gap
+    generated_by_reason: missing_relation
+    trigger_relation_type: product_has_lifecycle_stage
+    target_relation_type: product_has_lifecycle_stage
+    program_ids: [PRG_AVGO_TAURUS]
+    lifecycle_stages: [sampling]
+    display_parent: TQ013
+    depends_on: [TQ013]
+    question_template: >-
+      截至 {as_of}，Program {program_id} 是否已达到 Lifecycle Stage {lifecycle_stage}？
+    target_binding:
+      exact_program_required: true
+      exact_lifecycle_stage_required: true
+    acceptance:
+      relation_type: product_has_lifecycle_stage
+      epistemic_status: source_encoded
+      polarity: supporting
+      modality: actual
+      minimum_independent_origin_groups: 1
+      exact_lifecycle_stage_required: true
+    reopen_on:
+      - last_qualified_support_withdrawn
+      - same_scope_time_modality_conflict
+      - adapter_or_contract_change
+    initial_workflow_status: formalized
+    initial_resolution_status: open
+    retain_satisfied: true

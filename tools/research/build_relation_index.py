@@ -23,6 +23,7 @@ import csv
 import hashlib
 import json
 import re
+import sys
 from collections import defaultdict
 from datetime import date as _date
 from datetime import datetime as _dt
@@ -32,7 +33,14 @@ from typing import Any, Iterable
 import yaml
 
 
+# When this file is invoked as ``python tools/research/build_relation_index.py``
+# Python puts ``tools/research`` (rather than the repository root) on
+# ``sys.path``.  The lead projection is intentionally kept in the question
+# reducer module, so make the script entry point behave like ``python -m``
+# without requiring callers to set PYTHONPATH.
 ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 DEFAULT_CONTRACTS = ROOT / "contracts"
 DEFAULT_ASSERTIONS = ROOT / "relation_assertions.yaml"
 DEFAULT_OUTPUT = ROOT / "out"
@@ -1328,9 +1336,14 @@ def adapt_calls(root: Path, config: dict[str, Any]) -> list[dict[str, Any]]:
                     "primary_subject_id": event["primary_subject_id"],
                     "lifecycle_stage": stage,
                 },
+                # A product-stage event records when the program reached the
+                # stage; it is not a point-in-time fact that expires at the
+                # end of the event row.  Keep the reached stage active from
+                # occurred_start onward.  Revisions still carry their own
+                # effective_at and are applied by the temporal reducer.
                 valid_time={
                     "start": event["occurred_start"] or None,
-                    "end": event["occurred_end"] or None,
+                    "end": None,
                 },
                 modality=modality,
                 polarity=polarity,
@@ -2041,7 +2054,7 @@ def compute_slot_states(
                     item["assertion_id"] for item in non_comparable_contradicts
                 ],
                 "withdrawal_assertion_ids": [
-                    item["assertion_id"] for item in items if item["polarity"] == "withdrawn"
+                    item["assertion_id"] for item in active_withdrawals
                 ],
                 "withdrawn_assertion_ids": sorted(withdrawn_ids),
                 "superseded_assertion_ids": sorted(superseded_ids),
@@ -2114,6 +2127,19 @@ def _computed_slot_id(
             f"{item.get('assertion_id')}: scope contains fields not declared by "
             f"{relation_type} contract: {unknown_scope_fields}"
         )
+    if relation_type == "product_has_lifecycle_stage":
+        lifecycle_stage = scope.get("lifecycle_stage")
+        if object_ref != f"lifecycle_stage:{lifecycle_stage}":
+            raise RelationIndexError(
+                f"{item.get('assertion_id')}: lifecycle object_ref and lifecycle_stage "
+                "must identify the same exact stage"
+            )
+        program_id = scope.get("program_id")
+        if subject_ref != f"product_or_program:{program_id}":
+            raise RelationIndexError(
+                f"{item.get('assertion_id')}: lifecycle subject_ref and program_id "
+                "must identify the same exact program"
+            )
     for field in definition.get("slot_identity_fields") or ("subject_ref", "object_ref"):
         if field in ("subject_ref", "object_ref"):
             value = subject_ref if field == "subject_ref" else object_ref
@@ -2394,6 +2420,65 @@ def build_relation_graph(
     )
 
 
+PILOT_RULE_IDS = (
+    "QGR-CAPABILITY-WITHOUT-EXACT-SERVICE-V1",
+    "QGR-PRODUCT-STAGE-AS-OF-V1",
+)
+
+
+def reducer_contract_compatibility(
+    relation_contract: dict[str, Any],
+    adapters_contract: dict[str, Any],
+    rules_contract: dict[str, Any],
+) -> dict[str, Any]:
+    """Compute the semantic contract consumed by the reducer pilot.
+
+    A schema version or rule version is only a label.  The reducer's meaning
+    also changes when an identity, acceptance, trigger, lifecycle, or admission
+    field changes without a version bump.  Keep the full canonical definitions
+    in this digest so the consumer can recompute it from the files rather than
+    trusting a builder-authored compatibility value.
+    """
+    lifecycle_definition = (
+        relation_contract.get("relation_types", {}).get("product_has_lifecycle_stage")
+        or {}
+    )
+    lifecycle_adapter = (
+        adapters_contract.get("adapters", {}).get("calls_product_lifecycle") or {}
+    )
+    rules_by_id = {
+        rule.get("rule_id"): rule
+        for rule in rules_contract.get("rules") or []
+        if rule.get("rule_id")
+    }
+    missing = [rule_id for rule_id in PILOT_RULE_IDS if rule_id not in rules_by_id]
+    if missing:
+        raise RelationIndexError(
+            f"question rules missing reducer pilot rule(s): {', '.join(missing)}"
+        )
+    return {
+        "relation_types_schema_version": relation_contract.get("schema_version"),
+        "relation_product_lifecycle_hash": hashlib.sha256(
+            canonical_json(lifecycle_definition).encode("utf-8")
+        ).hexdigest(),
+        "adapter_calls_product_lifecycle_version": lifecycle_adapter.get("adapter_version"),
+        "adapter_calls_product_lifecycle_hash": hashlib.sha256(
+            canonical_json(lifecycle_adapter).encode("utf-8")
+        ).hexdigest(),
+        "question_rules_schema_version": rules_contract.get("schema_version"),
+        "question_rule_versions": {
+            rule_id: rules_by_id[rule_id].get("rule_version")
+            for rule_id in PILOT_RULE_IDS
+        },
+        "question_rule_semantic_hashes": {
+            rule_id: hashlib.sha256(
+                canonical_json(rules_by_id[rule_id]).encode("utf-8")
+            ).hexdigest()
+            for rule_id in PILOT_RULE_IDS
+        },
+    }
+
+
 def compute_build_manifest(
     assertions: list[dict[str, Any]],
     states: list[dict[str, Any]],
@@ -2437,7 +2522,10 @@ def compute_build_manifest(
             "extra registry paths must have unique manifest-relative paths"
         )
     registries = sorted(registry_refs, key=lambda item: item["path"])
-    return {
+    relation_types_contract = load_yaml(contracts_dir / "relation_types.yaml")
+    adapters_contract = load_yaml(adapters_path)
+    rules_contract = load_yaml(rules_path)
+    manifest = {
         "build_id": data_hash[:24].upper(),
         "assertion_count": len(assertions),
         "slot_count": len(states),
@@ -2452,7 +2540,21 @@ def compute_build_manifest(
         "assertion_data_hash": assertion_data_hash,
         "slot_data_hash": slot_data_hash,
         "data_hash": data_hash,
+        # Keep the query boundary independently observable.  The state rows
+        # normally make data_hash change as well, but a consumer should not
+        # have to infer a temporal query from a row diff.
+        "projection_query_hash": hashlib.sha256(
+            canonical_json({"as_of": as_of, "modality": modality}).encode("utf-8")
+        ).hexdigest(),
+        # Schema-level compatibility is intentionally separate from content
+        # hashes.  It lets a later question build use a different data
+        # snapshot while still proving that the reducer contracts are
+        # compatible across the history chain.
+        "contract_compatibility": reducer_contract_compatibility(
+            relation_types_contract, adapters_contract, rules_contract
+        ),
     }
+    return manifest
 
 
 def write_jsonl(path: Path, rows: Iterable[dict[str, Any]], manifest: dict[str, Any] | None = None) -> None:
@@ -2478,6 +2580,11 @@ def parse_args() -> argparse.Namespace:
         "computed as-of this instant",
     )
     parser.add_argument(
+        "--assertions-only",
+        action="store_true",
+        help="write only the raw assertion index; no temporal slot states or leads are built",
+    )
+    parser.add_argument(
         "--modality",
         type=str,
         default=None,
@@ -2496,6 +2603,16 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    if args.assertions_only and (args.as_of is not None or args.modality is not None):
+        raise RelationIndexError(
+            "--assertions-only is a raw projection and cannot be combined with "
+            "--as-of or --modality"
+        )
+    if not args.as_of and not args.assertions_only:
+        raise RelationIndexError(
+            "temporal slot-state build requires explicit --as-of; "
+            "use --assertions-only for a raw assertion index"
+        )
     root = args.root.resolve()
     contracts = (args.contracts_dir or root / "contracts").resolve()
     assertions_path = (args.assertions or root / "relation_assertions.yaml").resolve()
@@ -2509,6 +2626,29 @@ def main() -> int:
         as_of=as_of,
         modality=args.modality,
     )
+    if args.assertions_only:
+        # A raw assertion projection deliberately carries no temporal slot
+        # state.  Keep the normal manifest shape so the assertion rows remain
+        # content-addressed, but never write a slot-state or lead file from a
+        # no-as_of invocation.  Consumers that need a temporal projection must
+        # use the explicit --as-of path below.
+        manifest = compute_build_manifest(
+            assertions,
+            [],
+            contracts,
+            contracts / "question_generation_rules.yaml",
+            contracts / "relation_adapters.yaml",
+            as_of=None,
+            modality=args.modality,
+            extra_registry_paths=args.extra_registry,
+        )
+        manifest["projection_kind"] = "raw_assertions"
+        write_jsonl(output / "relation_assertion_index.jsonl", assertions, manifest)
+        print(
+            f"raw relation assertions: {len(assertions)} -> {output} "
+            f"(build {manifest['build_id']})"
+        )
+        return 0
     manifest = compute_build_manifest(
         assertions,
         slot_states,
@@ -2521,6 +2661,36 @@ def main() -> int:
     )
     write_jsonl(output / "relation_assertion_index.jsonl", assertions, manifest)
     write_jsonl(output / "relation_slot_states.jsonl", slot_states, manifest)
+    # The route-service rule is frozen as an experimental lead-only rule.  Keep
+    # the 83 (or current deterministic) overlaps observable alongside the
+    # relation index without presenting them as formal questions or canonical
+    # relations.  Import lazily to avoid a module cycle: recompute_question_state
+    # imports the reducer helpers above.
+    from tools.research.recompute_question_state import generate_relation_leads
+
+    relation_contract = load_yaml(contracts / "relation_types.yaml")
+    adapter_contract = load_yaml(contracts / "relation_adapters.yaml")
+    adapter_contract["relation_contract"] = relation_contract
+    rules_contract = load_yaml(contracts / "question_generation_rules.yaml")
+    leads, funnel = generate_relation_leads(
+        assertions,
+        slot_states,
+        rules_contract,
+        adapter_contract,
+        relation_contract,
+        as_of=as_of,
+    )
+    write_jsonl(output / "relation_leads.jsonl", leads)
+    funnel_payload = {
+        **funnel,
+        "relation_build_id": manifest["build_id"],
+        "relation_data_hash": manifest["data_hash"],
+        "as_of": as_of,
+        "modality": args.modality,
+    }
+    (output / "relation_lead_funnel.json").write_text(
+        canonical_json(funnel_payload) + "\n", encoding="utf-8"
+    )
     print(
         f"relation index: {len(assertions)} assertions, "
         f"{len(slot_states)} slots -> {output} (build {manifest['build_id']})"
