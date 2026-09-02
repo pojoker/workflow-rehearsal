@@ -1,0 +1,11 @@
+[output]
+root = "tmp/news-daily-v2"
+timeout_seconds = 10
+user_agent = "news_daily/1.0 (configure-me)"
+
+# These intentionally empty sections are registry hooks for future live adapters.
+[adapters.domestic]
+scope = "domestic"
+
+[adapters.overseas]
+scope = "overseas"
