@@ -39,13 +39,6 @@ def _count(value: Any) -> int:
     return 0
 
 
-def _without_first_heading(text: str) -> str:
-    lines = text.strip().splitlines()
-    if lines and lines[0].startswith("# "):
-        lines = lines[1:]
-    return "\n".join(lines).strip()
-
-
 def _atomic_write(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary: str | None = None
@@ -138,9 +131,11 @@ def _load_domestic(root: Path, run_date: str) -> dict[str, Any]:
 def _load_overseas(root: Path, run_date: str) -> dict[str, Any]:
     report_path = root / "daily" / f"{run_date}.txt"
     summary_path = root / "staging" / run_date / "run-summary.json"
+    candidates_path = root / "staging" / run_date / "candidates.json"
     report, report_error = _read_text(report_path)
     summary, summary_error = _read_json(summary_path)
-    errors = [error for error in (report_error, summary_error) if error]
+    candidates, candidates_error = _read_json(candidates_path)
+    errors = [error for error in (report_error, summary_error, candidates_error) if error]
     if summary is not None and summary.get("run_date") != run_date:
         errors.append(
             f"run-summary date mismatch: expected {run_date}, got {summary.get('run_date')!r}"
@@ -151,103 +146,98 @@ def _load_overseas(root: Path, run_date: str) -> dict[str, Any]:
         "report": report,
         "report_path": str(report_path.resolve()),
         "summary_path": str(summary_path.resolve()),
+        "candidates_path": str(candidates_path.resolve()),
         "summary": summary or {},
+        "candidates": candidates or {},
         "errors": errors,
     }
 
 
-def _render_markdown(run_date: str, domestic: dict[str, Any], overseas: dict[str, Any]) -> str:
-    domestic_summary = domestic["summary"]
-    overseas_summary = overseas["summary"]
-    assembly_status = (
-        "complete"
-        if domestic["available"]
-        and overseas["available"]
-        and not domestic["errors"]
-        and not overseas["errors"]
-        else "partial"
+EVENT_CATEGORY_LABELS = {
+    "product_stage": "产品阶段",
+    "capacity_constraint": "产能与卡点",
+    "commercial_adoption": "商业采用",
+    "capital_relationship": "资本与关系",
+    "policy_access": "政策与准入",
+}
+
+LIFECYCLE_STAGE_LABELS = {
+    "announced": "已宣布",
+    "demonstrated": "完成演示",
+    "sampling": "送样",
+    "qualifying": "验证中",
+    "first_shipment": "首次出货",
+    "volume_order": "批量订单",
+    "scaled": "规模化",
+}
+
+
+def _overseas_event_line(event: dict[str, Any]) -> str:
+    category = EVENT_CATEGORY_LABELS.get(str(event.get("event_category")), "其他事件")
+    stage = LIFECYCLE_STAGE_LABELS.get(
+        str(event.get("lifecycle_stage")), str(event.get("lifecycle_stage") or "阶段未知")
     )
+    suggestion = (
+        "建议交叉确认"
+        if event.get("suggested_event_status") == "corroborated"
+        else "待人工核验"
+    )
+    return (
+        f"- {event.get('primary_subject_id') or '主体未解析'} | {category}·{stage} | "
+        f"{event.get('occurred_start') or '时间未知'} | 已声称；{suggestion}"
+    )
+
+
+def _render_markdown(run_date: str, domestic: dict[str, Any], overseas: dict[str, Any]) -> str:
+    overseas_summary = overseas["summary"]
     configured = _count(overseas_summary.get("configured_entity_count"))
     monitored = _count(overseas_summary.get("monitored_entity_count"))
     missing_endpoints = _count(overseas_summary.get("missing_endpoint_count"))
-    failure_types = overseas_summary.get("failure_types", {})
-    if not isinstance(failure_types, dict):
-        failure_types = {}
-    failure_total = sum(value for value in failure_types.values() if isinstance(value, int))
-
-    lines = [
-        f"# 国内与海外每日情报总览 {run_date}",
-        "",
-        "> 本报告只汇总两个独立镜像的产物；不修改国内 canonical、海外 calls/*.csv 或正式事件状态。",
-        "",
-        "## 今日摘要",
-        f"- 汇总状态：{assembly_status}",
-        (
-            "- 国内：监控 "
-            f"{domestic_summary['watched_codes']} 个代码；投关表 +{domestic_summary['ir_new']}、"
-            f"互动问答 +{domestic_summary['qa_new']}、公告 +{domestic_summary['announcements']}、"
-            f"召回队列 +{domestic_summary['queue_added']} / -{domestic_summary['queue_removed']}"
-        ),
-        (
-            "- 海外：披露 "
-            f"{_count(overseas_summary.get('disclosure_candidates'))}、主张 "
-            f"{_count(overseas_summary.get('claim_candidates'))}、事件 "
-            f"{_count(overseas_summary.get('event_candidates'))}、证据 "
-            f"{_count(overseas_summary.get('evidence_candidates'))}"
-        ),
-        (
-            "- 海外覆盖："
-            f"已配置 {configured}/{monitored} 个实体，缺端点 {missing_endpoints} 个；"
-            f"失败/待处理记录 {failure_total} 条"
-        ),
-        (
-            "- 海外晋级：正式账本写入 "
-            f"{_count(overseas_summary.get('promoted'))} 条；corroborated 建议 "
-            f"{_count(overseas_summary.get('corroboration_suggestions'))} 条，均等待人工确认"
-        ),
-        "",
-        "## 今日需处理",
-    ]
-    if domestic_summary["gate_review_suggested"]:
-        lines.append("- 国内存在新增或队列变化，建议进入判定闸复核。")
-    else:
-        lines.append("- 国内未发现需要开启判定闸的增量。")
-    if missing_endpoints:
-        lines.append(f"- 海外有 {missing_endpoints} 个监控实体缺少发现端点，覆盖尚不完整。")
-    if _count(overseas_summary.get("endpoint_failed")):
-        lines.append(
-            f"- 海外有 {_count(overseas_summary.get('endpoint_failed'))} 个端点抓取失败，需查看 failures.csv。"
-        )
-    if _count(overseas_summary.get("corroboration_suggestions")):
-        lines.append(
-            f"- 海外有 {_count(overseas_summary.get('corroboration_suggestions'))} 条独立佐证建议待人工批准。"
-        )
-    for source_name, source in (("国内", domestic), ("海外", overseas)):
-        for error in source["errors"]:
-            lines.append(f"- {source_name}输入异常：{error}")
-
-    lines.extend(["", "## 国内完整日报", ""])
     if domestic["report"] is None:
-        lines.append(f"未生成：`{domestic['report_path']}`")
+        lines = [f"# 日报 {run_date}", "", f"> 国内日报未生成：`{domestic['report_path']}`"]
     else:
-        lines.append(_without_first_heading(domestic["report"]))
+        lines = [domestic["report"].rstrip()]
 
-    lines.extend(["", "## 海外完整日报", ""])
-    if overseas["report"] is None:
-        lines.append(f"未生成：`{overseas['report_path']}`")
+    if not overseas["available"] or not overseas["summary"] or not overseas["candidates"]:
+        lines.extend(
+            ["", "## 海外事件增量 未生成", "- 缺少海外日报或候选清单，请检查海外日更任务。"]
+        )
     else:
-        lines.append(_without_first_heading(overseas["report"]))
-
-    lines.extend(
-        [
-            "",
-            "## 输入与权限边界",
-            f"- 国内日报：`{domestic['report_path']}`",
-            f"- 海外日报：`{overseas['report_path']}`",
-            "- 本总览只做读取与拼装，不执行 promote，不安装或修改定时任务。",
-            "",
-        ]
-    )
+        events = overseas["candidates"].get("event_candidates", [])
+        if not isinstance(events, list):
+            events = []
+        lines.extend(["", f"## 海外事件增量 {len(events)} 条"])
+        fetch_mode = (
+            overseas_summary.get("fetch_mode")
+            or overseas["candidates"].get("fetch_mode")
+            or "unknown"
+        )
+        if fetch_mode == "fixture":
+            lines.append("> 海外数据模式：fixture 演练数据，不代表当日真实采集。")
+        elif fetch_mode != "http":
+            lines.append(f"> 海外数据模式：{fetch_mode}，来源模式未确认。")
+        lines.extend(_overseas_event_line(event) for event in events)
+        if not events:
+            lines.append("- 无事件增量")
+        lines.extend(
+            [
+                "",
+                "### 海外采集状态",
+                (
+                    f"- 披露候选 {_count(overseas_summary.get('disclosure_candidates'))} 份 / "
+                    f"原子主张 {_count(overseas_summary.get('claim_candidates'))} 条 / "
+                    f"证据 {_count(overseas_summary.get('evidence_candidates'))} 条"
+                ),
+                f"- 覆盖 {configured}/{monitored} 个监控实体；缺端点 {missing_endpoints} 个；抓取失败 {_count(overseas_summary.get('endpoint_failed'))} 个",
+                f"- 交叉确认建议 {_count(overseas_summary.get('corroboration_suggestions'))} 条，等待人工批准",
+                "> 海外自动结果均为候选，未写入正式账本。",
+            ]
+        )
+    for error in domestic["errors"]:
+        lines.append(f"- 国内输入异常：{error}")
+    for error in overseas["errors"]:
+        lines.append(f"- 海外输入异常：{error}")
+    lines.append("")
     return "\n".join(lines)
 
 
@@ -280,7 +270,9 @@ def combine_daily_reports(
         "run_date": run_date,
         "assembly_status": assembly_status,
         "domestic": {key: value for key, value in domestic.items() if key != "report"},
-        "overseas": {key: value for key, value in overseas.items() if key != "report"},
+        "overseas": {
+            key: value for key, value in overseas.items() if key not in {"report", "candidates"}
+        },
     }
     _atomic_write(markdown_path, _render_markdown(run_date, domestic, overseas))
     _atomic_write(

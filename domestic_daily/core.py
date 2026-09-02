@@ -188,6 +188,32 @@ class DailyMirror:
                 digest.update(f"{stat.st_size}:{stat.st_mtime_ns}".encode())
         return digest.hexdigest()
 
+    def _source_check_lines(self):
+        scan = self.source / "scan.py"
+        if not scan.is_file():
+            return ["源仓库只读;镜像独立运行"], ["source_root 内容指纹前后相同"]
+        try:
+            result = subprocess.run(
+                [sys.executable, str(scan), "--check"],
+                cwd=self.source,
+                capture_output=True,
+                text=True,
+                timeout=120,
+            )
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            return (
+                ["源仓库只读;镜像独立运行"],
+                [f"scan.py --check 未完成: {type(exc).__name__}"],
+            )
+        ansi = re.compile(r"\x1b\[[0-9;]*m")
+        lines = [ansi.sub("", line).strip() for line in result.stdout.splitlines() if line.strip()]
+        corpus = [line for line in lines if "语料" in line]
+        checks = [line for line in lines if "全绿" in line or line.startswith("[")]
+        return (
+            corpus or ["源仓库只读;镜像独立运行"],
+            checks[:3] or ["source_root 内容指纹前后相同"],
+        )
+
     @contextmanager
     def _lock(self):
         self.state.mkdir(parents=True, exist_ok=True)
@@ -367,10 +393,14 @@ class DailyMirror:
                     restart.extend((w, f"公告流({date}): {title[:40]}", url) for w in self.watch if w.get("车道") == "日更" and w.get("公司") == company)
                 for company, count in digest["qa_new"]:
                     restart.extend((w, f"互动易+{count}条", "增量内容未逐条匹配,需人工过内容") for w in self.watch if w.get("车道") == "日更" and w.get("公司") == company)
-                current = self._scan(new_ir); latest = self.state / "daily/queue-latest.txt"; previous = latest.read_text(encoding="utf-8").splitlines() if latest.exists() else []
+                current = self._scan(new_ir); latest = self.state / "daily/queue-latest.txt"; queue_baseline_initialized = not latest.exists(); previous = latest.read_text(encoding="utf-8").splitlines() if latest.exists() else []
                 keys = lambda lines: {x.split("|", 2)[0] + "|" + x.split("|", 2)[1] for x in lines}
-                digest["q_delta_new"] = [x for x in current if x.split("|", 2)[0] + "|" + x.split("|", 2)[1] not in keys(previous)]
-                digest["q_delta_gone"] = [x for x in previous if x.split("|", 2)[0] + "|" + x.split("|", 2)[1] not in keys(current)]
+                if queue_baseline_initialized:
+                    digest["q_delta_new"] = []
+                    digest["q_delta_gone"] = []
+                else:
+                    digest["q_delta_new"] = [x for x in current if x.split("|", 2)[0] + "|" + x.split("|", 2)[1] not in keys(previous)]
+                    digest["q_delta_gone"] = [x for x in previous if x.split("|", 2)[0] + "|" + x.split("|", 2)[1] not in keys(current)]
                 rescreen = None
                 marker = self.state / "monthly" / f".rescreen-{today[:7]}.done"
                 if not marker.exists() and (day.day == 1 or not (self.state / "daily" / f"{today}.txt").exists()):
@@ -407,15 +437,23 @@ class DailyMirror:
                     if before != after: raise RuntimeError("source_root changed during run")
                     return {"daily_path": str(self.state / "daily" / f"{today}.txt"), "manifest_path": str(manifest_path), "manifest": prior_manifest}
                 evidence = bool(digest["ir_new"] or digest["qa_new"] or digest["ann"] or digest["q_delta_new"] or restart)
-                out = [f"# 日报 {today}", "", "## 语料", "- 源仓库只读;镜像独立运行", "", f"## 投关表新增 {len(digest['ir_new'])} 份"]
+                corpus_lines, check_lines = self._source_check_lines()
+                out = [f"# 日报 {today}", "", "## 语料", *[f"- {line}" for line in corpus_lines], "", f"## 投关表新增 {len(digest['ir_new'])} 份"]
                 out += [f"- {n} | {d} | {t[:60]}" for n, d, t in digest["ir_new"][:20]] + [f"\n## 互动易增量 {sum(x[1] for x in digest['qa_new'])} 条"]
-                out += [f"- {n} +{k}条" for n, k in digest["qa_new"]] + [f"\n## 公告流(关注公司) {len(digest['ann'])} 条"] + [f"- {n} | {d} | {t[:50]} | {u}" for n, d, t, u in digest["ann"][:15]]
+                out += [f"- {n} +{k}条" for n, k in digest["qa_new"]] + [f"\n## 公告流(关注公司) {len(digest['ann'])} 条"] + [f"- {n} | {d} | [{t[:50]}]({u})" for n, d, t, u in digest["ann"][:15]]
                 out += [f"\n## 重启复核(待判/待确认监视) {len(restart)} 条", "> 机械匹配，不构成判定"] + ([f"- {w['公司']} [{w['类别']}|{w.get('cell_id','')}] {src} | {ctx[:80]}" for w, src, ctx in restart[:20]] or ["- 无触发"])
-                out += [f"\n## 召回净队列差分: 新增{len(digest['q_delta_new'])} / 消失{len(digest['q_delta_gone'])}"] + [f"- {x}" for x in digest["q_delta_new"][:15]] + ["\n## 校验", "- source_root 内容指纹前后相同", f"- 判定闸建议: {'有增量,值得开闸复核' if evidence else '无实质增量,今日免开闸'}", f"\n## 补录候选(宇宙外·光通信命中) {len(outliers)} 条"] + ([f"- {n} | {d} | {t[:60]}" for n, d, t in outliers[:30]] or ["- 无"])
+                if queue_baseline_initialized:
+                    out.append(f"\n## 召回队列基线初始化: {len(current)} 条（不计为当日新增）")
+                else:
+                    out.append(f"\n## 召回净队列差分: 新增{len(digest['q_delta_new'])} / 消失{len(digest['q_delta_gone'])}")
+                    for item in digest["q_delta_new"][:15]:
+                        company, cell, word, segment = item.split("|", 3)
+                        out.append(f"- [{company}|{cell}] {word} | {segment[:60]}")
+                out += ["\n## 校验", *[f"- {line}" for line in check_lines], f"\n> 判定闸建议: {'有增量,值得开闸复核' if evidence else '无实质增量,今日免开闸'}", f"\n## 补录候选(宇宙外·光通信命中) {len(outliers)} 条"] + ([f"- {n} | {d} | {t[:60]}" for n, d, t in outliers[:30]] or ["- 无"])
                 if rescreen: out += [f"\n## 分母差分(月度重筛 {rescreen['month']})", f"- 复核存量 {rescreen['checked']} 家 / 移出 {len(rescreen['moved_out'])} 家 / 新增 0 家", "- 仅报 diff,不改 _frozen.csv"]
                 if logs: out += ["\n## 日志"] + [f"- {x}" for x in logs]
                 daily = staging / "daily"; daily.mkdir(parents=True, exist_ok=True); (daily / f"{today}.txt").write_text("\n".join(out), encoding="utf-8"); (daily / "queue-latest.txt").write_text("\n".join(current), encoding="utf-8"); (daily / "queue-prev.txt").write_text("\n".join(previous), encoding="utf-8")
-                manifest = {"date": today, "source_fingerprint": before, "queue_sha256": hashlib.sha256("\n".join(current).encode()).hexdigest(), "watched_codes": codes, "digest": digest, "restart_hits": len(restart), "outlier_hits": len(outliers), "outliers": outliers, "rescreen": rescreen, "logs": logs}
+                manifest = {"date": today, "source_fingerprint": before, "queue_sha256": hashlib.sha256("\n".join(current).encode()).hexdigest(), "queue_baseline_initialized": queue_baseline_initialized, "watched_codes": codes, "digest": digest, "restart_hits": len(restart), "outlier_hits": len(outliers), "outliers": outliers, "rescreen": rescreen, "logs": logs}
                 (staging / "manifest.json").write_bytes(_json_bytes(manifest))
                 (staging / "run.log").write_text("\n".join(logs) + ("\n" if logs else ""), encoding="utf-8")
                 for path in sorted(staging.rglob("*")):

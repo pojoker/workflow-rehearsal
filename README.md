@@ -64,7 +64,7 @@ python3 -m domestic_daily run --source-root . --state-root /path/to/domestic-dai
 
 ## 国内与海外合并日报
 
-两套镜像完成后，`daily_intelligence` 只读取它们的日报与运行清单，生成一份人类可读 Markdown 总览和一份机器可读 JSON 摘要。任一输入缺失时仍会生成 `partial` 报告并显式列出缺失项；合并过程不执行 promote，也不写国内 canonical 或海外 `calls/*.csv`。
+两套镜像完成后，`daily_intelligence` 只读取它们的日报与运行清单。Markdown **逐字保留原国内日报作为主体**，仅在末尾追加中文化的“海外事件增量”与采集状态；不会另造首页、重排原章节或暴露内部英文枚举。JSON 保存机器可读摘要。任一输入缺失时仍会生成 `partial` 结果并显式列出缺失项；合并过程不执行 promote，也不写国内 canonical 或海外 `calls/*.csv`。fixture 演练会在读者层醒目标注，不得冒充真实采集；国内首次运行只初始化召回基线，不把存量队列计为当日新增。
 
 ```bash
 python3 -m daily_intelligence combine \

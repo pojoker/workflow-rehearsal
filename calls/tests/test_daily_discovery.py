@@ -585,8 +585,13 @@ class TestIdempotency(DailyDiscoveryTestCase):
         _run(self.source, self.state)
         report = (self.state / "daily" / f"{RUN_DATE}.txt").read_text(encoding="utf-8")
         self.assertIn(f"# 海外事件雷达日更镜像 {RUN_DATE}", report)
+        self.assertIn("运行模式：fixture", report)
         self.assertIn("全部 review_status=candidate", report)
         self.assertIn("全部 event_status=asserted", report)
+        summary = json.loads(
+            (self.state / "staging" / RUN_DATE / "run-summary.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(summary["fetch_mode"], "fixture")
 
 
 class TestReadOnlyGuarantee(unittest.TestCase):

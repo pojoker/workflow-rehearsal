@@ -256,6 +256,8 @@ def parse_feed(body: str, base_url: str) -> list[dict[str, Any]]:
 class HttpFetcher:
     """Fetch public entity endpoints and normalize them to fixture-shaped items."""
 
+    fetch_mode = "http"
+
     def __init__(self, run_date: str, timeout: int = 30, lookback_days: int = 14, max_items: int = 20) -> None:
         self.run_date = date.fromisoformat(run_date)
         self.timeout = timeout

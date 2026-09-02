@@ -84,6 +84,17 @@ class MirrorTests(unittest.TestCase):
         self.assertIn("公司甲|C4|光模块", queue)
         self.assertNotIn("QAONLY", queue)
 
+    def test_first_run_seeds_queue_without_false_daily_delta(self):
+        source = self.make_source()
+        state = Path(tempfile.mkdtemp())
+        result = DailyMirror(source, state, FixtureClient()).run("2026-09-01")
+
+        self.assertTrue(result["manifest"]["queue_baseline_initialized"])
+        self.assertEqual(result["manifest"]["digest"]["q_delta_new"], [])
+        report = (state / "daily/2026-09-01.txt").read_text(encoding="utf-8")
+        self.assertIn("召回队列基线初始化: 1 条（不计为当日新增）", report)
+        self.assertIn("> 判定闸建议: 无实质增量,今日免开闸", report)
+
     def test_rescreen_401_short_circuits_without_marker(self):
         source = self.make_source()
         state = Path(tempfile.mkdtemp())

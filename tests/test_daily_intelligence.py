@@ -32,7 +32,18 @@ class CombinedDailyIntelligenceTest(unittest.TestCase):
         domestic_manifest = self.domestic / "manifest.json"
         overseas_report = self.overseas / "daily" / "2026-09-02.txt"
         overseas_summary = self.overseas / "staging" / "2026-09-02" / "run-summary.json"
-        domestic_report.write_text("# 国内日报\n\n## 明细\n- 国内事件\n", encoding="utf-8")
+        domestic_report.write_text(
+            "# 日报 2026-09-02\n\n"
+            "## 语料\n- [语料] 最新文件距今1天; 宇宙内缺席年报 0 家\n\n"
+            "## 投关表新增 1 份\n- 公司甲 | 2026-09-02 | 投资者关系活动记录表\n\n"
+            "## 互动易增量 2 条\n- 公司甲 +2条\n\n"
+            "## 公告流(关注公司) 0 条\n\n"
+            "## 召回净队列差分: 新增1 / 消失0\n- [公司甲|C4] 光模块 | 新增内容\n\n"
+            "## 校验\n- 不变量全绿(①-⑭)\n\n"
+            "> 判定闸建议: 有增量,值得开闸复核\n\n"
+            "## 补录候选(宇宙外·光通信命中) 0 条\n- 无\n",
+            encoding="utf-8",
+        )
         domestic_manifest.write_text(
             json.dumps(
                 {
@@ -58,6 +69,7 @@ class CombinedDailyIntelligenceTest(unittest.TestCase):
             json.dumps(
                 {
                     "run_date": "2026-09-02",
+                    "fetch_mode": "fixture",
                     "monitored_entity_count": 82,
                     "configured_entity_count": 7,
                     "missing_endpoint_count": 75,
@@ -74,7 +86,30 @@ class CombinedDailyIntelligenceTest(unittest.TestCase):
             ),
             encoding="utf-8",
         )
-        return [domestic_report, domestic_manifest, overseas_report, overseas_summary]
+        overseas_candidates = self.overseas / "staging" / "2026-09-02" / "candidates.json"
+        overseas_candidates.write_text(
+            json.dumps(
+                {
+                    "run_date": "2026-09-02",
+                    "fetch_mode": "fixture",
+                    "event_candidates": [
+                        {
+                            "event_id": "EC_001",
+                            "primary_subject_id": "LITE",
+                            "event_category": "commercial_adoption",
+                            "lifecycle_stage": "first_shipment",
+                            "occurred_start": "2026-09-01",
+                            "event_status": "asserted",
+                            "suggested_event_status": "corroborated",
+                            "blocked_reason": "",
+                        }
+                    ],
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        return [domestic_report, domestic_manifest, overseas_report, overseas_summary, overseas_candidates]
 
     def test_combines_both_reports_and_keeps_inputs_read_only(self) -> None:
         inputs = self._write_complete_inputs()
@@ -89,13 +124,15 @@ class CombinedDailyIntelligenceTest(unittest.TestCase):
 
         self.assertEqual(result["assembly_status"], "complete")
         report = Path(result["markdown_path"]).read_text(encoding="utf-8")
-        self.assertIn("国内与海外每日情报总览 2026-09-02", report)
-        self.assertIn("投关表 +1、互动问答 +2", report)
-        self.assertIn("披露 9、主张 10、事件 8、证据 9", report)
-        self.assertIn("已配置 7/82 个实体", report)
-        self.assertIn("正式账本写入 0 条", report)
-        self.assertIn("国内事件", report)
-        self.assertIn("LITE first shipment", report)
+        original = inputs[0].read_text(encoding="utf-8").rstrip()
+        self.assertTrue(report.startswith(original))
+        self.assertIn("## 海外事件增量 1 条", report)
+        self.assertIn("- LITE | 商业采用·首次出货 | 2026-09-01 | 已声称；建议交叉确认", report)
+        self.assertIn("海外数据模式：fixture 演练数据，不代表当日真实采集", report)
+        self.assertNotIn("国内与海外每日情报总览", report)
+        self.assertNotIn("commercial_adoption", report)
+        self.assertNotIn("first_shipment", report)
+        self.assertNotIn("status=asserted", report)
         self.assertEqual(before, {path: _sha256(path) for path in inputs})
 
     def test_missing_source_still_writes_an_explicit_partial_report(self) -> None:
@@ -114,8 +151,10 @@ class CombinedDailyIntelligenceTest(unittest.TestCase):
 
         self.assertEqual(result["assembly_status"], "partial")
         report = Path(result["markdown_path"]).read_text(encoding="utf-8")
-        self.assertIn("汇总状态：partial", report)
-        self.assertIn("海外输入异常：missing:", report)
+        self.assertTrue(report.startswith("# 国内日报"))
+        self.assertIn("## 海外事件增量 未生成", report)
+        self.assertIn("缺少海外日报", report)
+        self.assertNotIn("汇总状态：partial", report)
         payload = json.loads(Path(result["json_path"]).read_text(encoding="utf-8"))
         self.assertFalse(payload["overseas"]["available"])
 

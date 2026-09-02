@@ -418,6 +418,8 @@ class FixtureFetcher:
     Nothing in this module installs or triggers a scheduler.
     """
 
+    fetch_mode = "fixture"
+
     def __init__(self, fixture_dir: Path) -> None:
         self.fixture_dir = fixture_dir
 
@@ -1232,6 +1234,7 @@ def _daily_report(outcome: RunOutcome, registry: EntityRegistry, run_date: str) 
         f"# 海外事件雷达日更镜像 {run_date}",
         "",
         "本产物只写独立 state_root；calls/*.csv、calls/out/ 与根 canonical 均为只读。",
+        f"运行模式：{details.get('fetch_mode', 'unknown')}",
         "",
         "## 监控池并集",
         f"- 季度覆盖公司：{tiers['quarterly']}",
@@ -1303,6 +1306,7 @@ def run_daily_discovery(
     endpoints = load_discovery_config(config_path, registry)
     with _RunLock(state / LOCK_NAME):
         outcome = _build_candidates(registry, ledger, endpoints, fetcher, run_date)
+        outcome.details["fetch_mode"] = getattr(fetcher, "fetch_mode", "unknown")
         staging = state / STAGING_DIR / run_date
         staging.mkdir(parents=True, exist_ok=True)
         _atomic_write_csv(staging / "disclosure_candidates.csv",
@@ -1329,6 +1333,7 @@ def run_daily_discovery(
 
         summary = {
             "run_date": run_date,
+            "fetch_mode": outcome.details["fetch_mode"],
             "endpoint_count": outcome.details["endpoint_count"],
             "endpoint_failed": outcome.details["endpoint_failed"],
             "monitored_entity_count": outcome.details["monitored_entity_count"],
