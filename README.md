@@ -51,7 +51,7 @@ HTML 保持单一读者页面：`route_bom.csv` 提供 800G DR8 / 1.6T DR8 / 400
 ```bash
 # 重建研究问题树（与全景图/知识库/问题队列一同生成）
 /Users/jowang/miniconda3/bin/python3 render.py
-# 校验输出未被手改（含 研究问题树.md）
+# 两次临时重建并比较，校验生成确定性；不把 out/ 当 canonical
 /Users/jowang/miniconda3/bin/python3 render.py --verify
 # 不变量①-⑭（含研究问题图 v3 的 display parent 与 depends_on DAG 校验）
 /Users/jowang/miniconda3/bin/python3 scan.py --check

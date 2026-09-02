@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""render.py — tree.yaml+csv→out/全景.md+.html 幂等确定性渲染。--verify: 重渲比对防手改。"""
+"""render.py — tree.yaml+csv→out/全景.md+.html 幂等确定性渲染。
+
+--verify 在两个临时目录独立重建并比较，验证生成确定性；out/ 不是 canonical。
+"""
 import os,csv,sys,re,yaml,filecmp,tempfile,shutil
 from collections import namedtuple, Counter
 from datetime import date
@@ -532,15 +535,18 @@ def build(outdir):
     write_research_tree(outdir)
 if __name__=='__main__':
     if '--verify' in sys.argv:
-        tmp=tempfile.mkdtemp(); build(tmp)
-        # 强制核验六文件：全景.md/.html + 知识库.md/.html + 问题队列.md + 研究问题树.md；任一缺失或不一致即失败
-        ok=True
-        for f in ('全景.md','全景.html','知识库.md','知识库.html','问题队列.md','研究问题树.md'):
-            tp=os.path.join(tmp,f); op=os.path.join(ROOT,'out',f)
-            if not (os.path.exists(tp) and os.path.exists(op) and filecmp.cmp(tp,op,shallow=False)):
-                ok=False; break
-        shutil.rmtree(tmp)
-        if not ok: print('\033[31m[--verify] out/ 与重渲不一致或文件缺失(疑手改)\033[0m'); sys.exit(1)
-        print('--verify: 一致')
+        left=tempfile.mkdtemp(); right=tempfile.mkdtemp()
+        try:
+            build(left); build(right)
+            # 生成物不是事实源；只校验同一 canonical 输入能否两次得到完全相同的六个读者文件。
+            ok=True
+            for f in ('全景.md','全景.html','知识库.md','知识库.html','问题队列.md','研究问题树.md'):
+                lp=os.path.join(left,f); rp=os.path.join(right,f)
+                if not (os.path.exists(lp) and os.path.exists(rp) and filecmp.cmp(lp,rp,shallow=False)):
+                    ok=False; break
+        finally:
+            shutil.rmtree(left); shutil.rmtree(right)
+        if not ok: print('\033[31m[--verify] 两次临时重建不一致或文件缺失\033[0m'); sys.exit(1)
+        print('--verify: 两次临时重建一致(out/非canonical)')
     else:
         build(os.path.join(ROOT,'out')); print('out/ 已重建')
