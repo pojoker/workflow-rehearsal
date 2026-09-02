@@ -69,3 +69,15 @@ HTML 保持单一读者页面：`route_bom.csv` 提供 800G DR8 / 1.6T DR8 / 400
 
 年报季提示：A股年报4月末集中披露；美股10-K财年后60-90天。
 边界：语料宇宙见 corpus/_frozen.csv（每文件一行带出处）；archive/ 为旧结构冷冻区（默认禁读）。
+
+## 国内日更镜像
+
+`domestic_daily` 是 `corpus/_daily_update.py` 的隔离实现：它读取本仓库账本、`corpus/_frozen.csv`、`triage.csv`、`points.csv`、`_restart_watchlist.csv`、年报、IR 和 QA 作为只读输入，但绝不写入 `corpus/`、`tmp/daily/` 或 canonical 文件。输出根目录由调用方传入：
+
+```bash
+python3 -m domestic_daily run --source-root . --state-root /path/to/domestic-daily-state --date 2026-09-02
+```
+
+运行状态、投关表文本、QA 全量并集快照、日报和队列差分均写入 `state_root`。关注公司仍是“triage 待判 ∪ points 生产中/在建 ∪ 日更 watchlist”；投关表查询仍覆盖 `relation/category_dyhd_szdy` 与全文“投资者关系”，宇宙外只产生光通信补录候选；公告仍按原 `ANN_PAT` 过滤；QA 从 `2023-01-01` 请求并按 `index_id` 与既有源/镜像快照并集，只增不减。重启段是内容/标题机械匹配，不构成判定，QA 增量须人工过内容。月度重筛逐家公司执行，只报告差分、不改 `_frozen.csv`，401/token 失败记录后降级。
+
+实现通过 state-root 锁、临时 staging 目录和原子替换保证重复运行幂等；网络由 `RequestsClient` 提供，测试使用 `FixtureClient`，不依赖公网。手工调度可在未来使用同一 CLI，例如 `30 18 * * * cd /repo && python3 -m domestic_daily run --source-root . --state-root /var/lib/domestic-daily --date $(date +\%F)`；本项目不会安装或启动 scheduler。离线测试：`python3 -m unittest discover -s tests`。源基线扫描仍须单独运行 `python3 scan.py --check`；缺失 gitignored 年报文本时，其召回结果仅代表当前基线，不能视为完整语料覆盖。

@@ -1,0 +1,340 @@
+from __future__ import annotations
+
+import csv
+import datetime as dt
+import hashlib
+import json
+import os
+import re
+import shutil
+import subprocess
+import tempfile
+from contextlib import contextmanager
+from pathlib import Path
+
+ANN_PAT = re.compile(r"重大合同|向特定对象|定增|业绩预告|业绩快报|问询|回复|收购|资产重组")
+IR_KW = re.compile(r"光模块|光通信|光通讯|CPO|光芯片|光器件|光引擎|硅光|800G|1\.6T|相干", re.I)
+QA_KEYS = ("code", "question", "answer", "answer_date", "index_id", "empty", "fetch_date")
+IR_ENDPOINT = "https://www.cninfo.com.cn/new/hisAnnouncement/query"
+
+
+def _rows(path):
+    if not path.exists():
+        return []
+    with path.open(encoding="utf-8-sig", newline="") as f:
+        return list(csv.DictReader(f))
+
+
+def _clean(value):
+    return re.sub(r"<[^>]+>", "", str(value or "")).replace("&nbsp;", " ").replace("&amp;", "&").strip()
+
+
+def _date(value):
+    if isinstance(value, (int, float)):
+        return dt.datetime.fromtimestamp(value / 1000).date().isoformat()
+    return str(value or "")[:10]
+
+
+def _key(row):
+    return ("id", str(row.get("index_id"))) if row.get("index_id") else (
+        "content", row.get("question", ""), row.get("answer", ""), row.get("ask_date", ""), row.get("answer_date", ""))
+
+
+def _json_bytes(value):
+    return (json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode()
+
+
+class RequestsClient:
+    """Small network adapter. Tests replace it with FixtureClient."""
+
+    def __init__(self):
+        import requests
+        self.session = requests.Session()
+
+    def _post(self, data):
+        return self.session.post(IR_ENDPOINT, data=data, timeout=40).json().get("announcements", [])
+
+    def query_ir(self, tab, category, since, until):
+        data = {"pageNum": "1", "pageSize": "30", "column": "", "tabName": tab,
+                "plate": "", "stock": "", "searchkey": "", "secid": "", "category": category,
+                "trade": "", "seDate": f"{since}~{until}", "sortName": "", "sortType": "", "isHLtitle": "true"}
+        return self._post(data)
+
+    def download(self, url):
+        if not url.startswith("http"):
+            url = "https://static.cninfo.com.cn/" + url.lstrip("/")
+        return self.session.get(url, timeout=60).content
+
+    def fetch_qa(self, code, since):
+        if code.startswith("6"):
+            return []  # SSE is intentionally a no-op here; the source snapshot remains authoritative.
+        info = self.session.post("https://irm.cninfo.com.cn/newircs/index/queryKeyboardInfo", data={"keyWord": code}, timeout=20).json()
+        secid = next((x.get("secid") or x.get("secId") for x in info.get("data", []) if str(x.get("stockCode") or x.get("secCode")) == code), None)
+        if not secid:
+            return []
+        page, result = 1, []
+        while True:
+            data = self.session.get("https://irm.cninfo.com.cn/newircs/search/searchResult", params={
+                "stockCodes": f"{secid}_{code}", "keywords": "", "infoTypes": "11",
+                "startDate": since + " 00:00:00", "endDate": "2099-12-31 23:59:59",
+                "pageNum": page, "pageSize": 30, "onlyAttentionCompany": 2}, timeout=20).json().get("data", {})
+            rows = data.get("results") or []
+            for item in rows:
+                answer = str(item.get("attachedContent") or "").strip()
+                def stamp(value):
+                    try: return dt.date.fromtimestamp(int(value) / 1000).isoformat()
+                    except (TypeError, ValueError, OSError): return ""
+                result.append({"code": code, "secid": secid, "question": str(item.get("mainContent") or "").strip(), "answer": answer,
+                               "answer_date": stamp(item.get("attachedPubDate") or item.get("updateDate")), "ask_date": stamp(item.get("pubDate")),
+                               "index_id": str(item.get("indexId") or ""), "empty": not bool(answer), "fetch_date": dt.date.today().isoformat(),
+                               "source": "irm.cninfo.com.cn searchResult(infoTypes=11)"})
+            if not rows or page >= int(data.get("totalPage") or 0): break
+            page += 1
+        return result
+
+    def query_announcements(self, code, since, until):
+        data = {"pageNum": "1", "pageSize": "15", "column": "", "tabName": "fulltext",
+                "plate": "", "stock": "", "searchkey": code, "secid": "", "category": "",
+                "trade": "", "seDate": f"{since}~{until}", "sortName": "", "sortType": "", "isHLtitle": "true"}
+        return self._post(data)
+
+    def rescreen(self, code, until):
+        response = self.session.get("https://webapi.cninfo.com.cn/api/stock/p_stock2110", params={"scode": code, "sdate": "1990-01-01", "edate": until}, timeout=30)
+        if response.status_code == 401 or "未经授权" in response.text or '"resultcode":401' in response.text:
+            raise RuntimeError("p_stock2110 需token(401)")
+        try: records = response.json()
+        except ValueError: return None
+        if isinstance(records, dict): records = records.get("result") or records.get("data") or []
+        for row in records:
+            if str(row.get("F001V") or row.get("f001v") or "") == "008003" and str(row.get("F008C") or row.get("f008c") or "") == "1":
+                return str(row.get("F005V") or row.get("f005v") or "").strip() or None
+        return None
+
+
+class FixtureClient:
+    """Deterministic adapter used by tests and local fixture runs."""
+
+    def __init__(self, **kwargs):
+        self.data = kwargs
+        self.calls = []
+
+    def _get(self, name, *args):
+        self.calls.append((name,) + args)
+        value = self.data.get(name, {})
+        return value.get(args[0], []) if isinstance(value, dict) else value
+
+    def query_ir(self, tab, category, since, until): return self.data.get("ir", {}).get(tab, [])
+    def download(self, url): return self.data.get("downloads", {}).get(url, b"%PDF-fixture")
+    def fetch_qa(self, code, since): return self._get("qa", code)
+    def query_announcements(self, code, since, until): return self._get("announcements", code)
+    def rescreen(self, code, until): return self._get("rescreen", code)
+
+
+class DailyMirror:
+    def __init__(self, source_root, state_root, client):
+        self.source = Path(source_root).resolve()
+        self.state = Path(state_root).resolve()
+        if self.state == self.source or self.source in self.state.parents:
+            raise ValueError("state_root must be outside source_root")
+        self.client = client
+        self.frozen = {r["代码"]: r["名称"] for r in _rows(self.source / "corpus/_frozen.csv")}
+        self.watch = _rows(self.source / "corpus/_restart_watchlist.csv")
+
+    def watched_codes(self):
+        names = {code: name for code, name in self.frozen.items()}
+        codes = set()
+        for row in _rows(self.source / "triage.csv"):
+            if row.get("处置") == "待判":
+                codes.update(c for c, n in names.items() if n == row.get("公司"))
+        for row in _rows(self.source / "points.csv"):
+            if row.get("状态") in ("生产中", "在建"):
+                codes.update(c for c, n in names.items() if n == row.get("公司"))
+        codes.update(r["代码"] for r in self.watch if r.get("车道") == "日更" and r.get("代码"))
+        return sorted(codes)
+
+    def _protected_fingerprint(self):
+        digest = hashlib.sha256()
+        for path in sorted(p for p in self.source.rglob("*") if p.is_file() and ".git" not in p.parts):
+            digest.update(str(path.relative_to(self.source)).encode())
+            digest.update(path.read_bytes())
+        return digest.hexdigest()
+
+    @contextmanager
+    def _lock(self):
+        self.state.mkdir(parents=True, exist_ok=True)
+        lock_path = self.state / ".lock"
+        import fcntl
+        with lock_path.open("w") as lock:
+            try:
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError as exc:
+                raise RuntimeError(f"state root is locked: {lock_path}") from exc
+            try:
+                yield
+            finally:
+                fcntl.flock(lock, fcntl.LOCK_UN)
+
+    def _source_qa(self, code):
+        path = self.source / "corpus/qa" / code / "qa.jsonl"
+        return self._read_qa(path)
+
+    @staticmethod
+    def _read_qa(path):
+        rows = []
+        if path.exists():
+            for line in path.read_text(encoding="utf-8").splitlines():
+                try:
+                    row = json.loads(line)
+                    if all(k in row for k in QA_KEYS): rows.append(row)
+                except json.JSONDecodeError:
+                    continue
+        return rows
+
+    def _old_qa(self, code):
+        return self._read_qa(self.state / "qa" / code / "qa.jsonl")
+
+    def _scan(self, added_ir, added_qa):
+        words = []
+        for line in (self.source / "words.txt").read_text(encoding="utf-8").splitlines():
+            if line.strip() and not line.startswith("#"):
+                word, cell, exclude, context = [x.strip() for x in line.split("|", 3)]
+                words.append((word, cell, exclude, context))
+        done = {r.get("hit_id") for r in _rows(self.source / "triage.csv")}
+        filled = {r.get("cell_id") for r in _rows(self.source / "points.csv")}
+        known = {r.get("公司") for r in _rows(self.source / "points.csv")}
+        texts = []
+        for path in sorted((self.source / "corpus/annual").glob("**/*.txt")):
+            code = path.parent.name; company = re.search(r"_([^_]+)_em_", path.name)
+            texts.append((company.group(1) if company else code, path.name, path.read_text(errors="ignore")))
+        for path in sorted((self.state / "ir").glob("**/*.txt")):
+            texts.append((self.frozen.get(path.parent.name, path.parent.name), path.name, path.read_text(errors="ignore")))
+        for code, path, text in added_ir:
+            texts.append((self.frozen.get(code, code), path.name, text))
+        for code, row in added_qa:
+            texts.append((self.frozen.get(code, code), row.get("index_id", "qa"), row.get("answer", "")))
+        queue = []
+        for company, filename, original in texts:
+            text = re.sub(r"\s+", "", original)
+            for word, cell, exclude, context in words:
+                if cell == "ANY" and company in known: continue
+                match = re.search(re.escape(word), text)
+                if not match: continue
+                segment = text[max(0, match.start()-40):match.end()+40]
+                if exclude and re.search(exclude, segment): continue
+                if context and context not in segment: continue
+                hit = f"{company}+{cell}+{filename[:40]}"
+                if hit in done: continue
+                priority = 1 if cell == "ANY" else (0 if cell not in filled else 2)
+                queue.append((priority, f"{company}|{cell}|{word}|{segment[:50]}", company, cell, word, segment[:50]))
+        return [x[1] for x in sorted(queue)]
+
+    def run(self, run_date):
+        day = dt.date.fromisoformat(run_date)
+        today, since = day.isoformat(), (day - dt.timedelta(days=3)).isoformat()
+        with self._lock():
+            before = self._protected_fingerprint()
+            staging = Path(tempfile.mkdtemp(prefix=".run-", dir=self.state))
+            try:
+                prior_manifest = None
+                manifest_path = self.state / "manifest.json"
+                if manifest_path.exists():
+                    try:
+                        prior_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+                    except (OSError, json.JSONDecodeError):
+                        prior_manifest = None
+                codes = self.watched_codes(); digest = {"ir_new": [], "qa_new": [], "ann": [], "q_delta_new": [], "q_delta_gone": []}
+                logs = []; new_ir = []; added_qa = []; outliers = []
+                seen = set()
+                for tab, category in (("relation", "category_dyhd_szdy"), ("fulltext", "")):
+                    for item in self.client.query_ir(tab, category, since, today) or []:
+                        code, name, title = str(item.get("secCode", "")), str(item.get("secName", "")), _clean(item.get("announcementTitle"))
+                        url = str(item.get("adjunctUrl", ""))
+                        if tab == "fulltext" and "投资者关系" not in title: continue
+                        if code in self.frozen and url.lower().endswith(".pdf"):
+                            key = code + title
+                            if key in seen: continue
+                            seen.add(key)
+                            content = self.client.download(url)
+                            path = staging / "ir" / code / (re.sub(r"[^\w\-.一-龥]", "_", f"{code}_{_date(item.get('announcementTime'))}_{title}") + ".pdf")
+                            path.parent.mkdir(parents=True, exist_ok=True)
+                            existing_path = self.state / path.relative_to(staging)
+                            if existing_path.exists():
+                                continue
+                            path.write_bytes(content)
+                            text_path = path.with_suffix(path.suffix + ".txt")
+                            text = str(item.get("text", ""))
+                            if text: text_path.write_text(text, encoding="utf-8")
+                            elif content.startswith(b"%PDF"):
+                                proc = subprocess.run(["pdftotext", "-layout", str(path), str(text_path)], capture_output=True)
+                                if proc.returncode: text_path.write_text("", encoding="utf-8")
+                            else: text_path.write_text("", encoding="utf-8")
+                            digest["ir_new"].append((self.frozen[code], _date(item.get("announcementTime")), title)); new_ir.append((code, text_path, text_path.read_text(errors="ignore")))
+                        elif name and IR_KW.search(title): outliers.append((name, _date(item.get("announcementTime")), title))
+                for code in codes:
+                    existing = self._source_qa(code) + self._old_qa(code); prior = {_key(x) for x in existing}; fetched = self.client.fetch_qa(code, "2023-01-01") or []
+                    merged = { _key(x): x for x in existing }
+                    for row in fetched:
+                        if _key(row) not in merged: added_qa.append((code, row))
+                        merged[_key(row)] = row
+                    if len(merged) > len(prior): digest["qa_new"].append((self.frozen.get(code, code), len(merged) - len(prior)))
+                    qpath = staging / "qa" / code / "qa.jsonl"; qpath.parent.mkdir(parents=True, exist_ok=True)
+                    qpath.write_text("".join(json.dumps(v, ensure_ascii=False, sort_keys=True) + "\n" for v in merged.values()), encoding="utf-8")
+                for code in codes:
+                    for item in self.client.query_announcements(code, since, today) or []:
+                        if str(item.get("secCode", code)) != code: continue
+                        title = _clean(item.get("announcementTitle"))
+                        if ANN_PAT.search(title): digest["ann"].append((self.frozen.get(code, code), _date(item.get("announcementTime")), title, str(item.get("adjunctUrl", ""))))
+                restart = []
+                for code, path, text in new_ir:
+                    for w in self.watch:
+                        if w.get("车道") == "日更" and w.get("代码") == code and re.search(w.get("触发词", ""), text, re.I): restart.append((w, f"投关表《{path.stem[:30]}》", text[:100]))
+                for company, date, title, url in digest["ann"]:
+                    restart.extend((w, f"公告流({date}): {title[:40]}", url) for w in self.watch if w.get("车道") == "日更" and w.get("公司") == company)
+                for company, count in digest["qa_new"]:
+                    restart.extend((w, f"互动易+{count}条", "增量内容未逐条匹配,需人工过内容") for w in self.watch if w.get("车道") == "日更" and w.get("公司") == company)
+                current = self._scan(new_ir, added_qa); latest = self.state / "daily/queue-latest.txt"; previous = latest.read_text(encoding="utf-8").splitlines() if latest.exists() else []
+                keys = lambda lines: {x.split("|", 2)[0] + "|" + x.split("|", 2)[1] for x in lines}
+                digest["q_delta_new"] = [x for x in current if x.split("|", 2)[0] + "|" + x.split("|", 2)[1] not in keys(previous)]
+                digest["q_delta_gone"] = [x for x in previous if x.split("|", 2)[0] + "|" + x.split("|", 2)[1] not in keys(current)]
+                rescreen = None
+                marker = self.state / "monthly" / f".rescreen-{today[:7]}.done"
+                if not marker.exists() and (day.day == 1 or not (self.state / "daily" / f"{today}.txt").exists()):
+                    rescreen = {"month": today[:7], "checked": 0, "moved_out": [], "unresolved": 0, "blocked": False}
+                    for code in self.frozen:
+                        try:
+                            result = self.client.rescreen(code, today)
+                            rescreen["checked"] += 1
+                            if result and result not in ("半导体", "光学光电子", "通信设备", "元件"): rescreen["moved_out"].append((code, self.frozen[code], result))
+                        except Exception as exc: rescreen["unresolved"] += 1; logs.append(f"[重筛] {code} 失败: {str(exc)[:50]}")
+                    marker.parent.mkdir(parents=True, exist_ok=True); marker.write_text(today, encoding="utf-8")
+                if not rescreen and day.day == 1: logs.append("[重筛] 本月已存在标记,跳过")
+                unchanged_replay = bool(
+                    prior_manifest and prior_manifest.get("date") == today
+                    and not digest["ir_new"] and not digest["qa_new"]
+                    and json.loads(json.dumps(digest["ann"], ensure_ascii=False)) == prior_manifest.get("digest", {}).get("ann", [])
+                    and json.loads(json.dumps(outliers, ensure_ascii=False)) == prior_manifest.get("outliers", [])
+                )
+                if unchanged_replay:
+                    after = self._protected_fingerprint()
+                    if before != after: raise RuntimeError("source_root changed during run")
+                    return {"daily_path": str(self.state / "daily" / f"{today}.txt"), "manifest_path": str(manifest_path), "manifest": prior_manifest}
+                evidence = bool(digest["ir_new"] or digest["qa_new"] or digest["ann"] or digest["q_delta_new"] or restart)
+                out = [f"# 日报 {today}", "", "## 语料", "- 源仓库只读;镜像独立运行", "", f"## 投关表新增 {len(digest['ir_new'])} 份"]
+                out += [f"- {n} | {d} | {t[:60]}" for n, d, t in digest["ir_new"][:20]] + [f"\n## 互动易增量 {sum(x[1] for x in digest['qa_new'])} 条"]
+                out += [f"- {n} +{k}条" for n, k in digest["qa_new"]] + [f"\n## 公告流(关注公司) {len(digest['ann'])} 条"] + [f"- {n} | {d} | {t[:50]} | {u}" for n, d, t, u in digest["ann"][:15]]
+                out += [f"\n## 重启复核(待判/待确认监视) {len(restart)} 条", "> 机械匹配，不构成判定"] + ([f"- {w['公司']} [{w['类别']}|{w.get('cell_id','')}] {src} | {ctx[:80]}" for w, src, ctx in restart[:20]] or ["- 无触发"])
+                out += [f"\n## 召回净队列差分: 新增{len(digest['q_delta_new'])} / 消失{len(digest['q_delta_gone'])}"] + [f"- {x}" for x in digest["q_delta_new"][:15]] + ["\n## 校验", "- source_root 内容指纹前后相同", f"- 判定闸建议: {'有增量,值得开闸复核' if evidence else '无实质增量,今日免开闸'}", f"\n## 补录候选(宇宙外·光通信命中) {len(outliers)} 条"] + ([f"- {n} | {d} | {t[:60]}" for n, d, t in outliers[:30]] or ["- 无"])
+                if rescreen: out += [f"\n## 分母差分(月度重筛 {rescreen['month']})", f"- 复核存量 {rescreen['checked']} 家 / 移出 {len(rescreen['moved_out'])} 家 / 新增 0 家", "- 仅报 diff,不改 _frozen.csv"]
+                if logs: out += ["\n## 日志"] + [f"- {x}" for x in logs]
+                daily = staging / "daily"; daily.mkdir(parents=True, exist_ok=True); (daily / f"{today}.txt").write_text("\n".join(out), encoding="utf-8"); (daily / "queue-latest.txt").write_text("\n".join(current), encoding="utf-8"); (daily / "queue-prev.txt").write_text("\n".join(previous), encoding="utf-8")
+                manifest = {"date": today, "watched_codes": codes, "digest": digest, "restart_hits": len(restart), "outlier_hits": len(outliers), "outliers": outliers, "rescreen": rescreen, "logs": logs}
+                (staging / "manifest.json").write_bytes(_json_bytes(manifest))
+                (staging / "run.log").write_text("\n".join(logs) + ("\n" if logs else ""), encoding="utf-8")
+                for path in sorted(staging.rglob("*")):
+                    if path.is_file():
+                        target = self.state / path.relative_to(staging); target.parent.mkdir(parents=True, exist_ok=True); os.replace(path, target)
+                after = self._protected_fingerprint()
+                if before != after: raise RuntimeError("source_root changed during run")
+                return {"daily_path": str(self.state / "daily" / f"{today}.txt"), "manifest_path": str(self.state / "manifest.json"), "manifest": manifest}
+            finally:
+                shutil.rmtree(staging, ignore_errors=True)
