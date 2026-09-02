@@ -25,8 +25,8 @@ target_contract:
   batch_write_policy: atomic_after_dependency
   dependency_semantics: PQ003_batch_may_only_be_materialized_after_PQ001_and_PQ002_candidate_batches
   canonical_write_requires_explicit_user_approval: true
-  current_canonical_sha256: 96c3e28f05abe4392a9984fc63b15f120719bbeb1d97ed445111cd672298dd19
-  current_canonical_max_id: KN007
+  current_canonical_sha256: ecb9f6efefaba2085bf0e3f6121de17ab56e107953b3649e6bb07e64288b5c22
+  current_canonical_max_id: KN010
   materialized_dependency_max_id: KN013
   proposed_ids: [KN014]
   proposed_ids_are_reserved: false

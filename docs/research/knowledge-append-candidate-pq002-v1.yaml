@@ -5,9 +5,6 @@ canonical_write_performed: false
 target_file: knowledge.yaml
 prepared_at: '2026-08-31'
 
-dependency_candidate_files:
-  - docs/research/knowledge-append-candidate-pq001-v1.yaml
-
 source_package:
   path: docs/research/pi-packages/2026-08-23-expansion-v1
   adjudication: docs/research/pi-packages/2026-08-23-expansion-v1/adjudication-pq002-final.md
@@ -22,12 +19,10 @@ source_package:
 target_contract:
   target_class: physical_domain_knowledge
   target_system: 物理知识
-  batch_write_policy: atomic_after_dependency
-  dependency_semantics: PQ002_batch_may_only_be_materialized_after_PQ001_candidate_batch
+  batch_write_policy: atomic_all_or_none
   canonical_write_requires_explicit_user_approval: true
-  current_canonical_sha256: 96c3e28f05abe4392a9984fc63b15f120719bbeb1d97ed445111cd672298dd19
-  current_canonical_max_id: KN007
-  materialized_dependency_max_id: KN010
+  current_canonical_sha256: ecb9f6efefaba2085bf0e3f6121de17ab56e107953b3649e6bb07e64288b5c22
+  current_canonical_max_id: KN010
   proposed_ids: [KN011, KN012, KN013]
   proposed_ids_are_reserved: false
   question_acceptance_effect:
@@ -271,7 +266,7 @@ question_growth:
 review_state:
   machine_preflight: pass
   machine_checker: tools/research/check_knowledge_append_candidates.py
-  materialized_scan: pass_with_dependency_on_temporary_copy
+  materialized_scan: pass_on_temporary_copy
   canonical_knowledge_file_mutated: false
   external_semantic_review: pass
   external_reviewer: Kimi

@@ -1,10 +1,12 @@
 schema_version: knowledge_append_candidate_v1
-status: draft_only
+status: promoted
 canonical_write_allowed: false
-canonical_write_performed: false
+canonical_write_performed: true
 target_file: knowledge.yaml
 prepared_at: '2026-08-31'
-purpose: 将PQ001既有冻结研究拆成可审阅的物理知识原子条目_不落正式知识库
+purpose: 将PQ001既有冻结研究拆成可审阅的物理知识原子条目_并记录整批晋升结果
+applied_at: '2026-08-31'
+applied_ids: [KN008, KN009, KN010]
 
 source_package:
   path: docs/research/pi-packages/2026-08-23-pq001-v1
@@ -18,8 +20,8 @@ target_contract:
   target_class: physical_domain_knowledge
   target_system: 物理知识
   target_file: knowledge.yaml
-  current_canonical_sha256: 96c3e28f05abe4392a9984fc63b15f120719bbeb1d97ed445111cd672298dd19
-  current_canonical_max_id: KN007
+  current_canonical_sha256: ecb9f6efefaba2085bf0e3f6121de17ab56e107953b3649e6bb07e64288b5c22
+  current_canonical_max_id: KN010
   proposed_ids: [KN008, KN009, KN010]
   ids_are_reserved: false
   batch_write_policy: atomic_all_or_none
@@ -241,11 +243,11 @@ items:
 review_state:
   machine_preflight: pass
   machine_checker: tools/research/check_knowledge_append_candidates.py
-  materialized_scan: pass_on_temporary_copy
-  canonical_knowledge_file_mutated: false
+  materialized_scan: pass_on_current_canonical
+  canonical_knowledge_file_mutated: true
   external_semantic_review: pass_after_quote_fidelity_fix
   external_reviewer: Kimi
   continuity_handle: session_9b3c8af2-d10c-4713-a573-ed0e37e69a03
   external_review_record: docs/reviews/2026-08-31-kimi-review-knowledge-append-pq001-v1.md
-  user_decision: not_requested
-  canonical_changes: 0
+  user_decision: approved
+  canonical_changes: 3
