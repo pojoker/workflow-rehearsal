@@ -95,23 +95,41 @@ class EventIntelligenceTest(unittest.TestCase):
 
     def test_migration_samples_and_expansion_events_are_source_traced(self) -> None:
         projection = derive_event_projection(load_event_facts(self.root))
-        self.assertEqual(len(projection["radar_events"]), 21)
+        self.assertEqual(len(projection["radar_events"]), 34)
         event_by_id = {row["event_id"]: row for row in projection["radar_events"]}
-        self.assertEqual(set(event_by_id), {f"EV{number:03d}" for number in range(1, 22)})
+        self.assertEqual(set(event_by_id), {f"EV{number:03d}" for number in range(1, 35)})
         aaoi, lite = event_by_id["EV001"], event_by_id["EV002"]
         self.assertEqual((aaoi["lifecycle_stage"], aaoi["event_status"]), ("volume_order", "asserted"))
         self.assertEqual(aaoi["evidence"][0]["published_at"], "2026-03-09")
         self.assertEqual((lite["lifecycle_stage"], lite["evidence"][0]["event_claim_id"]), ("demonstrated", "ECL002"))
         self.assertEqual(
             {row["primary_subject_id"] for row in projection["radar_events"]},
-            {"AAOI", "LITE", "AVGO", "MRVL", "NOK", "CIEN", "MTSI", "CRDO"},
+            {
+                "AAOI", "LITE", "AVGO", "MRVL", "NOK", "CIEN", "MTSI",
+                "CRDO", "AXTI", "GFS", "TSEM", "VECO", "GLW", "POET",
+                "COHR", "WATCH_MOLEX",
+            },
         )
-        self.assertEqual(projection["coverage_summary"]["disclosure_count"], 38)
+        self.assertEqual(projection["coverage_summary"]["disclosure_count"], 50)
         self.assertEqual(
             projection["coverage_summary"]["processing_status_counts"],
-            {"anchor_reviewed": 30, "no_relevant_claims": 8},
+            {"anchor_reviewed": 42, "no_relevant_claims": 8},
         )
-        self.assertEqual(projection["discovery_queue"], [])
+        self.assertEqual(
+            {
+                row.get("candidate_id")
+                for row in projection["discovery_queue"]
+                if row.get("candidate_id")
+            },
+            {
+                "CAND_AMKR", "CAND_DELTA", "CAND_EKI", "CAND_HAMAMATSU",
+                "CAND_HPE", "CAND_RBBN", "CAND_TEL",
+            },
+        )
+        self.assertEqual(len(projection["company_candidates"]), 64)
+        self.assertEqual(len(projection["company_tier_reviews"]), 68)
+        self.assertEqual(len(projection["entity_relationships"]), 12)
+        self.assertEqual(projection["coverage_summary"]["active_watch_entity_count"], 37)
 
     def test_expanded_event_regressions_preserve_stages_evidence_and_watch_boundary(self) -> None:
         facts = load_event_facts(self.root)
@@ -307,7 +325,7 @@ class EventIntelligenceTest(unittest.TestCase):
 
     def test_main_validator_includes_event_ledger(self) -> None:
         messages = validate(self.root)
-        self.assertIn("21 reviewed radar events", messages[-1])
+        self.assertIn("34 reviewed radar events", messages[-1])
         self.mutate("events.csv", "EV001", {"primary_subject_id": "UNKNOWN"})
         with self.assertRaisesRegex(Exception, "unknown primary_subject_id"):
             validate(self.root)

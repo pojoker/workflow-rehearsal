@@ -22,6 +22,9 @@ class EventLedgerError(ValueError):
 
 EVENT_FILES = (
     "watch_entities.csv",
+    "company_candidates.csv",
+    "company_tier_reviews.csv",
+    "entity_relationships.csv",
     "disclosures.csv",
     "event_claims.csv",
     "events.csv",
@@ -94,6 +97,17 @@ def load_event_facts(root: Path) -> dict:
 
     universe = _index(universe_rows, "company_id", "universe.csv")
     watch = _index(rows["watch_entities.csv"], "entity_id", "watch_entities.csv")
+    candidates = _index(
+        rows["company_candidates.csv"], "candidate_id", "company_candidates.csv"
+    )
+    tier_reviews = _index(
+        rows["company_tier_reviews.csv"], "review_id", "company_tier_reviews.csv"
+    )
+    relationships = _index(
+        rows["entity_relationships.csv"],
+        "relationship_id",
+        "entity_relationships.csv",
+    )
     sources = _index(source_rows, "source_id", "sources.csv")
     legacy_claims = _index(claim_rows, "claim_id", "claims.csv")
     themes = _index(theme_rows, "theme_id", "themes.csv")
@@ -121,6 +135,110 @@ def load_event_facts(root: Path) -> dict:
         if promoted:
             raise EventLedgerError(f"{where}: only promoted entities may set promoted_company_id")
         entities[entity_id] = row
+
+    identity_entities = {**universe, **watch}
+    candidate_overlap = set(candidates) & set(identity_entities)
+    if candidate_overlap:
+        raise EventLedgerError(
+            "company_candidates.csv: candidate_id collides with tracked entity: "
+            f"{sorted(candidate_overlap)}"
+        )
+    tier_reviews_by_candidate: dict[str, list[dict[str, str]]] = defaultdict(list)
+    seen_review_periods: set[tuple[str, str]] = set()
+    for review_id, row in tier_reviews.items():
+        where = f"company_tier_reviews:{review_id}"
+        candidate_id = row["candidate_id"]
+        if candidate_id not in candidates:
+            raise EventLedgerError(f"{where}: unknown candidate_id")
+        if not row["period_label"]:
+            raise EventLedgerError(f"{where}: period_label is required")
+        period_key = (candidate_id, row["period_label"])
+        if period_key in seen_review_periods:
+            raise EventLedgerError(f"{where}: duplicate candidate period review")
+        seen_review_periods.add(period_key)
+        for field in ("published_date", "reviewed_at"):
+            _date(row[field], field, where)
+        if not row["published_date"] or not row["reviewed_at"]:
+            raise EventLedgerError(f"{where}: published_date and reviewed_at are required")
+        if not _url_ok(row["source_ref"]):
+            raise EventLedgerError(f"{where}: invalid source_ref")
+        _enum(row, "material_type", "material_type", where)
+        if row["material_type"] in {"unknown", "official_technical_blog"}:
+            raise EventLedgerError(f"{where}: tier review requires formal disclosure material")
+        _enum(row, "signal_class", "tier_review_signal_class", where)
+        if not row["signal_summary"]:
+            raise EventLedgerError(f"{where}: signal_summary is required")
+        tier_reviews_by_candidate[candidate_id].append(row)
+
+    for candidate_id, row in candidates.items():
+        where = f"company_candidates:{candidate_id}"
+        for field, enum_name in (
+            ("entity_type", "entity_type"),
+            ("suggested_role", "role"),
+            ("suggested_tier", "suggested_tier"),
+            ("priority", "candidate_priority"),
+            ("verification_status", "candidate_verification_status"),
+        ):
+            _enum(row, field, enum_name, where)
+        _date(row["reviewed_at"], "reviewed_at", where)
+        if row["source_ref"] and not _url_ok(row["source_ref"]):
+            raise EventLedgerError(f"{where}: invalid source_ref")
+        if row["verification_status"] in {
+            "source_verified", "promotion_ready", "promoted",
+        } and not (row["source_ref"] and row["reviewed_at"]):
+            raise EventLedgerError(
+                f"{where}: verified candidate needs source_ref and reviewed_at"
+            )
+        if row["verification_status"] == "promoted":
+            if row["promoted_entity_id"] not in identity_entities:
+                raise EventLedgerError(
+                    f"{where}: promoted candidate needs known promoted_entity_id"
+                )
+        elif row["promoted_entity_id"]:
+            raise EventLedgerError(
+                f"{where}: only promoted candidate may set promoted_entity_id"
+            )
+        if (
+            row["suggested_tier"] == "quarterly"
+            and row["verification_status"] in {"promotion_ready", "promoted"}
+        ):
+            reviews = tier_reviews_by_candidate.get(candidate_id, [])
+            if len(reviews) < 2:
+                raise EventLedgerError(
+                    f"{where}: quarterly promotion needs two formal tier reviews"
+                )
+            if all(item["signal_class"] == "no_relevant_signal" for item in reviews):
+                raise EventLedgerError(
+                    f"{where}: quarterly promotion lacks optical or adjacent signal"
+                )
+
+    for relationship_id, row in relationships.items():
+        where = f"entity_relationships:{relationship_id}"
+        _enum(row, "relationship_type", "entity_relationship_type", where)
+        _enum(
+            row,
+            "review_status",
+            "entity_relationship_review_status",
+            where,
+        )
+        subject_id = row["subject_entity_id"]
+        object_id = row["object_entity_id"]
+        if subject_id not in identity_entities or object_id not in identity_entities:
+            raise EventLedgerError(f"{where}: unknown relationship endpoint")
+        if subject_id == object_id:
+            raise EventLedgerError(f"{where}: self relationship is not allowed")
+        for field in ("effective_from", "effective_to"):
+            _date(row[field], field, where)
+        if (
+            row["effective_from"]
+            and row["effective_to"]
+            and row["effective_from"] > row["effective_to"]
+        ):
+            raise EventLedgerError(f"{where}: effective_from is after effective_to")
+        if row["source_ref"] and not _url_ok(row["source_ref"]):
+            raise EventLedgerError(f"{where}: invalid source_ref")
+        if row["review_status"] == "reviewed" and not row["source_ref"]:
+            raise EventLedgerError(f"{where}: reviewed relationship needs source_ref")
 
     for disclosure_id, row in disclosures.items():
         where = f"disclosures:{disclosure_id}"
@@ -260,13 +378,24 @@ def load_event_facts(root: Path) -> dict:
             # Candidate events remain legal but are excluded from the radar.
             continue
         if event["lifecycle_stage"] in MATURE_COMMERCIAL_STAGES:
-            supporting_disclosures = [
-                disclosures[event_claims[link["event_claim_id"]]["disclosure_id"]]
+            supporting_claims = [
+                event_claims[link["event_claim_id"]]
                 for link in reviewed_links
                 if link["relationship"] in {"reports", "supports"}
             ]
+            supporting_disclosures = [
+                disclosures[claim["disclosure_id"]]
+                for claim in supporting_claims
+            ]
             if event["event_status"] in {"asserted", "corroborated"} and not supporting_disclosures:
                 raise EventLedgerError(f"{where}: mature commercial stage lacks supporting report")
+            if supporting_claims and all(
+                claim["statement_kind"] == "forward_looking"
+                for claim in supporting_claims
+            ):
+                raise EventLedgerError(
+                    f"{where}: forward-looking claims alone cannot support mature commercial stage"
+                )
             if supporting_disclosures and all(item["disclosure_type"] == "technical_blog" for item in supporting_disclosures):
                 raise EventLedgerError(f"{where}: technical blog alone cannot support mature commercial stage")
         if event["event_status"] == "corroborated":
@@ -290,6 +419,10 @@ def load_event_facts(root: Path) -> dict:
         "entities": entities,
         "universe": universe,
         "watch_entities": watch,
+        "company_candidates": candidates,
+        "company_tier_reviews": tier_reviews,
+        "entity_relationships": relationships,
+        "sources": sources,
         "disclosures": disclosures,
         "event_claims": event_claims,
         "events": events,
@@ -304,6 +437,12 @@ def derive_event_projection(facts: dict) -> dict:
     claims = facts["event_claims"]
     events = facts["events"]
     evidence = facts["evidence"]
+    universe = facts["universe"]
+    watch = facts["watch_entities"]
+    candidates = facts["company_candidates"]
+    tier_reviews = facts["company_tier_reviews"]
+    relationships = facts["entity_relationships"]
+    sources = facts["sources"]
 
     evidence_by_event: dict[str, list[dict[str, str]]] = defaultdict(list)
     for row in evidence.values():
@@ -385,6 +524,19 @@ def derive_event_projection(facts: dict) -> dict:
                 "title": disclosure["title"],
             })
 
+    for candidate_id in sorted(candidates):
+        candidate = candidates[candidate_id]
+        if candidate["verification_status"] != "promoted":
+            queue.append({
+                "queue_type": "company_candidate_review",
+                "candidate_id": candidate_id,
+                "entity_name": candidate["entity_name"],
+                "verification_status": candidate["verification_status"],
+                "suggested_tier": candidate["suggested_tier"],
+                "priority": candidate["priority"],
+                "source_ref": candidate["source_ref"],
+            })
+
     timelines: dict[str, list[dict]] = defaultdict(list)
     theme_impacts: dict[str, list[dict]] = defaultdict(list)
     for row in radar:
@@ -413,10 +565,52 @@ def derive_event_projection(facts: dict) -> dict:
         "latest_retrieved_at": max(retrieved) if retrieved else "",
         "latest_reviewed_at": max(reviewed) if reviewed else "",
     }
+    enabled_company_ids = {
+        company_id
+        for company_id, row in universe.items()
+        if row["enabled"] == "yes"
+    }
+    quarterly_slots: dict[str, set[str]] = defaultdict(set)
+    available_slots: dict[str, set[str]] = defaultdict(set)
+    for source in sources.values():
+        company_id = source["company_id"]
+        if company_id not in enabled_company_ids or source["source_scope"] != "quarterly":
+            continue
+        quarterly_slots[company_id].add(source["slot_label"])
+        if source["availability"] == "available":
+            available_slots[company_id].add(source["slot_label"])
+    candidate_status_counts: dict[str, int] = defaultdict(int)
+    for row in candidates.values():
+        candidate_status_counts[row["verification_status"]] += 1
+    coverage.update({
+        "quarterly_company_count": len(enabled_company_ids),
+        "four_slot_complete_count": sum(
+            len(quarterly_slots[company_id]) == 4
+            for company_id in enabled_company_ids
+        ),
+        "four_available_slot_complete_count": sum(
+            len(available_slots[company_id]) == 4
+            for company_id in enabled_company_ids
+        ),
+        "active_watch_entity_count": sum(
+            row["monitoring_status"] == "active" for row in watch.values()
+        ),
+        "candidate_status_counts": dict(sorted(candidate_status_counts.items())),
+        "tier_review_count": len(tier_reviews),
+        "tier_reviewed_candidate_count": len({
+            row["candidate_id"] for row in tier_reviews.values()
+        }),
+    })
     return {
         "radar_events": radar,
         "company_timelines": timeline_rows,
         "theme_impacts": theme_rows,
-        "discovery_queue": sorted(queue, key=lambda item: (item["queue_type"], item.get("event_id", ""), item.get("disclosure_id", ""))),
+        "discovery_queue": sorted(queue, key=lambda item: (
+            item["queue_type"], item.get("candidate_id", ""),
+            item.get("event_id", ""), item.get("disclosure_id", ""),
+        )),
         "coverage_summary": coverage,
+        "company_candidates": [candidates[key] for key in sorted(candidates)],
+        "company_tier_reviews": [tier_reviews[key] for key in sorted(tier_reviews)],
+        "entity_relationships": [relationships[key] for key in sorted(relationships)],
     }

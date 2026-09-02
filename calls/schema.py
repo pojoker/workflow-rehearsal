@@ -51,6 +51,22 @@ FILES = {
         "entity_id", "entity_name", "entity_type", "aliases", "inclusion_reason",
         "monitoring_status", "promoted_company_id", "source_ref", "notes",
     ),
+    "company_candidates.csv": (
+        "candidate_id", "entity_name", "entity_type", "suggested_role",
+        "suggested_tier", "priority", "capability_scope", "inclusion_reason",
+        "source_ref", "verification_status", "promoted_entity_id",
+        "reviewed_at", "notes",
+    ),
+    "company_tier_reviews.csv": (
+        "review_id", "candidate_id", "period_label", "published_date",
+        "source_ref", "material_type", "signal_class", "signal_summary",
+        "reviewed_at", "notes",
+    ),
+    "entity_relationships.csv": (
+        "relationship_id", "subject_entity_id", "object_entity_id",
+        "relationship_type", "effective_from", "effective_to", "source_ref",
+        "review_status", "notes",
+    ),
     "disclosures.csv": (
         "disclosure_id", "publisher_entity_id", "legacy_source_id", "title",
         "disclosure_type", "content_class", "provenance_class", "canonical_url",
@@ -79,7 +95,7 @@ ENUMS = {
     "role": {"core_peer", "upstream_enabler", "system_vendor", "downstream"},
     "enabled": {"yes", "no"},
     "source_scope": {"quarterly", "interquarter"},
-    "material_type": {"unknown", "transcript", "prepared_remarks", "earnings_presentation", "webcast_transcript", "earnings_release", "official_release", "official_technical_blog"},
+    "material_type": {"unknown", "transcript", "prepared_remarks", "earnings_presentation", "webcast_transcript", "earnings_release", "regulatory_filing", "official_release", "official_technical_blog"},
     "source_grade": {"unknown", "A", "B", "C"},
     "availability": {"available", "not_collected", "unavailable"},
     "speaker_role": {"management", "analyst", "operator", "corporate_author"},
@@ -98,6 +114,19 @@ ENUMS = {
     "feedback_status": {"confirmed", "partially_confirmed", "not_mentioned", "contradicted", "pending"},
     "entity_type": {"company", "regulator", "government", "customer", "partner", "other"},
     "monitoring_status": {"active", "paused", "promoted"},
+    "suggested_tier": {"quarterly", "watch"},
+    "candidate_priority": {"P1", "P2", "P3"},
+    "candidate_verification_status": {
+        "discovered", "source_verified", "promotion_ready", "promoted", "rejected",
+    },
+    "tier_review_signal_class": {
+        "direct_optical", "adjacent_segment", "no_relevant_signal",
+    },
+    "entity_relationship_type": {
+        "parent_of", "subsidiary_of", "acquired_by", "brand_of",
+        "predecessor_of", "business_transferred_to",
+    },
+    "entity_relationship_review_status": {"candidate", "reviewed", "rejected"},
     "disclosure_type": {"official_release", "regulatory_filing", "technical_blog", "product_page", "datasheet", "customer_release", "government_record", "media", "other"},
     "content_class": {"technical_disclosure", "demonstration_disclosure", "corporate_narrative", "commercial_disclosure", "regulatory_record"},
     "provenance_class": {"first_party", "counterparty", "regulator", "government", "third_party", "unknown"},

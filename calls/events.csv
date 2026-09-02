@@ -20,3 +20,16 @@ EV018,PRG_CRDO_DUST,capital_relationship,not_applicable,asserted,CRDO,WATCH_DUST
 EV019,PRG_CIEN_SCALEACROSS,commercial_adoption,first_shipment,asserted,CIEN,,T021,2025-09-04,2025-09-04,exact,,,全球,,Ciena称首个scale-across项目已开始产生收入出货,第一方管理层陈述；客户未具名且不是短距IMDD模块
 EV020,PRG_CIEN_SUPPLY_CONSTRAINT,capacity_constraint,not_applicable,asserted,CIEN,,T016,2026-03-05,2026-03-05,exact,,,全球,,Ciena称供应约束实际压低第一季度可实现收入,管理层未识别具体受限元件；不作为单一器件行业卡点
 EV021,PRG_CIEN_HYPERRAIL,commercial_adoption,announced,asserted,CIEN,,T021,2026-06-04,2026-06-04,exact,,,全球,,Ciena称获得首个Hyper-Rail多轨订单,订单没有客户名称金额数量或交付状态
+EV022,PRG_AXTI_LITE_INP,supply_chain_arrangement,not_applicable,asserted,AXTI,LITE,T007;T016,2026-07-29,2026-07-29,exact,,,全球,,AXT称与Lumentum签署InP晶圆供给和产能预留协议,只有AXT一方披露；协议不等于交付或实际产能形成
+EV023,PRG_GFS_US_SIPHO,capacity_constraint,announced,asserted,GFS,,T013;T015;T017,2026-07-29,2026-07-29,exact,,美国,美国,美国,GlobalFoundries称签署3亿美元硅光研发资助LOI,LOI与expected award不等于最终拨款或量产产能
+EV024,PRG_TSEM_JP_SIPHO,capacity_constraint,announced,asserted,TSEM,,T013;T015;T017,2026-07-14,2026-07-14,exact,,日本,全球,日本,Tower提出日本300mm硅光产能2027Q4生产准备目标,目标日期尚需后续正式材料验证
+EV025,PRG_VECO_LUMINAPLUS,product_stage,qualifying,asserted,VECO,WATCH_ENNOSTAR,T007;T008,2026-06-11,2026-06-11,exact,,中国台湾,全球,,Veeco称LUMINA+ MOCVD获Ennostar商业验收与生产资格,设备覆盖AsP高量产但应用不只光通信
+EV026,PRG_LITE_GREENSBORO_INP,capacity_constraint,announced,asserted,LITE,,T007;T008,2026-03-26,2026-03-26,exact,,美国,美国,美国,Lumentum提出Greensboro美国InP工厂2028年中爬坡目标,设施当前运营但InP产品线仍需改造
+EV027,PRG_GLW_NVDA_OPTICAL,capacity_constraint,announced,asserted,GLW,NVDA,T017;T019,2026-05-06,2026-05-06,exact,,美国,美国,美国,Corning提出美国光连接产能十倍和光纤产能提升逾50%的目标,Corning与NVIDIA两域名承载同一联合新闻稿；仍只有一个原始事件源
+EV028,PRG_POET_LUMILENS,commercial_adoption,volume_order,asserted,POET,WATCH_LUMILENS,T010;T017,2026-05-14,2026-05-14,exact,,,全球,,POET称获得Lumilens价值5000万美元EOI光引擎初始采购订单,只有POET一方披露；五年潜在采购额不作为已确认订单
+EV029,PRG_POET_CELESTIAL,commercial_adoption,withdrawn,asserted,POET,,T010;T017,2026-04-23,2026-04-23,exact,,,全球,,POET披露Marvell/Celestial AI于2026-04-23书面取消此前全部purchase orders,被取消订单不得继续计入backlog；取消不影响其他订单的真实性判断也不证明其他订单兑现
+EV030,PRG_COHR_NVDA_20260302,supply_chain_arrangement,not_applicable,asserted,COHR,NVDA,T007;T016,2026-03-02,2026-03-02,exact,,,全球,,Coherent披露与NVIDIA签署含采购承诺及未来产能权的非独家多年协议,仅Coherent第一方公告；协议不等于未来采购已执行交付或产能已可用
+EV031,PRG_COHR_NVDA_20260302,capital_relationship,not_applicable,asserted,COHR,NVDA,T017,2026-03-02,2026-03-02,exact,,,全球,,Coherent披露NVIDIA将投资20亿美元,前瞻投资表述；不等于资金已到账
+EV032,PRG_LITE_NVDA_20260302,supply_chain_arrangement,not_applicable,asserted,LITE,NVDA,T007;T016,2026-03-02,2026-03-02,exact,,,全球,,Lumentum披露与NVIDIA签署含采购承诺及未来产能权的非独家多年协议,仅Lumentum第一方公告；协议不等于未来采购已执行交付或产能已可用
+EV033,PRG_LITE_NVDA_20260302,capital_relationship,not_applicable,asserted,LITE,NVDA,T017,2026-03-02,2026-03-02,exact,,,全球,,Lumentum披露NVIDIA将投资20亿美元,前瞻投资表述；不等于资金已到账
+EV034,PRG_MOLEX_TERAMOUNT,capital_relationship,not_applicable,asserted,WATCH_MOLEX,WATCH_TERAMOUNT,T017,2026-05-07,2026-05-07,exact,,,全球,,Molex完成对Teramount Ltd.的收购,收购完成不证明产品整合、量产或收入
