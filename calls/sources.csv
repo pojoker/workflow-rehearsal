@@ -1,20 +1,20 @@
 source_id,company_id,slot_label,period_end,source_scope,material_type,source_grade,url,local_path,published_date,accessed_date,availability,missing_reason,acquisition_note
+S_COHR_2026Q4,COHR,FY2026Q4,2026-06-30,quarterly,earnings_release,A,https://ir.coherent.com/news-releases/news-release-details/coherent-corp-reports-fourth-quarter-and-full-year-fiscal-2026,,2026-08-12,2026-08-22,available,,公司官方季度及全年业绩新闻稿
 S_COHR_2026Q3,COHR,FY2026Q3,2026-03-31,quarterly,earnings_release,A,https://www.coherent.com/news/press-releases/third-quarter-fiscal-year-2026-results,,2026-05-06,2026-08-06,available,,公司官方季度业绩新闻稿
 S_COHR_2026Q2,COHR,FY2026Q2,2025-12-31,quarterly,earnings_release,A,https://www.coherent.com/news/press-releases/second-quarter-fiscal-year-2026-results,,2026-02-04,2026-08-06,available,,公司官方季度业绩新闻稿
 S_COHR_2026Q1,COHR,FY2026Q1,2025-09-30,quarterly,earnings_release,A,https://www.coherent.com/news/press-releases/first-quarter-fiscal-year-2026-results,,2025-11-05,2026-08-06,available,,公司官方季度业绩新闻稿
-S_COHR_2025Q4,COHR,FY2025Q4,2025-06-30,quarterly,earnings_release,A,https://www.coherent.com/news/press-releases/fourth-quarter-and-fiscal-year-2025-results,,2025-08-13,2026-08-06,available,,公司官方季度及全年业绩新闻稿
+S_LITE_2026Q4,LITE,FY2026Q4,2026-06-27,quarterly,earnings_release,A,https://investor.lumentum.com/financial-news-releases/news-details/2026/Lumentum-Announces-Fourth-Quarter-and-Full-Fiscal-Year-2026-Results/default.aspx,,2026-08-11,2026-08-22,available,,公司官方季度及全年业绩新闻稿
 S_LITE_2026Q3,LITE,FY2026Q3,2026-03-28,quarterly,earnings_presentation,A,https://s21.q4cdn.com/377324469/files/doc_financials/2026/q3/Q3-FY26-Earnings-Presentation_final.pdf,,2026-05-05,2026-08-06,available,,公司官方Q3 FY26 earnings presentation
 S_LITE_2026Q2,LITE,FY2026Q2,2025-12-31,quarterly,unknown,unknown,,,,,not_collected,MVP尚未采集并人工核验该槽位,目标为公司IR材料
 S_LITE_2026Q1,LITE,FY2026Q1,2025-09-30,quarterly,unknown,unknown,,,,,not_collected,MVP尚未采集并人工核验该槽位,目标为公司IR材料
-S_LITE_2025Q4,LITE,FY2025Q4,2025-06-30,quarterly,unknown,unknown,,,,,not_collected,MVP尚未采集并人工核验该槽位,目标为公司IR材料
+S_AAOI_2026Q2,AAOI,2026Q2,2026-06-30,quarterly,earnings_release,A,https://investors.ao-inc.com/news-releases/news-release-details/applied-optoelectronics-reports-second-quarter-2026-results,,2026-08-06,2026-08-22,available,,公司官方季度业绩新闻稿
 S_AAOI_2026Q1_C,AAOI,2026Q1,2026-03-31,quarterly,transcript,C,https://www.fool.com/earnings/call-transcripts/2026/05/07/aaoi-q1-2026-earnings-call-transcript/,,2026-05-07,2026-08-04,available,,免费公开第三方逐字稿；仅保存短引文和定位
 S_AAOI_2025Q4,AAOI,2025Q4,2025-12-31,quarterly,unknown,unknown,,,,,not_collected,MVP尚未完成逐字稿人工核验,不绕过登录或付费限制
 S_AAOI_2025Q3,AAOI,2025Q3,2025-09-30,quarterly,unknown,unknown,,,,,not_collected,MVP尚未完成逐字稿人工核验,不绕过登录或付费限制
-S_AAOI_2025Q2,AAOI,2025Q2,2025-06-30,quarterly,unknown,unknown,,,,,not_collected,MVP尚未完成逐字稿人工核验,不绕过登录或付费限制
+S_FN_2026Q4,FN,FY2026Q4,2026-06-26,quarterly,earnings_release,A,https://investor.fabrinet.com/node/13666,,2026-08-17,2026-08-22,available,,公司官方季度及全年业绩新闻稿
 S_FN_2026Q3,FN,FY2026Q3,2026-03-27,quarterly,earnings_release,A,https://investor.fabrinet.com/news-releases/news-release-details/fabrinet-announces-third-quarter-fiscal-year-2026-financial,,2026-05-04,2026-08-06,available,,公司官方季度业绩新闻稿
 S_FN_2026Q2,FN,FY2026Q2,2025-12-26,quarterly,earnings_release,A,https://investor.fabrinet.com/news-releases/news-release-details/fabrinet-announces-second-quarter-fiscal-year-2026-financial,,2026-02-02,2026-08-06,available,,公司官方季度业绩新闻稿
 S_FN_2026Q1,FN,FY2026Q1,2025-09-26,quarterly,earnings_release,A,https://investor.fabrinet.com/news-releases/news-release-details/fabrinet-announces-first-quarter-fiscal-year-2026-financial,,2025-11-03,2026-08-06,available,,公司官方季度业绩新闻稿
-S_FN_2025Q4,FN,FY2025Q4,2025-06-27,quarterly,earnings_release,A,https://investor.fabrinet.com/news-releases/news-release-details/fabrinet-announces-fourth-quarter-and-fiscal-year-2025-financial,,2025-08-18,2026-08-06,available,,公司官方季度及全年业绩新闻稿
 S_NVDA_2026Q1,NVDA,FY2027Q1,2026-04-26,quarterly,earnings_release,A,https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-First-Quarter-Fiscal-2027/default.aspx,,2026-05-20,2026-08-06,available,,公司官方季度业绩新闻稿
 S_NVDA_2025Q4,NVDA,FY2026Q4,2026-01-25,quarterly,earnings_release,A,https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Fourth-Quarter-and-Fiscal-2026/,,2026-02-25,2026-08-06,available,,公司官方季度及全年业绩新闻稿
 S_NVDA_2025Q3,NVDA,FY2026Q3,2025-10-26,quarterly,earnings_release,A,https://investor.nvidia.com/news/press-release-details/2025/NVIDIA-Announces-Financial-Results-for-Third-Quarter-Fiscal-2026/,,2025-11-19,2026-08-06,available,,公司官方季度业绩新闻稿

@@ -1,6 +1,6 @@
 entity_id,entity_name,entity_type,aliases,inclusion_reason,monitoring_status,promoted_company_id,source_ref,notes
 WATCH_IQE,IQE plc,company,IQE,MACOM长期外延供应安排的具名对手方,active,,https://www.iqep.com/media/press-releases/2026/full-year-2025-results/,仅用于显式事件证据；不进入四季度电话会覆盖池
-WATCH_DUST,DustPhotonics,company,Dust Photonics,Credo硅光收购的具名交易对手方,active,,https://investors.credosemi.com/news-events/news/news-details/2026/Credo-Completes-Acquisition-of-DustPhotonics/default.aspx,仅用于显式交易事件；不推导独立客户采用
+WATCH_DUST,DustPhotonics,company,Dust Photonics,Credo硅光收购的具名交易对手方,active,,https://investors.credosemi.com/news-events/news/news-details/2026/Credo-Completes-Acquisition-of-DustPhotonics/default.aspx,Credo收购已完成；被收购关系已在entity_relationships.csv的REL_DUST_CRDO登记；由于现有事件身份闭合规则暂保留active，但不代表独立经营计票；历史身份保留但不重复计算
 WATCH_IIVI,II-VI Incorporated,company,II-VI;II VI,Coherent Corp更名前主体和能力来源,promoted,COHR,https://www.coherent.com/news/press-releases/ii-vi-changes-name-to-coherent-and-launches-new-brand,仅作历史身份解析；不重复计算公司或来源
 WATCH_FINISAR,Finisar Corporation,company,Finisar,Coherent通信产品能力的并购来源,promoted,COHR,https://www.coherent.com/content/dam/coherent/site/en/documents/investors/annual-filings/2020/ii-vi-2020-annual-report.pdf,2019-09并入当时的II-VI；历史材料按事件时间归因
 WATCH_OCLARO,Oclaro Inc.,company,Oclaro,Lumentum光通信能力的并购来源,promoted,LITE,https://investor.lumentum.com/financial-news-releases/news-details/2018/Lumentum-Announces-Completion-Of-Oclaro-Acquisition-2018-12-10/default.aspx,只作历史身份与能力来源
@@ -33,7 +33,7 @@ WATCH_RANOVUS,Ranovus,company,Ranovus Inc.,Odin CPO合作演示与量产迁移�
 WATCH_SOURCEPHOTONICS,Source Photonics,company,Source Photonics Inc.,800G与1.6T模块产品产能和客户事件监控,active,,https://www.sourcephotonics.com/news/source-photonics-announce-the-product-availability-of-its-200g-per-lane-based-1-6t-and-800g-pam4-transceiver-family-products-at-ofc25/,无连续公开季度材料
 WATCH_MOLEX,Molex,company,Molex LLC,CPO连接与光路交换新品并购事件监控,active,,https://www.molex.com/en-us/news/molex-accelerates-ai-cluster-deployment-with-one-stop-optical-interconnect-architecture-and-debut-of-high-radix-optical-circuit-switch-platform,Koch私有子公司
 WATCH_SENKO,SENKO Advanced Components,company,SENKO,高密度光连接产品合作与采用事件监控,active,,https://www.senko.com/mpc-series/,私企不补季度槽
-WATCH_TERAMOUNT,Teramount,company,Teramount Ltd.,PhotonicPlug产品及Molex拟收购状态事件监控,active,,https://www.molex.com/en-us/news/agreement-to-acquire-teramount-to-accelerate-scalable-co-packaged-optics-adoption,收购完成前不登记为已并入
+WATCH_TERAMOUNT,Teramount,company,Teramount Ltd.,PhotonicPlug产品及Molex拟收购状态事件监控,active,,https://www.molex.com/en-us/news/molex-completes-acquisition-of-teramount-ltd,Molex收购已完成；被收购关系已在entity_relationships.csv的REL_TERAMOUNT_MOLEX登记；由于现有事件身份闭合规则暂保留active，但不代表独立经营计票；历史身份保留但不证明产品整合或收入目标兑现
 WATCH_FICONTEC,ficonTEC,company,ficonTEC Service GmbH,光子装配测试自动化订单事件监控,active,,https://www.ficontec.com/,订单应用范围需逐条核验
 WATCH_PI,PI,company,Physik Instrumente,光子对准产品和订单事件监控,active,,https://www.pi-usa.us/en/products/photonics-alignment-solutions,订单应用不可分时不归因光模块
 WATCH_EVG,EV Group,company,EVG,die-to-wafer键合及异质集成事件监控,active,,https://www.evgroup.com/fileadmin/media/products/bonding/Die_to_Wafer_bonding_systems/White_Paper_D2W_Bonding.pdf,应用跨行业
