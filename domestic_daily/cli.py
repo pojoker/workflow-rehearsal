@@ -11,7 +11,7 @@ def main(argv=None):
     run.add_argument("--date", required=True, dest="run_date")
     args = parser.parse_args(argv)
     if args.command == "run":
-        result = DailyMirror(args.source_root, args.state_root, RequestsClient()).run(args.run_date)
+        result = DailyMirror(args.source_root, args.state_root, RequestsClient(args.source_root)).run(args.run_date)
         print(f"日报: {result['daily_path']}")
         print(f"manifest: {result['manifest_path']}")
         return 0
