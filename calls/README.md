@@ -74,6 +74,21 @@ CSV 是事实源，`out/` 只由渲染器生成，禁止手改。`raw/` 可保�
 5. 运行 `python3 -m calls all`。缺失、未知、冲突与证据不足会继续显示，不会被
    渲染器静默过滤。
 
+## 日更发现镜像（只读扫描，只写候选）
+
+`python3 -m calls.daily_discovery` 按实体扫描官方/监管/对手方/政府端点，只把
+schema-shaped 候选写进独立 `state_root`；`calls/*.csv`、`calls/out/` 与根 canonical
+一律只读。自动主张只能 `candidate`，自动事件至多 `asserted`，`corroborated` 只是建议。
+详细映射与人工过闸流程见 [`DAILY-DISCOVERY.md`](DAILY-DISCOVERY.md)。
+
+```bash
+python3 -m calls.daily_discovery run --source-root . --state-root /path/to/state \
+  --date 2026-09-01 --config calls/discovery_config.json
+# 离线演练/测试时追加：--fixtures calls/fixtures/daily_discovery
+python3 -m calls.daily_discovery verify --source-root . --state-root /path/to/state \
+  --date 2026-09-01
+```
+
 ## 公司升级闸门
 
 1. 新名称先进入 `company_candidates.csv`；取得一手来源并人工复核后可标
