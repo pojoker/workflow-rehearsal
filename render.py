@@ -264,7 +264,7 @@ def write_research_tree(outdir):
     pts=rows('points.csv'); rb=rows('route_bom.csv')
     routes=sorted(set(r['产品路线'] for r in rb))
     L=[]
-    L+=['# 光模块研究问题树 v2（双知识体系 + Why 关联）','','> 本页由 render.py 生成，勿手改（--verify 会拒绝）。',
+    L+=['# 光模块研究问题图 v3（树形展示 + 多依赖）','','> 本页由 render.py 生成，勿手改（--verify 会拒绝）。',
         '> 这是主研究导航：从“什么是光模块？”逐层生长，明确区分两套知识：',
         '>  · 物理知识体系：系统功能 → 组件 → 接口 → 制造 → 设备。',
         '>  · 技术路线体系：需求/约束 → 瓶颈 → 正交轴 → 路线画像 → 能力 → 公司能力群。',
@@ -287,7 +287,9 @@ def write_research_tree(outdir):
     def _emit(qid,depth):
         q=qmap[qid]; kn=sorted(cov.get(qid,set()))
         status=f'[已覆盖: {",".join(kn)}]' if kn else '[待研究]'
-        L.append(f"{'  '*depth}- **{qid}** {q['question']} {status}")
+        deps=q.get('depends_on') or []
+        dep_text=f"（理解依赖：{', '.join(deps)}）" if deps else ''
+        L.append(f"{'  '*depth}- **{qid}** {q['question']} {status}{dep_text}")
         for c in children.get(qid,[]): _emit(c,depth+1)
     for c in children.get(root_id,[]):
         if qmap.get(c,{}).get('system')=='physical': _emit(c,1)

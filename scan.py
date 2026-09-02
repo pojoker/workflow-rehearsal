@@ -202,6 +202,7 @@ def _validate_research(rq, why_links, kb, rb_rows, pts, tree_cells, failfn):
     if list(qmap).count('RQ000')!=1:
         failfn('⑭',f'根 RQ000 必须唯一存在且恰好一个: 实际{list(qmap).count("RQ000")}')
     children={}
+    dependencies={}
     for qid,q in qmap.items():
         sys_=q.get('system')
         if sys_ not in RQ_SYS:
@@ -234,6 +235,21 @@ def _validate_research(rq, why_links, kb, rb_rows, pts, tree_cells, failfn):
                     anc=qmap[anc].get('parent_id') or None
         if not isinstance(q.get('order'), int):
             failfn('⑭',f'{qid} order 须为整数: {q.get("order")}')
+        raw_deps=q.get('depends_on',[]) or []
+        if not isinstance(raw_deps,list):
+            failfn('⑭',f'{qid} depends_on 须为列表: {raw_deps}')
+            raw_deps=[]
+        deps=[]
+        for dep in raw_deps:
+            if dep==qid:
+                failfn('⑭',f'{qid} depends_on 不得自指')
+            elif dep not in qmap:
+                failfn('⑭',f'{qid} depends_on 悬空: {dep}')
+            elif dep in deps:
+                failfn('⑭',f'{qid} depends_on 重复: {dep}')
+            else:
+                deps.append(dep)
+        dependencies[qid]=deps
     # 无环 (DFS 着色)
     color={i:0 for i in qmap}
     def _dfs(u):
@@ -244,6 +260,19 @@ def _validate_research(rq, why_links, kb, rb_rows, pts, tree_cells, failfn):
         color[u]=2
     for i in qmap:
         if color[i]==0: _dfs(i)
+    # 理解依赖是独立于页面父子的 DAG；允许跨物理/路线主干，但拒绝自指、悬空和循环。
+    dep_color={i:0 for i in qmap}
+    def _dep_dfs(u):
+        dep_color[u]=1
+        for v in dependencies.get(u,[]):
+            if dep_color[v]==1:
+                failfn('⑭',f'问题依赖图存在环: {u}→{v}')
+            elif dep_color[v]==0:
+                _dep_dfs(v)
+        dep_color[u]=2
+    for i in qmap:
+        if dep_color[i]==0:
+            _dep_dfs(i)
     # 3. PQ 仅物理 / TQ 仅路线
     for qid,q in qmap.items():
         if qid.startswith('PQ') and q.get('system')!='physical':
@@ -756,6 +785,18 @@ def selftest():
     def f_cycle():
         rq=_rq_base(); rq['questions'][2]['parent_id']='PQ002'; _run14(rq=rq)
     case('⑭ 反例: 问题树成环被拦', f_cycle, expect_fail=True)
+    # 正例：页面父子保持树形，真实理解依赖可跨主干且允许多依赖。
+    def f_dep_ok():
+        rq=_rq_base(); rq['questions'][2]['depends_on']=['PQ001','TQ001']; _run14(rq=rq)
+    case('⑭ 正例: 问题多依赖跨主干通过', f_dep_ok, expect_fail=False)
+    # 反例：依赖悬空。
+    def f_dep_missing():
+        rq=_rq_base(); rq['questions'][2]['depends_on']=['PQ999']; _run14(rq=rq)
+    case('⑭ 反例: 问题依赖悬空被拦', f_dep_missing, expect_fail=True)
+    # 反例：parent 树无环，但 depends_on 图形成循环。
+    def f_dep_cycle():
+        rq=_rq_base(); rq['questions'][1]['depends_on']=['PQ002']; rq['questions'][2]['depends_on']=['PQ001']; _run14(rq=rq)
+    case('⑭ 反例: 问题依赖图成环被拦', f_dep_cycle, expect_fail=True)
     # 反例：WQ 跨侧（路线侧引用 PQ）
     def f_wqcross():
         rq=_rq_base(); rq['why_questions'][0]['route_question_ids']=['PQ001']; _run14(rq=rq)

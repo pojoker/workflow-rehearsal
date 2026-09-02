@@ -38,23 +38,40 @@ HTML 保持单一读者页面：`route_bom.csv` 提供 800G DR8 / 1.6T DR8 / 400
 例：K001 讲清共晶固晶机为什么光模块用的和显示屏用的差一个数量级（±1~3µm vs ±50µm），
 并据此给出设备类公司的准入判断法；K002 讲清气密封装不是技术高低而是电信/数通两条路线的分野。
 
-**研究问题树（主研究入口）**（`research_questions.yaml` → `out/研究问题树.md`，由 `render.py` 生成）
-从“什么是光模块？”开始，按理解依赖逐层生长出一份稳定 ID 的研究导航，明确区分两套知识：
+**研究问题图（主研究入口）**（`research_questions.yaml` → `out/研究问题树.md`，由 `render.py` 生成）
+从“什么是光模块？”开始，按理解依赖逐层生长出一份稳定 ID 的人工研究导航。`parent_id` 只负责页面树形展示，
+`depends_on[]` 保存可跨主干复用的真实理解依赖；二者都不计算问题状态。问题图明确区分两套知识：
 **物理知识体系**（系统功能→组件→接口→制造→设备）与**技术路线体系**（需求/约束→瓶颈→正交轴→路线画像→能力→公司能力群）。
 两套体系之间不是第三棵树，而是一组 **Why 关联**（需求/瓶颈→工程选择→物理变化→公司能力），写入 `knowledge.yaml` 顶层 `why_links:`。
-研究答案仍是可追加到 `knowledge.yaml` 的 KN 条目（物理/路线）；问题树只保存导航与回填合同，不保存事实答案。
+研究答案仍是可追加到 `knowledge.yaml` 的 KN 条目（物理/路线）；问题图只保存导航与回填合同，不保存事实答案。
 路线能力群严格区分**候选能力群**（能力匹配，不是路线采用/供货证据）与**确认服务群**（须有路线级直接证据）。
 
-> 研究问题树是主研究入口；`out/问题队列.md` 是后台**维护问题队列**（QA–QE 维护欠账），二者不是一回事，也不互相替代。
+> 研究问题图是主研究入口；`out/问题队列.md` 是后台**维护问题队列**（QA–QE 维护欠账），二者不是一回事，也不互相替代。
 
 ```bash
 # 重建研究问题树（与全景图/知识库/问题队列一同生成）
 /Users/jowang/miniconda3/bin/python3 render.py
 # 校验输出未被手改（含 研究问题树.md）
 /Users/jowang/miniconda3/bin/python3 render.py --verify
-# 不变量①-⑭（含研究问题树 v2 校验）
+# 不变量①-⑭（含研究问题图 v3 的 display parent 与 depends_on DAG 校验）
 /Users/jowang/miniconda3/bin/python3 scan.py --check
 ```
+
+**机械关系视图与线索**（`contracts/domain_relation_types.yaml` + `tools/research/build_relation_leads.py`）
+
+只读取现有 canonical 账本，固定使用 `part_of`、`connects_to`、`requires`、`has_capability`、
+`offers_product`、`implements_route`、`has_stage`、`supported_by` 八个领域关系词。自动化只输出来源编码关系和
+“公司能力格与路线要求格发生交集”的 relation lead；不会生成正式问题、产品关系、路线实现结论或 close/reopen 状态。
+默认命令只打印计数，不落文件；只有显式指定输出路径时才写可删除的 JSONL：
+
+```bash
+/Users/jowang/miniconda3/bin/python3 tools/research/build_relation_leads.py
+/Users/jowang/miniconda3/bin/python3 tools/research/build_relation_leads.py \
+  --relations-output /tmp/domain-relations.jsonl \
+  --leads-output /tmp/domain-relation-leads.jsonl
+```
+
+生成输出不是 canonical，不能作为正式问题或知识结论写回。
 注意：所有 Python 命令统一用 Miniconda 解释器 `/Users/jowang/miniconda3/bin/python3`（自带 PyYAML），
 不要用系统 `python3`，否则可能报 yaml 模块缺失。
 

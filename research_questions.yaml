@@ -1,9 +1,9 @@
 meta:
-  version: v2
+  version: v3
   root_id: RQ000
   answer_target: knowledge.yaml
 
-# 研究问题树：只保存研究导航与回填合同，不保存事实答案。
+# 人工策划问题图：parent_id 只决定页面树形展示，depends_on 保存真实理解依赖；不保存事实答案或自动状态。
 # 答案进入 knowledge.yaml（物理知识/技术路线 KN）；跨体系因果关系进入 why_links。
 # 问题 ID 与文案首版冻结（上游方案 §5）；新增问题须改本文件并升版本。
 questions:
@@ -39,6 +39,7 @@ questions:
     acceptance: 有一条通过校验的 KN 显式关联本问题（研究问题含 PQ003）
   - id: PQ004
     parent_id: PQ003
+    depends_on: [PQ002, PQ003]
     system: physical
     order: 4
     question: 参考样机由哪些组件构成，每个组件完成什么功能？
@@ -46,6 +47,7 @@ questions:
     acceptance: 有一条通过校验的 KN 显式关联本问题（研究问题含 PQ004）
   - id: PQ005
     parent_id: PQ004
+    depends_on: [PQ002, PQ004]
     system: physical
     order: 5
     question: 组件之间怎样衔接，分别是什么电/光/机械/热接口？
@@ -53,6 +55,7 @@ questions:
     acceptance: 有一条通过校验的 KN 显式关联本问题（研究问题含 PQ005）
   - id: PQ006
     parent_id: PQ004
+    depends_on: [PQ004]
     system: physical
     order: 6
     question: 每个组件由什么材料和结构构成？
@@ -60,6 +63,7 @@ questions:
     acceptance: 有一条通过校验的 KN 显式关联本问题（研究问题含 PQ006）
   - id: PQ007
     parent_id: PQ004
+    depends_on: [PQ004, PQ006]
     system: physical
     order: 7
     question: 每个组件怎样制造，关键工序和检测点是什么？
@@ -67,6 +71,7 @@ questions:
     acceptance: 有一条通过校验的 KN 显式关联本问题（研究问题含 PQ007）
   - id: PQ008
     parent_id: PQ007
+    depends_on: [PQ007]
     system: physical
     order: 8
     question: 每道制造或装配工序需要什么设备？
@@ -74,6 +79,7 @@ questions:
     acceptance: 有一条通过校验的 KN 显式关联本问题（研究问题含 PQ008）
   - id: PQ009
     parent_id: PQ005
+    depends_on: [PQ005]
     system: physical
     order: 9
     question: 每个接口用什么指标验证连接是否合格？
@@ -81,6 +87,7 @@ questions:
     acceptance: 有一条通过校验的 KN 显式关联本问题（研究问题含 PQ009）
   - id: PQ010
     parent_id: PQ004
+    depends_on: [PQ004]
     system: physical
     order: 10
     question: 哪些组件是通用骨干，哪些会随技术路线改变？
@@ -104,6 +111,7 @@ questions:
     acceptance: 有一条通过校验的 KN 显式关联本问题（研究问题含 TQ002）
   - id: TQ003
     parent_id: TQ002
+    depends_on: [TQ002]
     system: route
     order: 3
     question: 当前方案最先遇到的物理或工程瓶颈是什么？
@@ -146,6 +154,7 @@ questions:
     acceptance: 有一条通过校验的 KN 显式关联本问题（研究问题含 TQ008）
   - id: TQ009
     parent_id: TQ004
+    depends_on: [TQ005, TQ006, TQ007, TQ008]
     system: route
     order: 9
     question: 一个可比较的具体路线画像由哪些轴值组合而成？
@@ -153,6 +162,7 @@ questions:
     acceptance: 有一条通过校验的 KN 显式关联本问题（研究问题含 TQ009）
   - id: TQ010
     parent_id: TQ009
+    depends_on: [TQ009, PQ004, PQ005]
     system: route
     order: 10
     question: 该路线画像相对基线改变了哪些组件、接口、工序和设备？
@@ -160,6 +170,7 @@ questions:
     acceptance: 有一条通过校验的 KN 显式关联本问题（研究问题含 TQ010）
   - id: TQ011
     parent_id: TQ010
+    depends_on: [TQ010, PQ007, PQ008]
     system: route
     order: 11
     question: 这些变化要求供应链具备哪些物理能力？
@@ -167,6 +178,7 @@ questions:
     acceptance: 有一条通过校验的 KN 显式关联本问题（研究问题含 TQ011）
   - id: TQ012
     parent_id: TQ011
+    depends_on: [TQ011]
     system: route
     order: 12
     question: 哪些公司按现有能力点构成候选能力群？
@@ -174,6 +186,7 @@ questions:
     acceptance: 有一条通过校验的 KN 显式关联本问题（研究问题含 TQ012）
   - id: TQ013
     parent_id: TQ012
+    depends_on: [TQ012]
     system: route
     order: 13
     question: 哪些公司有路线级直接证据，可进入已确认服务群？
@@ -181,6 +194,7 @@ questions:
     acceptance: 有一条通过校验的 KN 显式关联本问题（研究问题含 TQ013）
   - id: TQ014
     parent_id: TQ009
+    depends_on: [TQ002, TQ003, TQ009]
     system: route
     order: 14
     question: 该路线解决了什么、代价是什么、新瓶颈在哪里、替代方案是什么？
