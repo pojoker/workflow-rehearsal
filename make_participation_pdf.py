@@ -31,7 +31,13 @@ import participation
 
 ROOT = Path(__file__).resolve().parent
 OUTPUT = ROOT / "output" / "pdf" / "光模块供应链已确认公司清单.pdf"
-FONT_PATH = Path("/System/Library/Fonts/STHeiti Light.ttc")
+# First existing path wins. macOS ships STHeiti; on Linux we rely on WenQuanYi,
+# whose TrueType outlines reportlab supports (Noto CJK uses unsupported CFF outlines).
+FONT_CANDIDATES = (
+    Path("/System/Library/Fonts/STHeiti Light.ttc"),
+    Path("/usr/share/fonts/truetype/wqy/wqy-microhei.ttc"),
+    Path("/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc"),
+)
 
 STAGES = [
     ("材料层", ("M",), "#2C6E8F"),
@@ -46,9 +52,15 @@ STAGES = [
 
 
 def register_fonts() -> None:
-    if not FONT_PATH.exists():
-        raise FileNotFoundError(f"中文字体不存在: {FONT_PATH}")
-    pdfmetrics.registerFont(TTFont("CN", str(FONT_PATH)))
+    font_path = next((p for p in FONT_CANDIDATES if p.exists()), None)
+    if font_path is None:
+        raise FileNotFoundError(
+            "中文字体不存在，请安装以下任一字体: "
+            + "、".join(str(p) for p in FONT_CANDIDATES)
+        )
+    # .ttc collections expose several faces; face 0 covers the CJK glyphs we need.
+    kwargs = {"subfontIndex": 0} if font_path.suffix.lower() == ".ttc" else {}
+    pdfmetrics.registerFont(TTFont("CN", str(font_path), **kwargs))
 
 
 def cell_names() -> dict[str, str]:

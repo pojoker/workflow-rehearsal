@@ -1,0 +1,4 @@
+{
+  "name": "光模块供应链图谱 (workflow-rehearsal)",
+  "install": "bash .cursor/install.sh"
+}
