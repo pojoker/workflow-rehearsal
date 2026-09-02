@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import json
+import errno
 import os
 import re
+import stat
 import shutil
 import uuid
 from contextlib import AbstractContextManager
@@ -27,20 +29,16 @@ def resolve_output_root(value: str | Path) -> Path:
             raise IsolationError("output root may not contain symlink components")
     resolved = absolute.resolve(strict=False)
     repo = Path(__file__).resolve().parents[1]
-    forbidden = (
-        repo,
-        repo / "tmp" / "daily",
-        repo / "corpus",
-        repo / "calls",
-        repo / "out",
-        repo / "tree.yaml",
-        repo / "knowledge.yaml",
-        repo / "points.csv",
-        repo / "edges.csv",
-    )
-    for index, protected in enumerate(forbidden):
-        if resolved == protected or (index and protected in resolved.parents):
-            raise IsolationError(f"forbidden output root: {resolved}")
+    allowed_in_repo = repo / "tmp" / "news-daily-v2"
+    try:
+        resolved.relative_to(repo)
+    except ValueError:
+        pass
+    else:
+        try:
+            resolved.relative_to(allowed_in_repo)
+        except ValueError as exc:
+            raise IsolationError(f"forbidden output root: {resolved}") from exc
     if resolved.exists() and not resolved.is_dir():
         raise IsolationError("output root is not a directory")
     return resolved
@@ -59,10 +57,7 @@ class RunLock(AbstractContextManager["RunLock"]):
         try:
             for scope in self.scopes:
                 path = locks / f"{self.date}-{scope}.lock"
-                try:
-                    fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
-                except FileExistsError as exc:
-                    raise RuntimeError(f"already_running: {self.date}/{scope}") from exc
+                fd = self._acquire(path, scope)
                 with os.fdopen(fd, "w", encoding="utf-8") as handle:
                     handle.write(json.dumps({"pid": os.getpid(), "date": self.date, "scope": scope}))
                 self.paths.append(path)
@@ -70,6 +65,17 @@ class RunLock(AbstractContextManager["RunLock"]):
             self._release()
             raise
         return self
+
+    @staticmethod
+    def _acquire(path: Path, scope: str) -> int:
+        for attempt in range(2):
+            try:
+                return os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+            except FileExistsError as exc:
+                if attempt == 0 and _recover_stale_lock(path):
+                    continue
+                raise RuntimeError(f"already_running: {path.name.removesuffix('.lock')}/{scope}") from exc
+        raise AssertionError("lock acquisition loop did not return")
 
     def _release(self) -> None:
         for path in reversed(self.paths):
@@ -81,6 +87,57 @@ class RunLock(AbstractContextManager["RunLock"]):
 
     def __exit__(self, exc_type: Any, exc: Any, tb: Any) -> None:
         self._release()
+
+
+def _recover_stale_lock(path: Path) -> bool:
+    """Remove one unchanged lock only when its PID is certainly dead."""
+    try:
+        before = path.stat()
+        if not stat.S_ISREG(before.st_mode):
+            return False
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, TypeError):
+        return False
+    pid = payload.get("pid") if isinstance(payload, dict) else None
+    if isinstance(pid, bool) or not isinstance(pid, int) or pid <= 0:
+        return False
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        pass
+    except OSError as exc:
+        if exc.errno != errno.ESRCH:
+            return False
+    except (OverflowError, ValueError):
+        return False
+    else:
+        return False
+
+    try:
+        after = path.stat()
+    except FileNotFoundError:
+        return True
+    if (
+        before.st_dev,
+        before.st_ino,
+        before.st_size,
+        before.st_mtime_ns,
+        before.st_ctime_ns,
+    ) != (
+        after.st_dev,
+        after.st_ino,
+        after.st_size,
+        after.st_mtime_ns,
+        after.st_ctime_ns,
+    ):
+        return False
+    try:
+        path.unlink()
+    except FileNotFoundError:
+        return True
+    except OSError:
+        return False
+    return True
 
 
 def new_run_id(date: str, scopes: tuple[str, ...]) -> str:

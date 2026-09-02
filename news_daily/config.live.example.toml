@@ -1,0 +1,44 @@
+[output]
+root = "tmp/news-daily-v2"
+timeout_seconds = 10
+user_agent = "Your Organization news_daily/1.0 (contact@example.com)"
+
+[adapters.cninfo-szse]
+kind = "cninfo"
+scope = "domestic"
+column = "szse"
+page_size = 30
+max_pages = 10
+
+[adapters.cninfo-sse]
+kind = "cninfo"
+scope = "domestic"
+column = "sse"
+page_size = 30
+max_pages = 10
+
+[adapters.cninfo-bj]
+kind = "cninfo"
+scope = "domestic"
+column = "bj"
+page_size = 30
+max_pages = 10
+
+[adapters.sec-press-releases]
+kind = "rss_atom"
+scope = "overseas"
+feed_url = "https://www.sec.gov/news/pressreleases.rss"
+publisher = "U.S. Securities and Exchange Commission"
+
+[adapters.federal-reserve-press]
+kind = "rss_atom"
+scope = "overseas"
+feed_url = "https://www.federalreserve.gov/feeds/press_all.xml"
+publisher = "Board of Governors of the Federal Reserve System"
+
+# Enable and configure this watchlist entry explicitly before use.
+[adapters.apple-sec-submissions]
+enabled = false
+kind = "sec_submissions"
+scope = "overseas"
+ciks = ["320193"]
