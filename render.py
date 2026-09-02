@@ -272,11 +272,13 @@ def write_research_tree(outdir):
         '>  · 物理知识体系：系统功能 → 组件 → 接口 → 制造 → 设备。',
         '>  · 技术路线体系：需求/约束 → 瓶颈 → 正交轴 → 路线画像 → 能力 → 公司能力群。',
         '>  · 两套体系之间不是第三棵树，而是一组 Why 关联（需求/瓶颈 → 工程选择 → 物理变化 → 公司能力）。',
-        '> 研究答案回填 knowledge.yaml（物理/路线 KN）；跨体系因果写入同一文件 why_links:。本页不保存事实答案。','']
+        '> 研究答案回填 knowledge.yaml（物理/路线 KN）；跨体系因果写入同一文件 why_links:。本页不保存事实答案。',
+        '> **状态措辞**：`[已有材料: KN…]` 只表示至少有一条通过校验的 KN/WHY 引用该问题；',
+        '> 它**不是**“已覆盖 / 已完成 / 已回答”。问题是否完成只由人工复核判定，本页不计算完成状态。','']
     # 实时基线
     L+=['## 实时基线（每次渲染从当前 YAML/CSV 重算，不写死）','',
         f'- 研究问题：{len(questions)} 个（RQ/PQ/TQ）+ Why 桥 {len(wqs)} 个（WQ）',
-        f'- 知识条目 knowledge.yaml：{len(kb)} 条（问题覆盖来自其 研究问题 引用）',
+        f'- 知识条目 knowledge.yaml：{len(kb)} 条（问题的“已有材料”来自其 研究问题 引用）',
         f'- Why 关联 why_links：{len(why_links)} 条（首版允许为空）',
         f'- tree.yaml 物理格：{len(cells)} 个',
         f'- 产品路线框架 route_bom.csv：{len(routes)} 条（{", ".join(routes)}）',
@@ -284,12 +286,12 @@ def write_research_tree(outdir):
     # 问题主干
     root_id=rq.get('meta',{}).get('root_id','RQ000')
     root=cov.get(root_id,set())
-    root_status=f'[已覆盖: {",".join(sorted(root))}]' if root else '[待研究]'
+    root_status=f'[已有材料: {",".join(sorted(root))}]' if root else '[待研究]'
     L+=['## 问题主干（从 RQ000 逐层生长）','',
         f'**{root_id}** {qmap.get(root_id,{}).get("question","")} {root_status}','','**物理知识体系**']
     def _emit(qid,depth):
         q=qmap[qid]; kn=sorted(cov.get(qid,set()))
-        status=f'[已覆盖: {",".join(kn)}]' if kn else '[待研究]'
+        status=f'[已有材料: {",".join(kn)}]' if kn else '[待研究]'
         deps=q.get('depends_on') or []
         dep_text=f"（理解依赖：{', '.join(deps)}）" if deps else ''
         L.append(f"{'  '*depth}- **{qid}** {q['question']} {status}{dep_text}")
@@ -305,11 +307,13 @@ def write_research_tree(outdir):
     L+=['## Why 桥（跨主干关系，不是第三主干）','',
         '> WQ 只表示技术路线体系与物理知识体系之间的跨体系因果关系，不挂进第三主干。',
         '> 每张 WQ 显示其连接：路线侧（TQ）→ 物理侧（PQ），以及关系类型。',
-        '> 已覆盖的 WQ 展示通过校验的 WHY 因果链；首版若无 WHY，显示“尚无已验证 Why 关联”。','']
+        '> 已有材料的 WQ 展示通过校验的 WHY 因果链；首版若无 WHY，显示“尚无已验证 Why 关联”。',
+        '> “已有材料”只表示至少有一条通过校验的 KN/WHY 引用该问题，**不等于问题已回答或已完成**；',
+        '> 问题是否完成只由人工复核判定，本页不显示、也不计算任何完成状态。','']
     any_why=False
     for w in sorted(wqs,key=lambda x:x.get('order',0)):
         wid=w['id']; whyids=sorted(why_cov.get(wid,set()))
-        status=f'[已覆盖: {",".join(whyids)}]' if whyids else '[待研究]'
+        status=f'[已有材料: {",".join(whyids)}]' if whyids else '[待研究]'
         L.append(f'### {wid} {w["question"]} {status}')
         L.append(f'- 路线侧（TQ）：{", ".join(w.get("route_question_ids",[]))}')
         L.append(f'- 物理侧（PQ）：{", ".join(w.get("physical_question_ids",[]))}')

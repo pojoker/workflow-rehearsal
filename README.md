@@ -1,5 +1,11 @@
 # 光模块产业结构与公司能力地图（点先行 v2）
 
+> **新会话先读 `AGENTS.md`。** 它规定必读文件、禁读材料（archive / 结案试点 / 其他分支历史 /
+> 旧 agent 轨迹）和必须停下来升级的情形，避免把历史状态当成当前指令。
+> 当前任务范围只在 `docs/control/ACTIVE_WORKPACK.yaml`；边界与架构准入闸见 `docs/control/PROJECT_CHARTER.md`；
+> 范围外发现记 `docs/control/PARKING_LOT.md`，不实现。
+> 点 / 边 / 判定 / 语料台账的日常纪律在 `docs/policies/point-ledger.md`（只在这类工作时才读）。
+
 canonical 一个账本，四个读者产品 + 一层知识。前三个产品共用 tree.yaml / knowledge.yaml / points.csv / edges.csv / triage.csv / corpus/_frozen.csv；第四产品是只读引用 canonical 的独立情报层。md/html 都是渲染。
 
 架构 = 本体层 + 事实与解释层 + 关系层 + 产品投影（三层一投影）：
@@ -46,6 +52,11 @@ HTML 保持单一读者页面：`route_bom.csv` 提供 800G DR8 / 1.6T DR8 / 400
 研究答案仍是可追加到 `knowledge.yaml` 的 KN 条目（物理/路线）；问题图只保存导航与回填合同，不保存事实答案。
 路线能力群严格区分**候选能力群**（能力匹配，不是路线采用/供货证据）与**确认服务群**（须有路线级直接证据）。
 
+**问题状态措辞（契约）**：每题的 `minimum_writeback_contract` 只规定"有材料可回填"的机器最低条件。
+页面上 `[已有材料: KN…]` **只表示**至少有一条通过校验的 KN/WHY 引用该问题，**不表示问题已覆盖、已完成或已回答**。
+问题是否完成只由**人工复核**判定；本仓库不保存、不计算、不自动翻转任何问题完成状态。
+（旧字段 `acceptance` 与旧措辞"已覆盖"已废弃——它们会把"有一条引用"误读成"问题已回答"。）
+
 > 研究问题图是主研究入口；`out/问题队列.md` 是后台**维护问题队列**（QA–QE 维护欠账），二者不是一回事，也不互相替代。
 
 ```bash
@@ -55,7 +66,14 @@ HTML 保持单一读者页面：`route_bom.csv` 提供 800G DR8 / 1.6T DR8 / 400
 /Users/jowang/miniconda3/bin/python3 render.py --verify
 # 不变量①-⑭（含研究问题图 v3 的 display parent 与 depends_on DAG 校验）
 /Users/jowang/miniconda3/bin/python3 scan.py --check
+# 参与识别分母、证据闭合与幂等
+/Users/jowang/miniconda3/bin/python3 participation.py --check
+# 海外电话会情报层
+/Users/jowang/miniconda3/bin/python3 -m calls check
 ```
+
+> 以上只是**机器门**：通过说明结构与引用闭合。**领域问题是否被回答、结论能否入 canonical，
+> 只由人工复核 + 用户授权判定**，见 `docs/control/PROJECT_CHARTER.md`。
 
 **机械关系视图与线索**（`contracts/domain_relation_types.yaml` + `tools/research/build_relation_leads.py`）
 

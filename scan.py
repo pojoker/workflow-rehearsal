@@ -187,6 +187,20 @@ def _validate_research(rq, why_links, kb, rb_rows, pts, tree_cells, failfn):
     meta=rq.get('meta') or {}
     questions=rq.get('questions') or []
     wqs=rq.get('why_questions') or []
+    completion=meta.get('completion_semantics') or {}
+    if completion.get('linked_kn_or_why_means')!='已有材料':
+        failfn('⑭','meta.completion_semantics.linked_kn_or_why_means 必须为 已有材料')
+    if completion.get('linked_kn_or_why_does_not_mean')!='已完成':
+        failfn('⑭','meta.completion_semantics.linked_kn_or_why_does_not_mean 必须为 已完成')
+    if '人工复核' not in str(completion.get('completion_is') or ''):
+        failfn('⑭','meta.completion_semantics.completion_is 必须声明人工复核')
+
+    def _check_writeback_contract(item, item_id):
+        if 'acceptance' in item:
+            failfn('⑭',f'{item_id} 不得使用旧字段 acceptance')
+        if not str(item.get('minimum_writeback_contract') or '').strip():
+            failfn('⑭',f'{item_id} minimum_writeback_contract 缺失或为空')
+
     # 2. 唯一根 RQ000 / ID 合法 / parent 闭合 / 无环 / system 合法 / 分支一致
     root_id=meta.get('root_id')
     qmap={}
@@ -204,6 +218,7 @@ def _validate_research(rq, why_links, kb, rb_rows, pts, tree_cells, failfn):
     children={}
     dependencies={}
     for qid,q in qmap.items():
+        _check_writeback_contract(q,qid)
         sys_=q.get('system')
         if sys_ not in RQ_SYS:
             failfn('⑭',f'{qid} system非法: {sys_}')
@@ -288,6 +303,7 @@ def _validate_research(rq, why_links, kb, rb_rows, pts, tree_cells, failfn):
         if wid in wqmap:
             failfn('⑭',f'WQ id重复: {wid}'); continue
         wqmap[wid]=w
+        _check_writeback_contract(w,wid)
         for rq_ in (w.get('route_question_ids') or []):
             if rq_ not in qmap or not rq_.startswith('TQ'):
                 failfn('⑭',f'{wid} route_question_ids 引用非TQ或悬空: {rq_}')
@@ -438,9 +454,9 @@ def invariants():
     for i,l in enumerate(open(os.path.join(ROOT,'words.txt'),encoding='utf-8')) if os.path.exists(os.path.join(ROOT,'words.txt')) else []:
         if l.strip() and not l.startswith('#') and l.count('|')!=3: fail('⑤',f"words.txt 第{i+1}行竖线数≠3")
     # ⑥白名单
-    # 须与 .githooks/pre-commit 的 WL 逐字一致(两处重复定义,改一处必改另一处——今日已三次因漏改卡闸)
+    # 白名单唯一来源就是本处：.githooks/pre-commit 只调用 scan.py --check，不再重复定义(曾因两处各写一份一天卡闸三次)。
     # '.git': worktree 下 .git 是文件不是目录,不列入则误报越位(远程代理绕闸根因)
-    WL={'README.md','CLAUDE.md','tree.yaml','knowledge.yaml','points.csv','edges.csv','triage.csv','words.txt',
+    WL={'README.md','CLAUDE.md','AGENTS.md','tree.yaml','knowledge.yaml','points.csv','edges.csv','triage.csv','words.txt',
         'scan.py','render.py','participation.py','make_participation_pdf.py',
         'build_detailed_capability_report.py','capability_details.csv',
         'route_bom.csv','macro_evidence.csv','shipments.csv','company_segment_revenue.csv',
@@ -452,7 +468,7 @@ def invariants():
     if len(refs)>8: fail('⑥',f'refs/文件数{len(refs)}>8(2026-08-04由6放宽,纪律4)')
     for m in glob.glob(os.path.join(ROOT,'**/*.md'),recursive=True):
         rel=os.path.relpath(m,ROOT)
-        if not rel.startswith(('archive/','refs/','out/','corpus/','calls/','docs/')) and rel not in ('README.md','CLAUDE.md','RESTART-v2.md','CONTEXT.md'):
+        if not rel.startswith(('archive/','refs/','out/','corpus/','calls/','docs/')) and rel not in ('README.md','CLAUDE.md','AGENTS.md','RESTART-v2.md','CONTEXT.md'):
             fail('⑥',f'越位md: {rel}')
     # ⑦triage一致性
     pnames={p['公司'] for p in pts}
@@ -745,16 +761,23 @@ def selftest():
     # ---- ⑭ research_questions.yaml + knowledge.yaml why_links ----
     def _rq_base():
         return {
-            'meta':{'version':'v2','root_id':'RQ000','answer_target':'knowledge.yaml'},
+            'meta':{
+                'version':'v2','root_id':'RQ000','answer_target':'knowledge.yaml',
+                'completion_semantics':{
+                    'linked_kn_or_why_means':'已有材料',
+                    'linked_kn_or_why_does_not_mean':'已完成',
+                    'completion_is':'由人工复核判定',
+                },
+            },
             'questions':[
-                {'id':'RQ000','parent_id':None,'system':'root','order':0,'question':'r','writeback':'knowledge','acceptance':'a'},
-                {'id':'PQ001','parent_id':'RQ000','system':'physical','order':1,'question':'p','writeback':'knowledge','acceptance':'a'},
-                {'id':'PQ002','parent_id':'PQ001','system':'physical','order':2,'question':'p2','writeback':'knowledge','acceptance':'a'},
-                {'id':'TQ001','parent_id':'RQ000','system':'route','order':1,'question':'t','writeback':'knowledge','acceptance':'a'},
+                {'id':'RQ000','parent_id':None,'system':'root','order':0,'question':'r','writeback':'knowledge','minimum_writeback_contract':'a'},
+                {'id':'PQ001','parent_id':'RQ000','system':'physical','order':1,'question':'p','writeback':'knowledge','minimum_writeback_contract':'a'},
+                {'id':'PQ002','parent_id':'PQ001','system':'physical','order':2,'question':'p2','writeback':'knowledge','minimum_writeback_contract':'a'},
+                {'id':'TQ001','parent_id':'RQ000','system':'route','order':1,'question':'t','writeback':'knowledge','minimum_writeback_contract':'a'},
             ],
             'why_questions':[
                 {'id':'WQ001','order':1,'route_question_ids':['TQ001'],'physical_question_ids':['PQ001'],
-                 'relation_type':'need_to_constraint','question':'w','writeback':'why_links','acceptance':'a'},
+                 'relation_type':'need_to_constraint','question':'w','writeback':'why_links','minimum_writeback_contract':'a'},
             ],
         }
     def _kb_base():
@@ -772,9 +795,15 @@ def selftest():
         _validate_research(rq, why, kb, rb, pts, cells, fail)
     # 正例：完整树 + 两个合法 KN + 空 why
     case('⑭ 正例: 完整问题树+合法KN通过', lambda:_run14(), expect_fail=False)
+    def f_missing_writeback_contract():
+        rq=_rq_base(); del rq['questions'][1]['minimum_writeback_contract']; _run14(rq=rq)
+    case('⑭ 反例: minimum_writeback_contract 缺失被拦', f_missing_writeback_contract, expect_fail=True)
+    def f_legacy_acceptance():
+        rq=_rq_base(); rq['questions'][1]['acceptance']=rq['questions'][1].pop('minimum_writeback_contract'); _run14(rq=rq)
+    case('⑭ 反例: 旧 acceptance 字段被拦', f_legacy_acceptance, expect_fail=True)
     # 反例：重复 ID
     def f_dup():
-        rq=_rq_base(); rq['questions'].append({'id':'PQ001','parent_id':'RQ000','system':'physical','order':3,'question':'x','writeback':'knowledge','acceptance':'a'})
+        rq=_rq_base(); rq['questions'].append({'id':'PQ001','parent_id':'RQ000','system':'physical','order':3,'question':'x','writeback':'knowledge','minimum_writeback_contract':'a'})
         _run14(rq=rq)
     case('⑭ 反例: 问题id重复被拦', f_dup, expect_fail=True)
     # 反例：悬空 parent
