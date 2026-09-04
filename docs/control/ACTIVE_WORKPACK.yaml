@@ -3,8 +3,9 @@
 workpack:
   id: OPS-RESTORE-001
   title: 九页前端与国内/海外只读日更恢复
-  status: approved_and_started
+  status: completed
   approved_at: 2026-09-04
+  completed_at: 2026-09-04
   owner: 用户
   authorization: 用户明确要求“按序执行”前端恢复、日更恢复、真实试跑和通过后调度
   supersedes_temporarily: OM-PHYS-001（prepared_not_started，未执行、未写 canonical）
@@ -122,3 +123,51 @@ stop_and_escalate:
   - 需要自动晋升候选
   - 需要删除旧救援工作区或远端分支
   - 真实抓取要求凭证、验证码或绕过访问控制
+
+completion_evidence:
+  frontend:
+    page_count: 9
+    section_count: 27
+    site_tests_passed: 13
+    test_entry: direct_unittest
+    output: out/光模块知识体系/index.html
+  domestic_live_trial:
+    date: 2026-09-04
+    watched_a_share_codes: 93
+    ir_new: 6
+    qa_rows_in_report: 711
+    announcements: 2
+    restart_review_hits: 9
+    fetch_failures:
+      - 002222
+      - 688183
+    monthly_rescreen: skipped_after_http_401
+    output: /Users/jowang/Downloads/workflow-rehearsal-daily-state/domestic/daily/2026-09-04.txt
+  overseas_live_trial:
+    date: 2026-09-04
+    configured_entities: 7
+    monitored_entities: 81
+    disclosure_candidates: 1
+    promoted: 0
+    endpoint_failed: 5
+    missing_endpoint: 74
+    verification: passed
+    output: /Users/jowang/Downloads/workflow-rehearsal-daily-state/overseas/staging/2026-09-04/run-summary.json
+  combined_output:
+    status: complete
+    output: /Users/jowang/Downloads/workflow-rehearsal-daily-state/combined/daily/2026-09-04.md
+  canonical_proof:
+    aggregate_sha256_before: 2ece8340c670375b17865c92c85ece6ad94ef34ed021267dec7c050a9c8b84ca
+    aggregate_sha256_after: 2ece8340c670375b17865c92c85ece6ad94ef34ed021267dec7c050a9c8b84ca
+    unchanged: true
+  final_gates:
+    scan: passed_all_14_invariants
+    render_verify: passed
+    participation: passed
+    calls_check: passed_39_companies_166_sources_70_claims
+    daily_tests: 71_passed
+  automation:
+    id: optical-daily-update
+    status: active
+    local_time: "06:47 Asia/Shanghai"
+    mode: existing_task_updated_without_duplicate
