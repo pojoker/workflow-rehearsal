@@ -1,86 +1,62 @@
-# ACTIVE_WORKPACK — 当前唯一工作包（人工控制，无自动状态机）
+# ACTIVE_WORKPACK — 用户已授权的当前实施任务
 
 workpack:
-  id: AUDIT-DQ-002
-  title: Kimi 与 Cursor 数据质量及消融独立双审
+  id: CONTROL-DOC-003
+  title: 更新会话入口与授权边界
   status: completed
-  approved_at: 2026-09-04
-  completed_at: 2026-09-04
+  approved_at: 2026-09-05
+  completed_at: 2026-09-05
   owner: 用户
-  authorization: 用户确认授权在 cmux 分屏独立运行 Kimi 和 Cursor 审核
+  authorization: 用户确认更新，随后明确要求“自动推送到github 吧”，授权提交并推送本次控制文档更新。
 
 objective:
-  - 以干净仓库中的审计委托书为唯一任务合同，分别执行领域语义审计与数据契约/消融审计。
-  - 保持两位审阅者相互独立，提交前不得读取对方报告。
-  - 只生成审计报告，不修改 canonical、代码、测试、网页或日更状态。
+  - 消除入口和章程中的重复审批与全局停工规则，支持已授权工作持续推进。
+  - 保留领域证据边界、canonical 晋升人工裁决和架构准入要求。
 
 baseline:
-  execution_repository: /Users/jowang/Downloads/optical-module-research
-  instruction_commit: 43d1d6cfa335e8693f33fa834a0d775ae2879195
-  canonical_snapshot_commit: 63d426b15b4c2e842ac9569f09febd6dd2d8ff5f
-  audit_brief: docs/reviews/2026-09-04-data-quality-ablation-independent-review-brief.md
-  audit_as_of: 2026-09-04
+  execution_repository: /Users/jowang/Downloads/workflow-rehearsal-goal-control
+  previous_workpack: AUDIT-DQ-002（已完成；原记录保留在 Git 历史中）
 
 reader_visible_deliverables:
-  - /Users/jowang/Downloads/optical-module-research/docs/reviews/2026-09-04-kimi-data-quality-semantic-audit.md
-  - /Users/jowang/Downloads/optical-module-research/docs/reviews/2026-09-04-cursor-data-quality-contract-ablation-audit.md
+  - AGENTS.md 的授权、读取、长期任务、委派及验证规则
+  - docs/control/PROJECT_CHARTER.md 中与入口一致的权限与暂停规则
 
 allowed_write_paths:
+  - AGENTS.md
+  - docs/control/PROJECT_CHARTER.md
   - docs/control/ACTIVE_WORKPACK.yaml
-  - /Users/jowang/Downloads/optical-module-research/docs/control/ACTIVE_WORKPACK.yaml
-  - /Users/jowang/Downloads/optical-module-research/docs/reviews/2026-09-04-kimi-data-quality-semantic-audit.md
-  - /Users/jowang/Downloads/optical-module-research/docs/reviews/2026-09-04-cursor-data-quality-contract-ablation-audit.md
 
 read_scope:
   allowed:
-    - /Users/jowang/Downloads/optical-module-research/AGENTS.md
-    - /Users/jowang/Downloads/optical-module-research/docs/control/PROJECT_CHARTER.md
-    - /Users/jowang/Downloads/optical-module-research/docs/control/ACTIVE_WORKPACK.yaml
-    - /Users/jowang/Downloads/optical-module-research/docs/reviews/2026-09-04-data-quality-ablation-independent-review-brief.md
-    - 委托书中为 Kimi 与 Cursor 分别列出的文件和测试
-    - 为验证公开证据而访问的一手来源
+    - AGENTS.md
+    - docs/control/PROJECT_CHARTER.md
+    - docs/control/ACTIVE_WORKPACK.yaml
+    - README.md 的验证命令
+    - 当前工作树状态及本次改动 diff
   forbidden:
     - archive/**
-    - 旧分支和其他 worktree
+    - 其他仓库及旧 worktree 历史
     - closure-pilot 与状态机材料
     - 完整 agent 轨迹和旧会话全量日志
-    - 对方尚未提交的审计报告
 
 canonical_policy:
   writable: false
-  protected:
-    - /Users/jowang/Downloads/optical-module-research/knowledge.yaml
-    - /Users/jowang/Downloads/optical-module-research/points.csv
-    - /Users/jowang/Downloads/optical-module-research/edges.csv
-    - /Users/jowang/Downloads/optical-module-research/triage.csv
-    - /Users/jowang/Downloads/optical-module-research/route_bom.csv
-    - /Users/jowang/Downloads/optical-module-research/tree.yaml
-    - /Users/jowang/Downloads/optical-module-research/shipments.csv
-    - /Users/jowang/Downloads/optical-module-research/macro_evidence.csv
-    - /Users/jowang/Downloads/optical-module-research/calls/*.csv
 
 execution_plan:
-  - 启动前记录目标仓库 HEAD、工作树和 canonical 指纹。
-  - 在 cmux 右侧拆分两个终端，分别运行 Kimi 与 Cursor。
-  - 等待两路完成；若任一请求扩大范围，停止该路并升级。
-  - 检查只产生两份允许报告，并验证 canonical 指纹不变。
-  - 执行机器门；机器门只证明结构未受损，不代替审计裁决。
-  - 汇总两份报告的一致结论、分歧与 UNKNOWN，不实施修复或消融。
+  - 按用户接受的建议更新入口和章程，记录本次授权。
+  - 检查规则一致性、YAML 格式及 diff 范围。
+  - 报告改动与验证结果。
 
 non_goals:
-  - 不修复被发现的数据问题
-  - 不执行任何消融、schema 合并或迁移
-  - 不修改或重新生成九页网页
-  - 不修改日更自动化
-  - 不把审阅者结论自动晋升为 canonical 事实
-  - 不要求两位审阅者形成一致结论
+  - 不修改代码、测试、canonical、网页或日更流程
+  - 不同步其他本地仓库，不合并分支，不纳入原有未跟踪 ZIP
+  - 不新增运行时架构或自动状态机
 
 acceptance_criteria:
-  - 两份报告均按共同输出合同覆盖 B01-B12 与 H1-H10。
-  - 每份报告包含证据、反例、依赖影响、回滚考虑和未解决问题。
-  - 两位审阅者在完成前未读取对方输出。
-  - 目标仓库除当前工作包和两份报告外无新改动，canonical 指纹前后相同。
-  - 最终汇总明确区分一致结论、分歧、证据不足和后续待用户裁决事项。
+  - 入口与章程对只读任务、用户授权、工作包同步和局部暂停的规定一致。
+  - 保留证据类型分列、人工复核、canonical 晋升授权及架构准入要求。
+  - 明确当前任务隔离 worktree 范围、精简交接及按影响验证规则。
+  - git diff --check 通过，工作包 YAML 可解析，本次改动只涉及允许路径。
 
 architecture_budget:
   new_relation_types: []
@@ -89,19 +65,11 @@ architecture_budget:
   new_engines: []
 
 stop_and_escalate:
-  - 任一审阅者尝试修改允许报告以外的文件
-  - 任一审阅者要求读取禁读材料或对方报告
-  - 目标仓库 HEAD 与固定 instruction commit 不一致
-  - canonical 指纹发生变化
-  - 审核需要登录、验证码、付费来源或绕过访问控制
-  - 审阅者建议直接实施修复而不是提交审计结论
+  - 需要超出本次授权修改其他文件时，暂停对应写入并报告。
+  - 需要改变北极星、晋升领域事实或新增架构时，提交用户裁决。
 
 completion_evidence:
-  kimi_report: /Users/jowang/Downloads/optical-module-research/docs/reviews/2026-09-04-kimi-data-quality-semantic-audit.md
-  cursor_report: /Users/jowang/Downloads/optical-module-research/docs/reviews/2026-09-04-cursor-data-quality-contract-ablation-audit.md
-  baseline_observations_recomputed: 12
-  hypotheses_adjudicated_per_reviewer: 10
-  canonical_aggregate_sha256_before: 72245127392937e184b712114e9354f4e883791c861da1960bb65fb4fe497a5a
-  canonical_aggregate_sha256_after: 72245127392937e184b712114e9354f4e883791c861da1960bb65fb4fe497a5a
-  canonical_unchanged: true
-  implementation_performed: false
+  - 已核对入口与章程的授权、暂停、读取范围及证据边界，规则一致。
+  - git diff --check 通过；工作包 YAML 解析与允许路径检查通过。
+  - 仅修改三份允许的控制文档，未修改代码、canonical 或网页；原有未跟踪 ZIP 保留。
+  - 按文档改动范围验证，未运行领域构建；其他仓库未同步。
