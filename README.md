@@ -8,6 +8,8 @@
 
 canonical 一个账本，四个读者产品 + 一层知识。前三个产品共用 tree.yaml / knowledge.yaml / points.csv / edges.csv / triage.csv / corpus/_frozen.csv；第四产品是只读引用 canonical 的独立情报层。md/html 都是渲染。
 
+九页光模块读者版位于 `out/光模块知识体系/`，其 HTML、CSS、JavaScript、SVG 与构建清单作为可直接恢复和浏览的发布快照纳入 Git。它仍是由 `site/optical-module/` 生成的非 canonical 投影；事实修改必须先进入相应 canonical 账本，再重新构建页面，不能直接把页面文字当作事实源回写。
+
 架构 = 本体层 + 事实与解释层 + 关系层 + 产品投影（三层一投影）：
 
 | 层 | 文件 | 回答什么 | 举证要求 |

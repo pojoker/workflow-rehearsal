@@ -133,6 +133,15 @@ class OpticalModuleReaderTest(unittest.TestCase):
             for asset, version in self.manifest["asset_versions"].items():
                 self.assertIn(f"assets/{asset}?v={version}", text, filename)
 
+    def test_generated_text_has_no_trailing_whitespace(self) -> None:
+        for path in OUTPUT.rglob("*"):
+            if not path.is_file() or path.suffix not in {".html", ".css", ".js", ".svg", ".yaml"}:
+                continue
+            text = path.read_text(encoding="utf-8")
+            self.assertTrue(text.endswith("\n"), str(path))
+            for line_number, line in enumerate(text.splitlines(), start=1):
+                self.assertEqual(line, line.rstrip(), f"{path}:{line_number}")
+
     def test_reference_figures_resolve(self) -> None:
         seen: set[str] = set()
         for filename, parser in self.pages.items():

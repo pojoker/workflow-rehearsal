@@ -152,7 +152,7 @@ def render(template: str, values: dict[str, str]) -> str:
     leftovers = sorted(set(re.findall(r"{{([A-Z0-9_]+)}}", result)))
     if leftovers:
         raise SystemExit(f"Unresolved template tokens: {leftovers}")
-    return result
+    return "\n".join(line.rstrip() for line in result.splitlines()) + "\n"
 
 
 def build() -> None:

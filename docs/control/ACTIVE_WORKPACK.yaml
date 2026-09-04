@@ -171,3 +171,8 @@ completion_evidence:
     status: active
     local_time: "06:47 Asia/Shanghai"
     mode: existing_task_updated_without_duplicate
+  post_completion_change:
+    authorized_at: 2026-09-04
+    authorization: 用户明确要求将九页网页纳入 Git
+    tracked_reader_snapshot: out/光模块知识体系/**
+    canonical_status: generated_noncanonical_projection
