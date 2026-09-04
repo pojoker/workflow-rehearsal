@@ -93,6 +93,39 @@ HTML 保持单一读者页面：`route_bom.csv` 提供 800G DR8 / 1.6T DR8 / 400
 注意：所有 Python 命令统一用 Miniconda 解释器 `/Users/jowang/miniconda3/bin/python3`（自带 PyYAML），
 不要用系统 `python3`，否则可能报 yaml 模块缺失。
 
+## 国内与海外只读日更
+
+`domestic_daily`、`calls.daily_discovery` 和 `daily_intelligence` 构成三段式日更模块：前两段只读取领域账本并把原始增量或候选写到仓库外状态目录，第三段只组装读者入口。它们不会修改根级 canonical、`calls/*.csv` 或 `calls/out/`，也不会自动晋升候选。
+
+```bash
+# 国内：投关记录、互动问答、公告和机械召回差分
+/Users/jowang/miniconda3/bin/python3 -m domestic_daily run \
+  --source-root /Users/jowang/Downloads/workflow-rehearsal-goal-control \
+  --state-root /Users/jowang/Downloads/workflow-rehearsal-daily-state/domestic \
+  --date YYYY-MM-DD
+
+# 海外：官网/IR/监管端点发现，只生成 schema-shaped candidates
+/Users/jowang/miniconda3/bin/python3 -m calls.daily_discovery run \
+  --source-root /Users/jowang/Downloads/workflow-rehearsal-goal-control \
+  --state-root /Users/jowang/Downloads/workflow-rehearsal-daily-state/overseas \
+  --date YYYY-MM-DD \
+  --config /Users/jowang/Downloads/workflow-rehearsal-goal-control/calls/discovery_config.json
+
+/Users/jowang/miniconda3/bin/python3 -m calls.daily_discovery verify \
+  --source-root /Users/jowang/Downloads/workflow-rehearsal-goal-control \
+  --state-root /Users/jowang/Downloads/workflow-rehearsal-daily-state/overseas \
+  --date YYYY-MM-DD
+
+# 统一 Markdown/JSON 概览；输入与输出根必须物理隔离
+/Users/jowang/miniconda3/bin/python3 -m daily_intelligence combine \
+  --date YYYY-MM-DD \
+  --domestic-state-root /Users/jowang/Downloads/workflow-rehearsal-daily-state/domestic \
+  --overseas-state-root /Users/jowang/Downloads/workflow-rehearsal-daily-state/overseas \
+  --output-root /Users/jowang/Downloads/workflow-rehearsal-daily-state/combined
+```
+
+海外配置当前只登记 7 个实体的公开端点；“每日运行”不等于已经覆盖全部 39 家公司。未登记端点、抓取失败和候选状态会显式写入日报，扩充端点需要单独人工复核。
+
 ## 日常怎么用（全流程）
 1. 新年报/招股书 PDF 扔进 corpus/annual/<代码>/，在 corpus/_frozen.csv 记一行（带出处）
 2. `/Users/jowang/miniconda3/bin/python3 scan.py` —— 关键词召回待办清单（`ANY` 词只召回"是否参与"，不预判格子；自动跳过已处置项）
