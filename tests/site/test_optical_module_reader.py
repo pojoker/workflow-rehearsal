@@ -10,6 +10,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUT = ROOT / "out" / "光模块知识体系"
+SITE_PAGES = ROOT / "site" / "optical-module" / "pages.yaml"
 
 
 class PageParser(HTMLParser):
@@ -42,8 +43,65 @@ class OpticalModuleReaderTest(unittest.TestCase):
 
     def test_manifest_declares_reader_only_build(self) -> None:
         self.assertFalse(self.manifest["canonical_write"])
-        self.assertEqual(self.manifest["page_count"], 7)
-        self.assertEqual(self.manifest["section_count"], 23)
+        page_config = yaml.safe_load(SITE_PAGES.read_text(encoding="utf-8"))
+        self.assertEqual(self.manifest["page_count"], len(page_config["pages"]) + 1)
+        section_ids = {
+            section_id
+            for page in page_config["pages"]
+            for section_id in page.get("sections", [])
+        }
+        self.assertEqual(self.manifest["section_count"], len(section_ids))
+
+    def test_research_page_has_promoted_foundation_golden_path(self) -> None:
+        research_text = (OUTPUT / "06-research.html").read_text(encoding="utf-8")
+        self.assertIn('id="candidate-foundation"', research_text)
+        for token in ["KN008", "KN009", "KN010"]:
+            self.assertIn(token, research_text)
+
+        section_start = research_text.index('id="candidate-foundation"')
+        section_end = research_text.index("</section>", section_start)
+        candidate_section = research_text[section_start:section_end]
+        self.assertIn("用户明确批准", candidate_section)
+        self.assertNotIn("atomic_all_or_none", candidate_section)
+        self.assertNotIn("canonical_write=3", candidate_section)
+        self.assertNotIn("user_decision=approved", candidate_section)
+        self.assertNotIn("KN011", candidate_section)
+
+    def test_decision_dossier_is_built_as_conditional_product(self) -> None:
+        text = (OUTPUT / "07-decision-dossier.html").read_text(encoding="utf-8")
+        self.assertIn('id="decision-dossier-01"', text)
+        self.assertIn("qualitative_boundary_map_no_numeric_system_model", text)
+        for token in [
+            "FP-RETIMED",
+            "FP-LPO",
+            "NPO-CONDITIONAL",
+            "CPO-CONDITIONAL",
+            "R01",
+            "R02",
+            "R03",
+            "R04",
+            "R05",
+        ]:
+            self.assertIn(token, text)
+        self.assertIn("没有无条件冠军", text)
+        self.assertIn('href="08-concept-primer.html#placement-primer"', text)
+
+    def test_concept_primer_explains_placement_and_pareto(self) -> None:
+        text = (OUTPUT / "08-concept-primer.html").read_text(encoding="utf-8")
+        for token in [
+            'id="placement-primer"',
+            'id="decision-glossary"',
+            "Front-panel",
+            "NPO / OBO",
+            "CPO",
+            "Pareto frontier",
+            "Active constraint",
+            "Failure domain",
+            "MTTR",
+            "TCO",
+            "UNKNOWN",
+        ]:
+            self.assertIn(token, text)
 
     def test_page_ids_are_unique(self) -> None:
         for filename, parser in self.pages.items():
@@ -83,7 +141,8 @@ class OpticalModuleReaderTest(unittest.TestCase):
                     continue
                 seen.add(source)
                 self.assertTrue((OUTPUT / unquote(source)).is_file(), f"{filename}: missing {source}")
-        self.assertEqual(len(seen), 4)
+        self.assertEqual(len(seen), 5)
+        self.assertIn("assets/figures/05-placement-primer.svg", seen)
 
     def test_foundation_has_physical_gallery(self) -> None:
         parser = self.pages["01-foundation.html"]

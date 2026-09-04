@@ -1,139 +1,124 @@
 # ACTIVE_WORKPACK — 当前唯一工作包（人工控制，无自动状态机）
-#
-# 读取顺序：AGENTS.md → docs/control/PROJECT_CHARTER.md → 本文件。
-# 本文件由人改写。不自动 close/reopen，不自动回执，不自动晋升。
 
 workpack:
-  id: OM-PHYS-001
-  title: 800G DR8 物理组件/接口链（Slice 1）
-  slice: 1
-  status: prepared_not_started        # 本轮只“准备”，未执行；执行须用户显式授权
-  prepared_at: 2026-09-03
-  owner: 用户（唯一可改范围与验收标准者）
-  executor_note: >
-    本工作包在本轮仅被准备。执行者不得在本轮开始领域研究，不得写入 canonical，
-    不得新增领域结论。开始执行前须由用户把 status 改为 approved_and_started 并确认范围。
+  id: OPS-RESTORE-001
+  title: 九页前端与国内/海外只读日更恢复
+  status: approved_and_started
+  approved_at: 2026-09-04
+  owner: 用户
+  authorization: 用户明确要求“按序执行”前端恢复、日更恢复、真实试跑和通过后调度
+  supersedes_temporarily: OM-PHYS-001（prepared_not_started，未执行、未写 canonical）
 
-# ---- 1. 要回答的真实领域问题（只允许这五个）----
-questions:
-  - id: PQ002
-    question: 电→光→电的功能链如何工作？
-    in_scope: 在 800G DR8 具体样机上落点（发端/收端、并行 8 通道），不再停留在通用描述
-  - id: PQ004
-    question: 参考样机由哪些组件构成，每个组件完成什么功能？
-    in_scope: 800G DR8 参考样机的组件清单、各自功能与边界
-  - id: PQ005
-    question: 组件之间怎样衔接，分别是什么电/光/机械/热接口？
-    in_scope: 组件间四类接口的逐项落地说明
-  - id: PQ009
-    question: 每个接口用什么指标验证连接是否合格？
-    in_scope: 每类接口的可验证指标与判定口径
-  - id: PQ010
-    question: 哪些组件是通用骨干，哪些会随技术路线改变？
-    in_scope: 在 PQ004/PQ005 结论之上区分通用件与路线相关件
+objective:
+  - 在干净领域分支恢复九页读者前端，不带回 closure/state-machine。
+  - 恢复国内和海外只读日更镜像，所有发现停留在仓库外状态目录。
+  - 完成一次真实联网试跑；证明 canonical 输入未变化后才启用每日任务。
 
-question_dependencies:                # 来自 research_questions.yaml，不可绕过
-  PQ002: [PQ001]
-  PQ004: [PQ002, PQ003]
-  PQ005: [PQ002, PQ004]
-  PQ009: [PQ005]
-  PQ010: [PQ004]
+execution_order:
+  - 1_restore_nine_page_frontend
+  - 2_restore_read_only_daily_mirrors
+  - 3_run_live_2026_09_04_trial
+  - 4_enable_daily_schedule_after_canonical_proof
 
-execution_prerequisites:
-  - 用户把 workpack.status 改为 approved_and_started；prepared_not_started 不得开工。
-  - corpus/annual 与 corpus/annual-2024 在当前 worktree 可读（可为 Git-ignored 本地软链接，但不得提交语料副本或链接）。
-  - 开工前四个机器门能在当前环境运行；若因语料不可见失败，先停止并报告环境缺口，不修改校验器绕过。
+reader_visible_deliverables:
+  - out/光模块知识体系/index.html
+  - out/光模块知识体系/07-decision-dossier.html
+  - out/光模块知识体系/08-concept-primer.html
+  - 仓库外 daily-state 的国内日报、海外候选报告和统一索引
 
-reference_sample_boundary:
-  kind: 标准定义的 800GBASE-DR8 可插拔模块架构类，不预设某家厂商内部 BOM
-  pq003_handling: 本工作包读取既有 PQ003 候选以限定样机边界，但不宣称 PQ003 已完成，也不晋升具名产品结论
-  stop_when: 若组件或接口结论必须依赖某个具名 SKU 的未公开内部结构，停止并向用户升级，不用行业通用结构代替产品事实
-
-# ---- 2. 读者可看到的交付物 ----
-reader_visible_deliverable:
-  target: >
-    一名不熟悉的读者读完能说清：一只 800G DR8 光模块由哪些组件组成、它们怎样衔接、
-    每类接口用什么指标判合格、以及哪些部分会随技术路线改变。
-  artifacts:
-    - docs/research/om-phys-001/chain-draft.md        # 读者可读的链式说明（先于 canonical）
-    - docs/research/om-phys-001/kn-append-candidates.yaml  # append-ready KN 草案（未授权不入 canonical）
-    - site/optical-module/sections/*.html             # 读者页面对应章节更新（措辞与结构，不新造页面）
-  canonical_writes:
-    knowledge.yaml: 仅在用户明确授权后追加 KN；未授权则停在草案
-
-# ---- 3. 允许写入路径（写别的路径前停止并升级）----
 allowed_write_paths:
-  - docs/research/om-phys-001/**
   - docs/control/ACTIVE_WORKPACK.yaml
   - docs/control/PARKING_LOT.md
-  - knowledge.yaml                    # 需用户显式授权，且只追加 KN
-  - site/optical-module/sections/**   # 读者可见措辞/章节
-  - out/**                            # 仅由 render.py 生成，禁止手改
-  - tests/**                          # 仅当契约/读者措辞变更直接需要时
+  - docs/plans/2026-09-domestic-daily-mirror-contract.md
+  - docs/plans/2026-09-overseas-event-daily-mirror-contract.md
+  - docs/research/decision-dossier-01-ai-fabric-placement-v1.yaml
+  - docs/research/npo-cpo-serviceability-matrix-seeds-v1.yaml
+  - docs/research/pi-packages/2026-08-31-q-mid-01-retimed-vs-lpo-v1/system-power-latency-primary.md
+  - docs/research/pi-packages/2026-08-31-q-up-05-npo-cpo-boundaries-v1/adjudication.md
+  - site/optical-module/**
+  - tools/site/**
+  - domestic_daily/**
+  - daily_intelligence/**
+  - calls/DAILY-DISCOVERY.md
+  - calls/daily_discovery.py
+  - calls/http_discovery.py
+  - calls/discovery_config.json
+  - calls/fixtures/daily_discovery/**
+  - calls/tests/test_daily_discovery.py
+  - calls/tests/test_http_discovery.py
+  - tests/test_domestic_daily.py
+  - tests/test_daily_intelligence.py
+  - tests/site/**
+  - README.md
+  - out/**
+  - /Users/jowang/Downloads/workflow-rehearsal-daily-state/**
 
-# ---- 4. 读取范围 ----
 read_scope:
   allowed:
     - AGENTS.md
     - docs/control/**
-    - research_questions.yaml
+    - README.md
+    - site/optical-module/**
+    - tools/site/**
     - knowledge.yaml
+    - points.csv
+    - triage.csv
     - route_bom.csv
-    - tree.yaml
-    - corpus/**                       # 一手语料（年报/招股书/标准/公开规格）
-    - refs/**                         # 默认只读参考，文件数 ≤8
-    - docs/research/knowledge-append-candidate-pq00{1,2,3}-v1.yaml   # 既有候选，非事实源
+    - calls/*.csv
+    - corpus/_frozen.csv
+    - corpus/_restart_watchlist.csv
+    - corpus/_fetch_qa.py
+    - 用户明确指定的旧九页前端源文件
+    - 已识别的 daily-intelligence-mirror 六个有限提交及其文件
   forbidden:
     - archive/**
-    - 任何 closure-pilot / 结案试点材料及其状态机、回执、清单
-    - 其他分支 / 其他 worktree 的历史与提交
-    - 早期完整 agent 轨迹、raw agent output、旧会话全量日志
-    - docs/research/光模块知识体系-历史综合-v1.30.md  # 历史综合，仅当引用历史记录时才读，且不得当指令
+    - research-metacognition-lab/**
+    - closure-pilot 状态机源码、输出或报告
+    - 其他无关历史分支和完整 agent 轨迹
 
-# ---- 5. 非目标（本工作包明确不做）----
+canonical_policy:
+  writable: false
+  protected:
+    - knowledge.yaml
+    - points.csv
+    - edges.csv
+    - triage.csv
+    - route_bom.csv
+    - tree.yaml
+    - calls/*.csv
+  daily_outputs_are: mirror_or_candidate_only
+  promotion: human_review_and_new_user_authorization_required
+
 non_goals:
-  - 公司、供应商、产能、市场份额结论（属 TQ*/能力群，后续切片）
-  - 自动生成 offers_product / implements_route 主张
-  - 新增关系类型、顶层体系或 schema（架构预算为 0）
-  - 材料与结构（PQ006）、制造工序（PQ007）、设备（PQ008）的深挖
-  - 跨体系 Why 桥（WQ*）——待物理侧与路线侧各自有材料后再议
-  - 任何状态机、自动 close/reopen、回执、清单、快照血统或取代引擎
-  - 用“测试通过”替代“问题已回答”
+  - 新增或恢复通用状态机、自动 close/reopen、receipt、snapshot lineage
+  - 自动晋升任何国内或海外候选
+  - 自动生成 offers_product 或 implements_route
+  - 开始 OM-PHYS-001 领域研究
+  - 把测试通过表述为领域问题已完成
 
-# ---- 6. 验收标准（领域判据，不是机器判据）----
 acceptance_criteria:
-  - PQ004 给出 800G DR8 参考样机的组件清单，每个组件的功能与边界有锚；无锚部分标 UNKNOWN 并写明缺什么。
-  - PQ005 给出组件间接口清单，每条标明电/光/机械/热四类之一及对接双方。
-  - PQ009 对 PQ005 的每类接口给出可验证指标与判定口径；指标不可得时显式标 blocked，不得用邻证替代。
-  - PQ002 把电→光→电功能链落到该样机的具体部件与通道数上，不保留纯通用描述。
-  - PQ010 在 PQ004/PQ005 结论上区分通用骨干件与随路线改变件，并给出区分依据。
-  - 每条结论标注类型：事实 / 派生 / 候选；派生须写出推导，候选须写明待授权。
-  - 机器门全绿：scan.py --check、render.py --verify、participation.py --check、-m calls check。
-  - 未经用户授权，canonical 写入数为 0；草案以 append-ready 形式停在 docs/research/om-phys-001/。
+  - 前端 manifest 为 9 页、27 章节，且读者页面不引用旧“当前任务控制文稿”。
+  - 九页前端构建前后 canonical 指纹不变，站点测试和本地链接检查通过。
+  - 国内镜像只写仓库外 state root；源仓库受保护指纹前后相同。
+  - 海外镜像只写仓库外 staging/daily；promoted=0，calls canonical 前后相同。
+  - 统一日更输出能区分成功、部分失败、缺端点和候选状态。
+  - 真实联网试跑完成；失败端点被记录但不会触发 canonical 写入。
+  - 仅在上述不变量成立后创建每日自动任务；无实质增量时静默。
+  - scan.py --check、render.py --verify、participation.py --check、python -m calls check 全绿。
 
-# ---- 7. 架构预算：0 ----
 architecture_budget:
   new_relation_types: []
-  new_top_level_systems: []
-  new_schema_fields: []
-  new_engines: []
-  note: >
-    任何一项变非空都必须先过 PROJECT_CHARTER 第 5 节四闸（两个真实切片被阻塞 / 生产数据在用 /
-    替代既存人工步骤或实现 / 读者可见结论所必需），四闸全过再交用户裁决；否则只写 PARKING_LOT。
+  new_state_machines: []
+  new_canonical_schemas: []
+  restored_modules:
+    - nine_page_reader
+    - domestic_daily_read_only_mirror
+    - overseas_daily_read_only_discovery
+    - daily_intelligence_assembler
 
-# ---- 8. 停止 / 升级条件 ----
 stop_and_escalate:
-  - 需要回答 PQ002/PQ004/PQ005/PQ009/PQ010 之外的问题
-  - 需要写 allowed_write_paths 之外的路径
-  - 需要新增关系类型、顶层体系、schema 或引擎
-  - 需要读 read_scope.forbidden 中的材料才能继续
-  - 参考样机的一手证据不足以支撑组件/接口清单（此时标 blocked 并停止，不用邻证凑数）
-  - 需要把候选晋升为 canonical 但用户尚未授权
-  - 用户指令与本工作包或 PROJECT_CHARTER 冲突
-
-# ---- 9. 语义提醒（与 research_questions.yaml 的 completion_semantics 同口径）----
-completion_semantics:
-  linked_kn_or_why_means: 已有材料
-  completion_means: 人工复核并由用户确认，不是机器判定
-  forbidden_phrasing: [已覆盖, 已完成, 已回答]   # 用于描述问题状态时
-  required_phrasing: [已有材料]
+  - 任一日更命令修改 canonical 或 tracked source files
+  - 九页前端需要 closure/state-machine 才能构建
+  - 需要自动晋升候选
+  - 需要删除旧救援工作区或远端分支
+  - 真实抓取要求凭证、验证码或绕过访问控制

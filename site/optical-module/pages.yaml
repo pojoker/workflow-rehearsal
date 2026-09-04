@@ -1,8 +1,8 @@
 site:
   title: 光模块知识体系
   edition: 模块化重构版
-  updated_at: 2026-08-31
-  canonical_status: 尚未写入正式知识库
+  updated_at: 2026-09-04
+  canonical_status: KN008–KN010 已整批晋升；其余候选仍未写入
 
 pages:
   - id: foundation
@@ -57,4 +57,22 @@ pages:
     title: 当前知道什么，还缺什么
     question: 问题如何继续生长，证据如何复核
     description: 集中放置确定性说明、问题树、来源台账和边界审计，不打断正文阅读。
-    sections: [status, questions, sources, audit]
+    sections: [status, candidate-foundation, questions, sources, audit]
+
+  - id: decision-dossier
+    file: 07-decision-dossier.html
+    number: "07"
+    nav: 决策卷宗
+    title: 哪些条件会改变 Front-panel、NPO、CPO 的相对价值
+    question: 先定放置，再定电职责；什么时候 Pareto 前沿会反转
+    description: 用同一 AI fabric 服务目标组织约束、责任迁移、候选路线、反证和 UNKNOWN，形成第一个条件化决策产品。
+    sections: [decision-dossier-01]
+
+  - id: concept-primer
+    file: 08-concept-primer.html
+    number: "08"
+    nav: 名词入门
+    title: Front-panel、NPO、CPO 与 Pareto 到底是什么意思
+    question: 不认识专业名词，也能读懂决策卷宗
+    description: 用位置示意图、白话类比和最小词典解释光学放置、电职责、Pareto、硬约束、故障域、MTTR 与 TCO。
+    sections: [placement-primer, decision-glossary]
