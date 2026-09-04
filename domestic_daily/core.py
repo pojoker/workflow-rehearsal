@@ -164,7 +164,10 @@ class DailyMirror:
             if row.get("状态") in ("生产中", "在建"):
                 codes.update(c for c, n in names.items() if n == row.get("公司"))
         codes.update(r["代码"] for r in self.watch if r.get("车道") == "日更" and r.get("代码"))
-        return sorted(codes)
+        # This module talks only to mainland disclosure/Q&A adapters. The
+        # shared frozen universe also contains overseas identifiers, which
+        # belong to calls.daily_discovery and must not reach these adapters.
+        return sorted(code for code in codes if re.fullmatch(r"\d{6}", code))
 
     def _protected_fingerprint(self):
         digest = hashlib.sha256()

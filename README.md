@@ -95,7 +95,7 @@ HTML 保持单一读者页面：`route_bom.csv` 提供 800G DR8 / 1.6T DR8 / 400
 
 ## 国内与海外只读日更
 
-`domestic_daily`、`calls.daily_discovery` 和 `daily_intelligence` 构成三段式日更模块：前两段只读取领域账本并把原始增量或候选写到仓库外状态目录，第三段只组装读者入口。它们不会修改根级 canonical、`calls/*.csv` 或 `calls/out/`，也不会自动晋升候选。
+`domestic_daily`、`calls.daily_discovery` 和 `daily_intelligence` 构成三段式日更模块：前两段只读取领域账本并把原始增量或候选写到仓库外状态目录，第三段只组装读者入口。国内 adapter 只查询六位 A 股代码，共享宇宙中的海外标识由海外模块处理。它们不会修改根级 canonical、`calls/*.csv` 或 `calls/out/`，也不会自动晋升候选。
 
 ```bash
 # 国内：投关记录、互动问答、公告和机械召回差分

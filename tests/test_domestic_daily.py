@@ -1,4 +1,5 @@
 import json
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -43,6 +44,8 @@ class MirrorTests(unittest.TestCase):
         state, result = self.run_mirror(client)
         self.assertIn("300308", result["manifest"]["watched_codes"])
         self.assertIn("600114", result["manifest"]["watched_codes"])
+        self.assertNotIn("AAOI", result["manifest"]["watched_codes"])
+        self.assertTrue(all(re.fullmatch(r"\d{6}", code) for code in result["manifest"]["watched_codes"]))
         self.assertTrue((state / "daily/2026-09-01.txt").exists())
 
     def test_qa_union_does_not_shrink_and_fixture_filters(self):
